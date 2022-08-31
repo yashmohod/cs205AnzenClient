@@ -8,7 +8,7 @@ def index():
     return 
 
 
-@app.route("/login/<email>?<password>")
+@app.route("/login")
 def login():
     return 
 
