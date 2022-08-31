@@ -1,11 +1,12 @@
 from flask import Flask, jsonify
 
 app = Flask(__name__)
-
+# barebones
 
 @app.route("/")
 def index():
     return 
+
 
 @app.route("/login/<email>?<password>")
 def login():
