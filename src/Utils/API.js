@@ -1,7 +1,7 @@
 export async function get(url) {
     try {
         let response = await fetch(url)
-        return response
+        return response.json()
     } catch {
         console.log("Error getting data")
     }

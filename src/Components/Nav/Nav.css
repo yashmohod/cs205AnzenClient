@@ -1,0 +1,29 @@
+.nav {
+
+}
+
+.ithaca-logo-container {
+    width: 100%;
+    height: 100%;
+}
+
+.ithaca-logo {
+    width: 100%;
+}
+
+.logout-logo-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+}
+
+.logout-logo {
+    width: 30px;
+    height: 30px;
+}
+
+.logout-logo:hover {
+    cursor: pointer;
+}

@@ -1,12 +1,14 @@
-import React, { Component, useState } from 'react'
+import React, { Component, useEffect, useState } from 'react'
 import SimpleLoginForm from 'simple-login-form'
 import 'simple-login-form/dist/index.css'
 import { API_URL, get, post } from '../../Utils/API'
 import './LoginForm.css'
+import IthacaLogo from '../../Images/logo.png'
 
 //'linear-gradient(#e66465, #9198e5)'
 //linear-gradient(#1f87ab, #004961 50%, #004961 90%);
-export default function LoginForm({setLoggedIn}) {
+export default function LoginForm({setLoggedIn, setLoggedInUser}) {
+
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
@@ -19,23 +21,31 @@ export default function LoginForm({setLoggedIn}) {
     }
 
     async function loginHandler(e) {
+      //if token is valid, auto log the user in
+      if (localStorage.getItem("token") === "true") {
+        setLoggedIn(true)
+      }
       e.preventDefault()
       let response = await post(API_URL + "/login",  {email: email, password: password})
       if (response.message === "success") {
         setLoggedIn(true)
+        setLoggedInUser(response.user)
+        localStorage.setItem("token", response.token)
       } else {
         setLoggedIn(false)
       }
     }
 
+    useEffect((e) => {
+      loginHandler(e)
+    }, [])
+ 
       return (
             <div className="form p-5">
-                <div className="ithaca-logo-container">
-                    <img src="https://lh3.googleusercontent.com/Fqzo91UwOrRgzU7a3p8UT823rNP8nZnrYsSD7QqaFplnEWpp5LRL0D9roG7pP2Na9WGi4MarbS5DM2JOemCEwBo2cQ" alt="" className="ithaca-logo"/>
+                <div className="ithaca-logo-login-container">
+                    <img src={IthacaLogo} alt="" className="ithaca-logo-login"/>
                 </div>
                 <form className='m-5'>
-                  
-                    
                     <h1>Access Page</h1>
                      <div class="mb-3">
                        <label for="exampleInputEmail1" class="form-label d-flex justify-content-start">Email address</label>

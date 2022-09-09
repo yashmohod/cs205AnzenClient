@@ -3,14 +3,14 @@
     border-radius: 15px;
 }
 
-.ithaca-logo-container {
+.ithaca-logo-login-container {
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.ithaca-logo {
+.ithaca-logo-login {
     width: 50%;
     height: 100%;
 }
