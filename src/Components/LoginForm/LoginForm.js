@@ -7,8 +7,7 @@ import IthacaLogo from '../../Images/logo.png'
 
 //'linear-gradient(#e66465, #9198e5)'
 //linear-gradient(#1f87ab, #004961 50%, #004961 90%);
-export default function LoginForm({setLoggedIn, setLoggedInUser}) {
-
+export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin}) {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
@@ -20,21 +19,23 @@ export default function LoginForm({setLoggedIn, setLoggedInUser}) {
       setPassword(e.target.value)
     }
 
+    
+ 
     async function loginHandler(e) {
-      //if token is valid, auto log the user in
-      if (localStorage.getItem("token") === "true") {
-        setLoggedIn(true)
-      }
+      autoLogin()
       e.preventDefault()
       let response = await post(API_URL + "/login",  {email: email, password: password})
-      if (response.message === "success") {
+      var tokenVerification = await post(API_URL + "/validate-token", {token: response.token})
+
+      if (tokenVerification.message === "verified") {
         setLoggedIn(true)
-        setLoggedInUser(response.user)
+        setLoggedInUser(tokenVerification.user)
         localStorage.setItem("token", response.token)
       } else {
         setLoggedIn(false)
+        setLoggedInUser(null)
       }
-    }
+   }
 
     useEffect((e) => {
       loginHandler(e)
@@ -59,8 +60,6 @@ export default function LoginForm({setLoggedIn, setLoggedInUser}) {
                      <button type="submit" class="btn btn-primary" onClick={(e) => loginHandler(e)}>Login</button>
                     
                 </form>
-                <a href="">Forgot password?</a>
-                <p>No account? <a href="">Sign Up</a></p> 
             </div>
       )
 }

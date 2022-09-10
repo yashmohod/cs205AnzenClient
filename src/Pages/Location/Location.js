@@ -1,20 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Nav from "../../Components/Nav/Nav";
 import './Location.css'
+import {AgGridReact} from 'ag-grid-react';
+import 'ag-grid-community/styles//ag-grid.css';
+import 'ag-grid-community/styles//ag-theme-alpine.css';
 
 
-
-export default function Location() {
+export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
+    const gridRef = useRef()
     const [rowData, setRowData] = useState([
-        {make: "Toyota", model: "Celica", price: 35000},
-        {make: "Ford", model: "Mondeo", price: 32000},
-        {make: "Porsche", model: "Boxster", price: 72000}
+        {location: "Bogart"},
+        {location: "West Tower"},
+        {location: "East Tower"},
+        {location: "Rowland"},
+        {location: "Eastman"},
+        {location: "Terrace 9"}
     ]);
 
+    function rowDeleteHandler() {
+        const selectedRow = gridRef.current.api.getSelectedRows()
+
+        console.log(selectedRow)
+
+    }
+
     const [columnDefs, setColumnDefs] = useState([
-        {field: 'make'},
+        {field: 'location', editable: true,  checkboxSelection: true},
         {field: 'model'},
-        {field: "'price"}
+        {field: "'price"},
     ]);
     const dorms = [
         {location: "Bogart"},
@@ -36,6 +49,9 @@ export default function Location() {
         setNewLocation(e.target.value)
     }
 
+    useEffect(() => {
+        autoLogin()
+    }, [])
 
 /*
         {locations.map((item) => {
@@ -52,7 +68,7 @@ export default function Location() {
 
     return (
         <div>
-            <Nav/>
+             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
             <h1>Add Location</h1>
             <input type="text" onChange={(e) => locationChangeHandler(e)}/>
             <button onClick={() => addLocationHandler()}>Add</button>
@@ -66,8 +82,22 @@ export default function Location() {
                 )
                 
             })}
+            <div
+				className="ag-theme-alpine"
+				style={{
+					height: '500px',
+					width: '100vw'
+				}}
+			>
+                
+				<AgGridReact
+                    ref={gridRef}
+					columnDefs={columnDefs}
+					rowData={rowData}>
+				</AgGridReact>
+			</div>
 
-           
+            <button onClick={() => rowDeleteHandler()}>Delete</button>
         </div>
     )
 }

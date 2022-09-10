@@ -7,18 +7,27 @@ import Dashboard from './Pages/Dashboard/Dashboard';
 import Location from './Pages/Location/Location';
 import { Routes, Route, Link } from "react-router-dom";
 import Incidents from './Pages/Incidents/Incidents';
+import { post } from './Utils/API';
+import { API_URL } from './Utils/API';
 
 function App() {
-  const [loading, setLoading] = useState(true)
   const [loggedIn, setLoggedIn] = useState(false)
   const [loggedInUser, setLoggedInUser] = useState(null)
 
-  useEffect(() => {
+  async function autoLogin() {
+    var tokenVerification
+    var storedToken = localStorage.getItem("token")
 
-    setTimeout(() => {
-      setLoading(false)
-    }, 2000)
-  }, [])
+    if (storedToken !== null) {
+      tokenVerification = await post(API_URL + "/validate-token", {token: storedToken})
+      if (tokenVerification.message === "verified") {
+        setLoggedIn(true)
+        setLoggedInUser(tokenVerification.user)
+      }
+    }
+  }
+
+
 /*
 
 {loggedIn ? <Dashboard loggedIn={loggedIn} setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/> :  <Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} setLoggedInUser={setLoggedInUser}/>}          
@@ -27,9 +36,9 @@ function App() {
   return (
     <div className="App">
         <Routes>
-          <Route path="/" element={loggedIn ? <Dashboard loggedIn={loggedIn} setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/> :  <Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} setLoggedInUser={setLoggedInUser}/>} />
-          <Route path="/locations" element={<Location/>}/>
-          <Route path="/incidents" element={<Incidents/>}/>
+          <Route path="/" element={loggedIn ? <Dashboard loggedIn={loggedIn} setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/> :  <Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} setLoggedInUser={setLoggedInUser} autoLogin={() => autoLogin()}/> } />
+          <Route path="/locations" element={<Location setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
+          <Route path="/incidents" element={<Incidents setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
         </Routes>                 
     </div>
   );

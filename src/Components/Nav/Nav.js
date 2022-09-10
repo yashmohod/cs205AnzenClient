@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
+import { API_URL } from "../../Utils/API";
 import './Nav.css'
 export default function Nav({setLoggedIn, loggedInUser}) {
 
 
     function logoutUserHandler() {
         localStorage.removeItem("token")
+        document.location.replace("/")
         setLoggedIn(false)
     }
 
@@ -21,7 +23,8 @@ export default function Nav({setLoggedIn, loggedInUser}) {
                             <div className="col-3 col-md-2"></div>
                             <div className="col-2 col-md-5">
                                 <div className="logout-logo-container">
-                                    <p className="m-2">{loggedInUser}</p>
+                                { loggedInUser &&   <p className="m-2">{loggedInUser.email}</p>}
+                                  
                                     <img src="https://cdn-icons-png.flaticon.com/512/126/126467.png" alt="Logout" onClick={() => logoutUserHandler()} className="logout-logo"/>
                                 </div>
                             </div>
