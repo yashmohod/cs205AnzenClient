@@ -48,6 +48,7 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
                     })}
                 </div>
             </div>
+
         </div>
     )
 }
