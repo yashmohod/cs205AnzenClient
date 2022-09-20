@@ -53,18 +53,6 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
         autoLogin()
     }, [])
 
-/*
-        {locations.map((item) => {
-                return (
-                    <div>
-                        <p>{item.location}</p>
-                        <button>Edit</button>
-                    </div>
-                )
-                
-            })}
-
-*/
 
     return (
         <div>
@@ -97,7 +85,6 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
 				</AgGridReact>
 			</div>
 
-            <button onClick={() => rowDeleteHandler()}>Delete</button>
         </div>
     )
 }
