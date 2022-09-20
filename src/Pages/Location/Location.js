@@ -7,7 +7,7 @@ import 'ag-grid-community/styles//ag-theme-alpine.css';
 import { API_URL, get, post } from '../../Utils/API';
 import DeleteButton from './DeleteButton'
 import EditButton from './EditButton'
-import EditPopUp from './EditPopUp';
+
 
 
 export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
@@ -38,20 +38,21 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
                 locName = tempLocation[x].locationName;
             }
         }
-        console.log(locName);
         var locationame = String(window.prompt("Enter the updated name", locName));
+        if( locationame != "" && locationame != null &&  locationame != "null"){
 
-        let response = await post(API_URL + "/editLocation",  {id :locationId ,editedLocation:locationame,token: localStorage.getItem("token")});
+            let response = await post(API_URL + "/editLocation",  {id :locationId ,editedLocation:locationame,token: localStorage.getItem("token")});
+            getLocations();
+        }
 
-        console.log(response);
-   
-        getLocations();
+        
     }
 
 
     async function getLocations(){
         let response = await get(API_URL + "/getLocations?token=" +  localStorage.getItem("token"));
-        setRowData(response.locations);
+        tempLocation =JSON.parse(response.locations);
+        setRowData(JSON.parse(response.locations));
     }
 
   
