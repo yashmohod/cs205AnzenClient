@@ -1,87 +1,114 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {Component, useEffect, useRef, useState,useMemo } from "react";
 import Nav from "../../Components/Nav/Nav";
 import './Location.css'
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-alpine.css';
+import { API_URL, get, post } from '../../Utils/API';
+import DeleteButton from './DeleteButton'
+import EditButton from './EditButton'
+
 
 
 export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
-    const gridRef = useRef()
-    const [rowData, setRowData] = useState([
-        {location: "Bogart"},
-        {location: "West Tower"},
-        {location: "East Tower"},
-        {location: "Rowland"},
-        {location: "Eastman"},
-        {location: "Terrace 9"}
-    ]);
 
-    function rowDeleteHandler() {
-        const selectedRow = gridRef.current.api.getSelectedRows()
-
-        console.log(selectedRow)
-
-    }
-
-    const [columnDefs, setColumnDefs] = useState([
-        {field: 'location', editable: true,  checkboxSelection: true},
-        {field: 'model'},
-        {field: "'price"},
-    ]);
-    const dorms = [
-        {location: "Bogart"},
-        {location: "West Tower"},
-        {location: "East Tower"},
-        {location: "Rowland"},
-        {location: "Eastman"},
-        {location: "Terrace 9"},
-    ]
-    const [locations, setLocations] = useState(dorms)
-    const [newLocation, setNewLocation] = useState("")
-
-   function addLocationHandler() {  
-        setLocations([...locations, {location : newLocation}])
-       //setLocations([...locations, {location : newLocation}])
-   }
-
+    const [Location, setLocation] = useState("")
+    let tempLocation ;
     function locationChangeHandler(e) {
-        setNewLocation(e.target.value)
+        setLocation(e.target.value);
+      }
+
+    async function addLocationHandler(e){
+        let response = await post(API_URL + "/enterLocation",  {location: Location,token: localStorage.getItem("token")});
+        if (response["message"] =="New location was successfully entered."){
+            document.getElementById("locationInput").value = "";
+            getLocations();
+            console.log(Location+" added!")
+        }
     }
+    async function deleteLocationHandler(locationId){
+        let response = await post(API_URL + "/deleteLocation",  {id :locationId ,token: localStorage.getItem("token")});
+        console.log(response);
+        getLocations();
+    }
+    async function editLocationHandler(locationId){
+        let locName = "";
+        for(let x =0; x <tempLocation.length; x++){
+            if(tempLocation[x].id == locationId){
+                locName = tempLocation[x].locationName;
+            }
+        }
+        var locationame = String(window.prompt("Enter the updated name", locName));
+        if( locationame != "" && locationame != null &&  locationame != "null"){
+
+            let response = await post(API_URL + "/editLocation",  {id :locationId ,editedLocation:locationame,token: localStorage.getItem("token")});
+            getLocations();
+        }
+
+        
+    }
+
+
+    async function getLocations(){
+        let response = await get(API_URL + "/getLocations?token=" +  localStorage.getItem("token"));
+        tempLocation =JSON.parse(response.locations);
+        setRowData(JSON.parse(response.locations));
+    }
+
+  
+
+
+
+
+    const gridRef = useRef(); // Optional - for accessing Grid's API
+    const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
+
+    // Each Column Definition results in one Column.
+  
+    const [columnDefs, setColumnDefs] = useState([
+    {field: 'locationName'},
+    {field: 'id', 
+    headerName: '' ,
+    cellRenderer: EditButton, 
+    cellRendererParams: {
+      clicked: function(field) {
+        editLocationHandler(field);
+
+        
+      }
+    }},
+    {field: 'id',
+    headerName: '' ,
+    cellRenderer: DeleteButton, 
+    cellRendererParams: {
+      clicked: function(field) {
+        deleteLocationHandler(field)
+      }
+    }}
+    ]);
+
+    // DefaultColDef sets props common to all Columns
+    const defaultColDef = useMemo( ()=> ({
+        sortable: true
+    }));
+
+
+
+
 
     useEffect(() => {
-        autoLogin()
+        autoLogin();
+        getLocations();
     }, [])
 
-/*
-        {locations.map((item) => {
-                return (
-                    <div>
-                        <p>{item.location}</p>
-                        <button>Edit</button>
-                    </div>
-                )
-                
-            })}
-
-*/
 
     return (
         <div>
              <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
             <h1>Add Location</h1>
-            <input type="text" onChange={(e) => locationChangeHandler(e)}/>
+            <input type="text" id="locationInput" onChange={(e) => locationChangeHandler(e)}/>
             <button onClick={() => addLocationHandler()}>Add</button>
-            <h1>Locations</h1>
-            {locations.map((item) => {
-                return (
-                    <div>
-                        <p>{item.location}</p>
-                        <button>Edit</button>
-                    </div>
-                )
-                
-            })}
+            
             <div
 				className="ag-theme-alpine"
 				style={{
@@ -96,8 +123,9 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
 					rowData={rowData}>
 				</AgGridReact>
 			</div>
-
-            <button onClick={() => rowDeleteHandler()}>Delete</button>
+           
         </div>
     )
 }
+
+
