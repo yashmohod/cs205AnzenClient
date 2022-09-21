@@ -13,7 +13,8 @@ import EditButton from './EditButton'
 export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
 
     const [Location, setLocation] = useState("")
-    let tempLocation ;
+    const [locations, setLocations] = useState(null)
+    let tempLocation
     function locationChangeHandler(e) {
         setLocation(e.target.value);
       }
@@ -32,6 +33,7 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
         getLocations();
     }
     async function editLocationHandler(locationId){
+        tempLocation = await getLocations()
         let locName = "";
         for(let x =0; x <tempLocation.length; x++){
             if(tempLocation[x].id == locationId){
@@ -39,9 +41,8 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
             }
         }
         var locationame = String(window.prompt("Enter the updated name", locName));
-        if( locationame != "" && locationame != null &&  locationame != "null"){
-
-            let response = await post(API_URL + "/editLocation",  {id :locationId ,editedLocation:locationame,token: localStorage.getItem("token")});
+        if( locationame != "" && locationame != null &&  locationame != "null")  {
+            await post(API_URL + "/editLocation",  {id :locationId ,editedLocation:locationame,token: localStorage.getItem("token")});
             getLocations();
         }
 
@@ -51,11 +52,9 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
 
     async function getLocations(){
         let response = await get(API_URL + "/getLocations?token=" +  localStorage.getItem("token"));
-        tempLocation =JSON.parse(response.locations);
-        setRowData(JSON.parse(response.locations));
+        setRowData(response.locations);
+        return response.locations
     }
-
-  
 
 
 
