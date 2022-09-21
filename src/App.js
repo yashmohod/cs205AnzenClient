@@ -5,7 +5,7 @@ import Login from './Pages/Login/Login';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Dashboard from './Pages/Dashboard/Dashboard';
 import Location from './Pages/Location/Location';
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, Navigate} from "react-router-dom";
 import Incidents from './Pages/Incidents/Incidents';
 import { post } from './Utils/API';
 import { API_URL } from './Utils/API';
@@ -34,7 +34,7 @@ function App() {
 
 {loggedIn ? <Dashboard loggedIn={loggedIn} setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/> :  <Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} setLoggedInUser={setLoggedInUser}/>}          
 */
-
+//<Route path='/sasp-eval-for-trainee' element={() => { window.location.href = 'https://google.com'; return null;} }/>
   return (
     <div className="App">
         <Routes>
