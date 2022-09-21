@@ -7,8 +7,7 @@ import 'ag-grid-community/styles//ag-theme-alpine.css';
 import { API_URL, get, post } from '../../Utils/API';
 import DeleteButton from './DeleteButton'
 import EditButton from './EditButton'
-
-
+import { Button, Form } from "react-bootstrap";
 
 export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
 
@@ -102,19 +101,24 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
 
 
     return (
-        <div>
+        <div className="location-page">
              <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
             <h1>Add Location</h1>
-            <input type="text" id="locationInput" onChange={(e) => locationChangeHandler(e)}/>
-            <button onClick={() => addLocationHandler()}>Add</button>
-            
-            <div
-				className="ag-theme-alpine"
-				style={{
-					height: '500px',
-					width: '100vw'
-				}}
-			>
+            <div className="container-fluid m-5">
+                <div className="row">
+                    <div className="col-12">
+                        <Form className="location-form">
+                            <Form.Control type="text" placeholder="Enter new location" onChange={(e) => locationChangeHandler(e)}  id="locationInput"/>
+                            <Button onClick={() => addLocationHandler()}>Add</Button>
+                        </Form>
+                    </div>
+                </div>
+            </div>
+          
+
+       
+        
+            <div className="ag-theme-alpine location-grid">
                 
 				<AgGridReact
                     ref={gridRef}
