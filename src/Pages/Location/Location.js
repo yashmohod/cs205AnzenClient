@@ -52,6 +52,7 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
     async function getLocations(){
         let response = await get(API_URL + "/getLocations?token=" +  localStorage.getItem("token"));
         setRowData(response.locations);
+        console.log(response.locations)
         return response.locations
     }
 

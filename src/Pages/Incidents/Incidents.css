@@ -1,0 +1,17 @@
+.incident-page {
+    overflow-x: hidden;
+}
+
+.incident-form-container {
+    width: 100vw;
+}
+
+.incident-form {
+    display: flex;
+
+}
+
+.incident-grid {
+    height: 1000px;
+    width: 100%;
+}
