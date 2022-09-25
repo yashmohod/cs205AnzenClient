@@ -1,13 +1,22 @@
-import React, { useEffect } from "react";
+import { hover } from "@testing-library/user-event/dist/hover";
+import React, { useEffect, useState } from "react";
 import { API_URL } from "../../Utils/API";
 import './Nav.css'
 export default function Nav({setLoggedIn, loggedInUser}) {
-
+    const [hovered, setHovered] = useState(false)
 
     function logoutUserHandler() {
         localStorage.removeItem("token")
         document.location.replace("/")
         setLoggedIn(false)
+    }
+
+    function changeHoverFalse() {
+        setHovered(false)
+    }
+
+    function changeHoverTrue() {
+        setHovered(true)
     }
 
 
@@ -24,8 +33,10 @@ export default function Nav({setLoggedIn, loggedInUser}) {
                             <div className="col-2 col-md-5">
                                 <div className="logout-logo-container">
                                 { loggedInUser &&   <p className="m-2">{loggedInUser.email}</p>}
-                                  
-                                    <img src="https://cdn-icons-png.flaticon.com/512/126/126467.png" alt="Logout" onClick={() => logoutUserHandler()} className="logout-logo"/>
+                                    <div onMouseEnter={() => changeHoverTrue()} onMouseLeave={() => changeHoverFalse()} onClick={() => logoutUserHandler()}>
+                                        {hovered ? <img src="https://cdn-icons-png.flaticon.com/512/4043/4043198.png" alt="Logout" onClick={() => logoutUserHandler()} className="logout-logo"/>   : <img src="https://cdn-icons-png.flaticon.com/512/126/126467.png" alt="Logout"  className="logout-logo"/>}
+                                    </div>
+                                 
                                 </div>
                             </div>
                         </div>
