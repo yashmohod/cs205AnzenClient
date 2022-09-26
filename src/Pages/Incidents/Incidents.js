@@ -93,6 +93,7 @@ export default function Incidents({setLoggedIn, loggedInUser, autoLogin}) {
                 </div>
             </div>
 */
+
     return (
         <div className="incident-page">
              <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
