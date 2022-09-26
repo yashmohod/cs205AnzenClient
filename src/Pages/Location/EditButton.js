@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {Button} from 'react-bootstrap'
 
 export default class EditButton extends Component {
    
@@ -11,7 +12,7 @@ export default class EditButton extends Component {
     }
     render() {
       return (
-        <button onClick={this.btnClickedHandler}>Edit</button>
+        <Button onClick={this.btnClickedHandler} className="p-1">Edit</Button>
       )
     }
   }

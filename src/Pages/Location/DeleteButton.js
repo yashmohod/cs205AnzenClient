@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {Button} from 'react-bootstrap'
 
 export default class DeleteButton extends Component {
    
@@ -11,7 +12,7 @@ export default class DeleteButton extends Component {
     }
     render() {
       return (
-        <button onClick={this.btnClickedHandler}>Delete</button>
+        <Button onClick={this.btnClickedHandler} variant="danger" className="p-1">Delete</Button>
       )
     }
   }

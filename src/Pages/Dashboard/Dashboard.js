@@ -1,16 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Card from "../../Components/Card/Card";
-import { API_URL } from "../../Utils/API";
 import Nav from "../../Components/Nav/Nav";
 import { Link } from "react-router-dom";
 import './Dashboard.css'
+import { API_URL, post } from "../../Utils/API";
 
 export default function({loggedIn, setLoggedIn, loggedInUser}) {
     const [clockin, setClockin] = useState(false)
 
-    function startClockin() {
-        setClockin(!clockin)
+    async function clockIn() {
+        let response = await post(API_URL + "/clockIn", {token: localStorage.getItem("token")})
+        setClockin(true) 
     }
+
+    async function clockOut() {
+        let response = await post(API_URL + "/clockOut", {token: localStorage.getItem("token")})
+        setClockin(false)
+    }
+
+    useEffect(() => {
+        const checkClockinStatus = async () => {
+            let response = await post(API_URL + "/checkClockInStatus", {token: localStorage.getItem("token")})
+            if (response.clock_in === true) {
+                setClockin(true)
+            } else {
+                setClockin(false)
+            }
+        }
+        checkClockinStatus()
+    }, [])
 
     const features = 
     [{title: "Daily", description:"Enter your report", url: "/daily"},
@@ -32,8 +50,8 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
             <div className="features container-fluid mt-5 ">
                 <div className="row">
-                    <div className="col-12" onClick={() => startClockin()}>
-                        {clockin ?  <Card title="Clock Out" description="End your work shift"/> : <Card title="Clock In" description="Start your work shift"/> }
+                    <div className="col-12">
+                        {clockin ?  <div onClick={() => clockOut()}><Card title="Clock Out" description="End your work shift"/></div> : <div onClick={() => clockIn()}><Card title="Clock In" description="Start your work shift"/></div> }
                     </div>
                 </div>
                 <div className="row  justify-content-center"  >
