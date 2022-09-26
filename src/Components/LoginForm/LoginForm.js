@@ -31,12 +31,18 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin}) {
         setLoggedIn(true)
         setLoggedInUser(tokenVerification.user)
         localStorage.setItem("token", response.token)
+        setOrgNPos(response.token)
       } else {
         setLoggedIn(false)
         setLoggedInUser(null)
       }
    }
-
+   async function setOrgNPos(){
+    const org = (await post(API_URL + "/getOrganization", {token: localStorage.getItem("token")}))
+    const pos = (await post(API_URL + "/getPosition", {token: localStorage.getItem("token")}))
+    localStorage.setItem("organization", org["organization"])
+    localStorage.setItem("position", pos["position"])
+   }
     useEffect((e) => {
       loginHandler(e)
     }, [])

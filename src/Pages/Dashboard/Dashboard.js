@@ -7,6 +7,41 @@ import { API_URL, post } from "../../Utils/API";
 
 export default function({loggedIn, setLoggedIn, loggedInUser}) {
     const [clockin, setClockin] = useState(false)
+    const org = localStorage.getItem("organization")
+    const pos = localStorage.getItem("position")
+    let accessLevel =null;
+
+    /*  
+    Sasp access level
+
+    Probationary Member =0
+    Junior Member =1
+    Senior Member =2
+    Executive Board Member =3
+    admin = 4
+
+     */
+    if(org=='SASP'){
+        if(pos == "Probationary Member"){
+            accessLevel =0;
+        }
+        else if(pos == "Junior Member"){
+            accessLevel =1;
+        }
+        else if(pos == "Senior Member"){
+            accessLevel =2;
+        }
+        else if(pos == "Executive Board Member"){
+            accessLevel =3;
+        }else if(pos == "admin"){
+            accessLevel = 4
+        }
+        else{
+            accessLevel= null
+        }
+        
+    }
+
 
     async function clockIn() {
         let response = await post(API_URL + "/clockIn", {token: localStorage.getItem("token")})
@@ -31,43 +66,47 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
     }, [])
 
     const features = 
-    [{title: "Daily", description:"Enter your report", url: "/daily"},
-     {title: "Record", description:"View all records", url: "/record"},
-     {title: "Referrals", description:"View all referrals", url: "/referrals"},
-     {title: "Senior Eval", description:"Senior Evaluation for Probationary Members", url: "/senior-eval-for-proba-member"},
-     {title: "Senior Eval", description:"Senior Evaluation for Junior Member", url: "/senior-eval-for-junior-member"},
-     {title: "Trainee Eval", description:"SASP Evaluation for a Trainee", url: "/sasp-eval-for-trainee"},
-     {title: "Incidents", description:"", url: "/incidents"},
-     {title: "Locations", description:"", url: "/locations"},
-     {title: "Employee Accounts", description:"", url: "/employee-accounts"},
-     {title: "Register Accounts", description:"", url: "/register-accounts"},
-     {title: "Change Passwords", description:"", url: "/change-passwords"},
+    [{org:"SASP",accesslevl:0,title: "Daily", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/daily"},
+     {org:"SASP",accesslevl:0,title: "Record", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/record"},
+     {org:"SASP",accesslevl:0,title: "Referrals", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/referrals"},
+     {org:"SASP",accesslevl:2,title: "Senior Evaluation for Probationary Members", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/senior-eval-for-proba-member", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSdhKZICw5BhHMp1ubDEJlFZEeVRVEOnx5iPDQieziG-fRl_vA/viewform"},
+     {org:"SASP",accesslevl:2,title: "Senior Evaluation for Junior Member", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/senior-eval-for-junior-member", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSc1Ihg_MKrxUjs37x1tjAtun0zCW7UznTrUbUzOpL0N25Oj_Q/viewform"},
+     {org:"SASP",accesslevl:0,title: "SASP Evaluation for a Trainee", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/sasp-eval-for-trainee", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSdoUWDh2nKgE8lSAvnRFQb0llbqCiYhjVBMDmkXhJQsP2d35Q/viewform"},
+     {org:"SASP",accesslevl:4,title: "Incidents", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/incidents"},
+     {org:"SASP",accesslevl:4,title: "Locations", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/locations"},
+     {org:"SASP",accesslevl:3,title: "Employee Accounts", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/employee-accounts"},
+     {org:"SASP",accesslevl:4,title: "Register Accounts", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/register-accounts"},
+     {org:"SASP",accesslevl:4,title: "Change Passwords", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/change-passwords"},
     ]
 
     return (
     
         <div>
-            <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
-            <div className="features container-fluid mt-5 ">
-                <div className="row">
-                    <div className="col-12">
-                        {clockin ?  <div onClick={() => clockOut()}><Card title="Clock Out" description="End your work shift"/></div> : <div onClick={() => clockIn()}><Card title="Clock In" description="Start your work shift"/></div> }
-                    </div>
+        <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
+        <div className="features container-fluid mt-5 ">
+            <div className="row">
+                <div className="col-12">
+                    {clockin ?  <div onClick={() => clockOut()}><Card title="Clock Out" description="End your work shift"/></div> : <div onClick={() => clockIn()}><Card title="Clock In" description="Start your work shift"/></div> }
                 </div>
-                <div className="row  justify-content-center"  >
-                        {features.map((item) => {
+            </div>
+            <div className="row  justify-content-center"  >
+                    {features.map((item) => {
+                        console.log(item.accesslevl)
+                        if(item.accesslevl <= accessLevel  && org == item.org){
                             return (
                                 <div className="row w-50">
                                     <Link to={item.url} className="feature-url" >
-                                        <Card title={item.title} description={item.description} style={{font:"100px"}}/>
+                                        <Card title={item.title} description={item.description} />
                                     </Link>
                                 </div>
                             )
-                        })}
-                    
-                </div>
+                        }
+                        
+                    })}
+                
             </div>
-
         </div>
+
+    </div>
     )
 }
