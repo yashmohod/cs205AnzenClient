@@ -1,7 +1,3 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable eqeqeq */
-/* eslint-disable no-unused-vars */
-/* eslint-disable import/no-anonymous-default-export */
 import React, { useEffect, useState } from "react";
 import Card from "../../Components/Card/Card";
 import Nav from "../../Components/Nav/Nav";
@@ -12,9 +8,10 @@ import { ToastContainer, toast } from 'react-toastify';
 
 export default function({loggedIn, setLoggedIn, loggedInUser}) {
     const [clockin, setClockin] = useState(false)
-    const org = localStorage.getItem("organization")
-    const pos = localStorage.getItem("position")
-    let accessLevel =null;
+    const [org,setorg] = useState(String(localStorage.getItem("organization")))
+    const [pos,setpos]= useState(String(localStorage.getItem("position")))
+    const [showFeatures,setshowFeatures] =useState(false)
+    const [accessLevel,setaccessLevel]= useState(null)
 
     function checkMessage(){
         if(!(localStorage.getItem("message") === null)){
@@ -25,36 +22,6 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
     }
     
 
-    /*  
-    Sasp access level
-
-    Probationary Member =0
-    Junior Member =1
-    Senior Member =2
-    Executive Board Member =3
-    admin = 4
-
-     */
-    if(org=='SASP'){
-        if(pos === "Probationary Member"){
-            accessLevel =0;
-        }
-        else if(pos === "Junior Member"){
-            accessLevel =1;
-        }
-        else if(pos === "Senior Member"){
-            accessLevel =2;
-        }
-        else if(pos === "Executive Board Member"){
-            accessLevel =3;
-        }else if(pos === "admin"){
-            accessLevel = 4
-        }
-        else{
-            accessLevel= null
-        }
-        
-    }
 
 
     async function clockIn() {
@@ -66,8 +33,64 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
         let response = await post(API_URL + "/clockOut", {token: localStorage.getItem("token")})
         setClockin(false)
     }
+    const ShowFeaturesElem = (props) => {
+        return (
+            <>
+            {features.map((item) => {
+                        if(item.accesslevl <= props.accessLevel  && props.org == item.org){
+                            return (
+                                <div className="row w-50">
+                                    <Link to={item.url} className="feature-url" >
+                                        <Card title={item.title} description={item.description} />
+                                    </Link>
+                                </div>
+                            )
+                        }
+                        
+                    })}
+            </>
+        )}
+        function setFeatures(){
+               /*  
+            Sasp access level
+
+            Probationary Member =0
+            Junior Member =1
+            Senior Member =2
+            Executive Board Member =3
+            admin = 4
+
+            */
+            console.log(org)
+            console.log(pos)
+            if(org==='SASP'){
+                if(pos === "Probationary Member"){
+                    setaccessLevel(0);
+                }
+                else if(pos === "Junior Member"){
+                    setaccessLevel(1);
+                }
+                else if(pos === "Senior Member"){
+                    setaccessLevel(2);
+                }
+                else if(pos === "Executive Board Member"){
+                    setaccessLevel(3);
+                }else if(pos === "admin"){
+                    setaccessLevel(4);
+                }
+                else{
+                    setaccessLevel(null);
+                }
+                
+            }
+            console.log(accessLevel)
+            setshowFeatures(true)
+        }
 
     useEffect(() => {
+        setorg(String(localStorage.getItem("organization")))
+        setpos(String(localStorage.getItem("position")))
+        setFeatures()
         const checkClockinStatus = async () => {
             let response = await post(API_URL + "/checkClockInStatus", {token: localStorage.getItem("token")})
             if (response.clock_in === true) {
@@ -107,19 +130,8 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
                 </div>
             </div>
             <div className="row  justify-content-center"  >
-                    {features.map((item) => {
-                        if(item.accesslevl <= accessLevel  && org == item.org){
-                            return (
-                                <div className="row w-50">
-                                    <Link to={item.url} className="feature-url" >
-                                        <Card title={item.title} description={item.description} />
-                                    </Link>
-                                </div>
-                            )
-                        }
-                        
-                    })}
-                
+                    
+            { showFeatures ? <ShowFeaturesElem org={org} accessLevel={accessLevel}  /> : null }
             </div>
         </div>
 

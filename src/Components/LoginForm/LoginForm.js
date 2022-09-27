@@ -28,23 +28,29 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin}) {
       var tokenVerification = await post(API_URL + "/validate-token", {token: response.token})
 
       if (tokenVerification.message === "verified") {
+        setOrgNPos(response)
         setLoggedIn(true)
         setLoggedInUser(tokenVerification.user)
-        localStorage.setItem("token", response.token)
-        setOrgNPos(response.token)
       } else {
         setLoggedIn(false)
         setLoggedInUser(null)
+        clearOrgNPos()
       }
    }
-   async function setOrgNPos(){
-    const org = (await post(API_URL + "/getOrganization", {token: localStorage.getItem("token")}))
-    const pos = (await post(API_URL + "/getPosition", {token: localStorage.getItem("token")}))
+   async function setOrgNPos(response){
+    const org = (await post(API_URL + "/getOrganization", {token: response.token}))
+    const pos = (await post(API_URL + "/getPosition", {token: response.token}))
+    localStorage.setItem("token", response.token)
     localStorage.setItem("organization", org["organization"])
     localStorage.setItem("position", pos["position"])
    }
+   function clearOrgNPos(){
+    localStorage.removeItem("organization")
+    localStorage.removeItem("position")
+   }
     useEffect((e) => {
       loginHandler(e)
+
     }, [])
  
       return (
