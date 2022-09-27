@@ -7,7 +7,6 @@ import { API_URL, post } from "../../Utils/API";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
-// import { setAriaPosInSet } from "ag-grid-community/dist/lib/utils/aria";
 
 
 export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
@@ -84,9 +83,10 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
  
 }
 
-
+  //Working
   function inputposHandler(e){
-    //formData["position"] = position
+    formData[e.target.name] = e.target.value
+    console.log(e.target.name)
     console.log(e.target.value)
 
   }
@@ -101,12 +101,11 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
         lastName: formData.lastName,
         collegeId: formData.collegeId,
         dob: formData.dob,
-        organization: formData.organization,
+        organization:localStorage.getItem("organization"),
         position: formData.position,
         })
       console.log(response)
       if(response.message === "registered successfully"){
-        // navigate("/");
         localStorage.setItem("message", response.message);
         navigate("/");
       }
@@ -122,35 +121,21 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
     function inputChangeHandler(e) {
         setFormData({...formData,  [e.target.name] : e.target.value})
         console.log(e.target.name)
-        
-        if(e.target.name==="organization"){
-          if(e.target.value==="SASP"){
-            console.log(e.target.value)
-            setSASPshowPos(true)
-            setRESLIFEshowPos(false)
-          }
-          if(e.target.value==="RESLIFE"){
-            console.log(e.target.value)
-            setRESLIFEshowPos(true)
-            setSASPshowPos(false)
-          }
-        }
+      
 
     }
-    function clearOrgPos(){
-      document.getElementById("SASP").checked = false;
-      document.getElementById("RESLIFE").checked = false;
-      setSASPshowPos(false)
-      setRESLIFEshowPos(false)
-      
-    }
     function setpos(){
-      // const org = localStorage.getItem("organization")
-      // if(org === "SASP"){
-      //   setSASPshowPos(true)
-      //   setRESLIFEshowPos(false)
-      // }
-      setRESLIFEshowPos(true)
+      const org = localStorage.getItem("organization")
+      
+      if(org === "SASP"){
+        setSASPshowPos(true)
+        setRESLIFEshowPos(false)
+      }
+      if(org === "RESLIFE"){
+        setSASPshowPos(false)
+        setRESLIFEshowPos(true)
+      }
+
     }
 
     useEffect(() => {
@@ -198,8 +183,8 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
             <Form.Group>
               
             <Form.Label className=" d-flex justify-content-start">Position</Form.Label>
-            { SASPshowPos ? <SASPPosButton changePosition={changePosition} formData={formData}/> : null }
-            { RESLIFEshowPos ? <RESLIFEPosButton changePosition={changePosition} formData={formData}/> : null }
+            { SASPshowPos ? <SASPPosButton inputposHandler = {inputposHandler} formData={formData}/> : null }
+            { RESLIFEshowPos ? <RESLIFEPosButton  inputposHandler = {inputposHandler} formData={formData}/> : null }
         
               
             </Form.Group>
