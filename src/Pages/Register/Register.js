@@ -38,26 +38,28 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
       password: "",
       password_confirm: "",
   })
-  const [radio, setRadio] = useState("")
+
+  function changePosition(e) {
+    setFormData({...formData, position : e.target.value})
+  }
+
+  useEffect(() => 
+  {
+    console.log("Form Position")
+    console.log(formData.position)
+   
+  }
+, [formData])
+
   const SASPPosButton = (props) => {
-    const [radio, setRadio] = useState("")
 
-    const onChangeRadio = (e) => {
-      setRadio(e.target.value)
-      props.inputChangeHandler(e)
-    }
-
-    useEffect(() => {
-      // console.log("Radio")
-      // console.log(radio)
-    }, [radio])
-//onChange={(e) => inputChangeHandler(e)} 
-//nChange={(e) => onChangeRadio(e)
     return (
-      <div onChange={(e) => onChangeRadio(e)} >
-      <input type="radio" value="pos1" name="gender" /> Male
-      <input type="radio" value="Female" name="gender" /> Female
-      <input type="radio" value="Other" name="gender" /> Other
+      <div>
+        {SasporgsNpos.map((item) => {
+        return (
+          <Form.Check inline label={item.pos} value ={item.pos} name="position" type={"radio"} id={item.pos} checked={props.formData.position == item.pos} onChange={(e) => props.changePosition(e)}/>
+                )})
+        }
     </div>
 
     )
@@ -68,18 +70,24 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
 
   // )})
 }
-  const RESLIFEPosButton = (props) => (
-      RESLIFEorgsNpos.map((item) => {
-      return (
-        <Form.Check inline label={item.pos} value ={item.pos} name="position" type={"radio"} id={item.pos} onChange={ (e) => props.inputposHandler(e)}/>
-  )})
-  )
+  const RESLIFEPosButton = (props) => {
+    return (
+      <div>
+      {
+        RESLIFEorgsNpos.map((item) => {
+        return (
+            <Form.Check inline label={item.pos} value ={item.pos} name="position" type={"radio"} id={item.pos} checked={props.formData.position == item.pos} onChange={(e) => props.changePosition(e)}/>
+      )})
+      }
+      </div>
+    )
+ 
+}
 
 
   function inputposHandler(e){
     //formData["position"] = position
     console.log(e.target.value)
-    setRadio(e.target.value)
 
   }
     async function registerHandler() {
@@ -190,8 +198,8 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
             <Form.Group>
               
             <Form.Label className=" d-flex justify-content-start">Position</Form.Label>
-            { SASPshowPos ? <SASPPosButton inputChangeHandler={(e) => inputChangeHandler(e)}/> : null }
-            { RESLIFEshowPos ? <RESLIFEPosButton  inputposHandler = {inputposHandler}/> : null }
+            { SASPshowPos ? <SASPPosButton changePosition={changePosition} formData={formData}/> : null }
+            { RESLIFEshowPos ? <RESLIFEPosButton changePosition={changePosition} formData={formData}/> : null }
         
               
             </Form.Group>
