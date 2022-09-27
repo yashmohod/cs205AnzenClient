@@ -1,15 +1,29 @@
+/* eslint-disable array-callback-return */
+/* eslint-disable eqeqeq */
+/* eslint-disable no-unused-vars */
+/* eslint-disable import/no-anonymous-default-export */
 import React, { useEffect, useState } from "react";
 import Card from "../../Components/Card/Card";
 import Nav from "../../Components/Nav/Nav";
 import { Link } from "react-router-dom";
 import './Dashboard.css'
 import { API_URL, post } from "../../Utils/API";
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function({loggedIn, setLoggedIn, loggedInUser}) {
     const [clockin, setClockin] = useState(false)
     const org = localStorage.getItem("organization")
     const pos = localStorage.getItem("position")
     let accessLevel =null;
+
+    function checkMessage(){
+        if(!(localStorage.getItem("message") === null)){
+            toast.success(String(localStorage.getItem("message")));
+            console.log(localStorage.getItem("message"));
+            localStorage.removeItem("message");
+        }
+    }
+    
 
     /*  
     Sasp access level
@@ -22,18 +36,18 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
 
      */
     if(org=='SASP'){
-        if(pos == "Probationary Member"){
+        if(pos === "Probationary Member"){
             accessLevel =0;
         }
-        else if(pos == "Junior Member"){
+        else if(pos === "Junior Member"){
             accessLevel =1;
         }
-        else if(pos == "Senior Member"){
+        else if(pos === "Senior Member"){
             accessLevel =2;
         }
-        else if(pos == "Executive Board Member"){
+        else if(pos === "Executive Board Member"){
             accessLevel =3;
-        }else if(pos == "admin"){
+        }else if(pos === "admin"){
             accessLevel = 4
         }
         else{
@@ -63,6 +77,7 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
             }
         }
         checkClockinStatus()
+        checkMessage()
     }, [])
 
     const features = 
@@ -80,9 +95,11 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
     ]
 
     return (
-    
+        
         <div>
+        
         <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
+        <ToastContainer />
         <div className="features container-fluid mt-5 ">
             <div className="row">
                 <div className="col-12">
@@ -91,7 +108,6 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
             </div>
             <div className="row  justify-content-center"  >
                     {features.map((item) => {
-                        console.log(item.accesslevl)
                         if(item.accesslevl <= accessLevel  && org == item.org){
                             return (
                                 <div className="row w-50">
