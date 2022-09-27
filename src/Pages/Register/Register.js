@@ -183,8 +183,8 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
             <Form.Group>
               
             <Form.Label className=" d-flex justify-content-start">Position</Form.Label>
-            { SASPshowPos ? <SASPPosButton inputposHandler = {inputposHandler} formData={formData}/> : null }
-            { RESLIFEshowPos ? <RESLIFEPosButton  inputposHandler = {inputposHandler} formData={formData}/> : null }
+            { SASPshowPos ? <SASPPosButton changePosition = {changePosition} formData={formData}/> : null }
+            { RESLIFEshowPos ? <RESLIFEPosButton  changePosition = {changePosition} formData={formData}/> : null }
         
               
             </Form.Group>
