@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { useState , React} from "react";
+import { useState , React, useEffect} from "react";
 import Nav from "../../Components/Nav/Nav";
 import { Form, Button } from 'react-bootstrap';
 import './Register.css'
@@ -7,6 +7,7 @@ import { API_URL, post } from "../../Utils/API";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
+// import { setAriaPosInSet } from "ag-grid-community/dist/lib/utils/aria";
 
 
 export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
@@ -37,18 +38,50 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
       password: "",
       password_confirm: "",
   })
-  const SASPPosButton = () => (
-    SasporgsNpos.map((item) => {
-      return (
-        <Form.Check inline label={item.pos} value ={item.pos} name="position" type={"radio"} id={item.pos} onChange={(e) => inputChangeHandler(e)}/>
-  )})
-  )
-  const RESLIFEPosButton = () => (
+  const [radio, setRadio] = useState("")
+  const SASPPosButton = (props) => {
+    const [radio, setRadio] = useState("")
+
+    const onChangeRadio = (e) => {
+      setRadio(e.target.value)
+      props.inputChangeHandler(e)
+    }
+
+    useEffect(() => {
+      // console.log("Radio")
+      // console.log(radio)
+    }, [radio])
+//onChange={(e) => inputChangeHandler(e)} 
+//nChange={(e) => onChangeRadio(e)
+    return (
+      <div onChange={(e) => onChangeRadio(e)} >
+      <input type="radio" value="pos1" name="gender" /> Male
+      <input type="radio" value="Female" name="gender" /> Female
+      <input type="radio" value="Other" name="gender" /> Other
+    </div>
+
+    )
+  
+  //   SasporgsNpos.map((item) => {
+  //     return (
+  //       <Form.Check inline label={item.pos} value ={item.pos} name="position" type={"radio"} id={item.pos} onChange={(e) => inputChangeHandler(e)}/>
+
+  // )})
+}
+  const RESLIFEPosButton = (props) => (
       RESLIFEorgsNpos.map((item) => {
       return (
-        <Form.Check inline label={item.pos} value ={item.pos} name="position" type={"radio"} id={item.pos} onChange={(e) => inputChangeHandler(e)}/>
+        <Form.Check inline label={item.pos} value ={item.pos} name="position" type={"radio"} id={item.pos} onChange={ (e) => props.inputposHandler(e)}/>
   )})
   )
+
+
+  function inputposHandler(e){
+    //formData["position"] = position
+    console.log(e.target.value)
+    setRadio(e.target.value)
+
+  }
     async function registerHandler() {
 
       let response = await post(API_URL + "/register", {
@@ -81,6 +114,7 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
     function inputChangeHandler(e) {
         setFormData({...formData,  [e.target.name] : e.target.value})
         console.log(e.target.name)
+        
         if(e.target.name==="organization"){
           if(e.target.value==="SASP"){
             console.log(e.target.value)
@@ -88,6 +122,7 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
             setRESLIFEshowPos(false)
           }
           if(e.target.value==="RESLIFE"){
+            console.log(e.target.value)
             setRESLIFEshowPos(true)
             setSASPshowPos(false)
           }
@@ -99,8 +134,20 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
       document.getElementById("RESLIFE").checked = false;
       setSASPshowPos(false)
       setRESLIFEshowPos(false)
+      
+    }
+    function setpos(){
+      // const org = localStorage.getItem("organization")
+      // if(org === "SASP"){
+      //   setSASPshowPos(true)
+      //   setRESLIFEshowPos(false)
+      // }
+      setRESLIFEshowPos(true)
     }
 
+    useEffect(() => {
+      setpos()
+  }, [])
 
     return (
     <div>
@@ -132,26 +179,21 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
 
             </Form.Group>
 
-            <Form.Group>
+            {/* <Form.Group>
               <Form.Label className=" d-flex justify-content-start">Organization</Form.Label>
-              <>
               <Form.Check inline label="SASP" value ="SASP" name="organization" type={"radio"} id="SASP" onChange={(e) => inputChangeHandler(e)}/>
             <Form.Check inline label="ResLife" value ="RESLIFE" name="organization" type={"radio"} id="RESLIFE" onChange={(e) => inputChangeHandler(e)}/>
-              </>
+
             <Button variant="primary" type="button" onClick={() => clearOrgPos()}>Clear</Button>
-            </Form.Group>
+            </Form.Group> */}
 
             <Form.Group>
               
             <Form.Label className=" d-flex justify-content-start">Position</Form.Label>
-            { SASPshowPos ? <SASPPosButton /> : null }
-            { RESLIFEshowPos ? <RESLIFEPosButton /> : null }
+            { SASPshowPos ? <SASPPosButton inputChangeHandler={(e) => inputChangeHandler(e)}/> : null }
+            { RESLIFEshowPos ? <RESLIFEPosButton  inputposHandler = {inputposHandler}/> : null }
         
               
-
-
-
-
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="formBasicEmail">
