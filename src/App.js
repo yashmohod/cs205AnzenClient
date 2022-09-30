@@ -20,28 +20,15 @@ function App() {
     var tokenVerification
     var storedToken = localStorage.getItem("token")
 
-
     if (storedToken !== null) {
       tokenVerification = await post(API_URL + "/validate-token", {token: storedToken})
       if (tokenVerification.message === "verified") {
         setLoggedIn(true)
         setLoggedInUser(tokenVerification.user)
-        setOrgNPos()
-      }else{clearOrgNPos()}
+      }
     }
-    else{clearOrgNPos()}
   }
 
-  async function setOrgNPos(){
-    const org = (await post(API_URL + "/getOrganization", {token: localStorage.getItem("token")}))
-    const pos = (await post(API_URL + "/getPosition", {token: localStorage.getItem("token")}))
-    localStorage.setItem("organization", org["organization"])
-    localStorage.setItem("position", pos["position"])
-   }
-   function clearOrgNPos(){
-    localStorage.removeItem("organization")
-    localStorage.removeItem("position")
-   }
 
 /*
 
