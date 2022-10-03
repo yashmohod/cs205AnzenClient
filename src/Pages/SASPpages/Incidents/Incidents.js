@@ -3,12 +3,12 @@ import { useState, useEffect, useRef } from "react";
 import './Incidents.css'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Nav from "../../Components/Nav/Nav";
+import Nav from "../../../Components/Nav/Nav";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-alpine.css';
 import {Form, Button} from 'react-bootstrap'
-import { API_URL, get, post } from "../../Utils/API";
+import { API_URL, get, post } from "../../../Utils/API";
 import EditButton from '../Location/EditButton'
 import DeleteButton from '../Location/DeleteButton'
 

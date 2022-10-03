@@ -1,10 +1,10 @@
 import React, {Component, useEffect, useRef, useState,useMemo } from "react";
-import Nav from "../../Components/Nav/Nav";
+import Nav from "../../../Components/Nav/Nav";
 import './Location.css'
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-alpine.css';
-import { API_URL, get, post } from '../../Utils/API';
+import { API_URL, get, post } from '../../../Utils/API';
 import DeleteButton from './DeleteButton'
 import EditButton from './EditButton'
 import { Button, Form } from "react-bootstrap";

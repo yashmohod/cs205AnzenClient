@@ -4,9 +4,10 @@ import './App.css';
 import Login from './Pages/Login/Login';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Dashboard from './Pages/Dashboard/Dashboard';
-import Location from './Pages/Location/Location';
+import Location from './Pages/SASPpages/Location/Location';
+import Daily from "./Pages/SASPpages/Daily/Daily"
 import { Routes, Route, Link, Navigate} from "react-router-dom";
-import Incidents from './Pages/Incidents/Incidents';
+import Incidents from './Pages/SASPpages/Incidents/Incidents';
 import { post } from './Utils/API';
 import { API_URL } from './Utils/API';
 import Register from './Pages/Register/Register';
@@ -38,11 +39,16 @@ function App() {
   return (
     <div className="App">
         <Routes>
+          {/* general routes */}
           <Route path="/" element={loggedIn ? <Dashboard loggedIn={loggedIn} setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/> :  <Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} setLoggedInUser={setLoggedInUser} autoLogin={() => autoLogin()}/> } />
           <Route path="/locations" element={<Location setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/incidents" element={<Incidents setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/register-accounts" element={<Register setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/change-passwords" element={<ChangePassword setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
+
+          {/* sasp routes */}
+          <Route path="/SASPpages/daily" element={<Daily setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
+
         </Routes>                 
     </div>
   );
