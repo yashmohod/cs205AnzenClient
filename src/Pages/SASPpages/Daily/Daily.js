@@ -15,6 +15,9 @@ import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 export default function Daily({setLoggedIn, loggedInUser, autoLogin}) {
   <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
   const navigate = useNavigate();
+  let referals=[];
+  let referalsCount =0;
+  const [showReferals,setshowReferals]=useEffect(false);
 
   const [formData, setFormData] = useState({
     incident: "",
@@ -38,6 +41,26 @@ function saspReportSumbitHandler(){
   console.log(formData)
 }
 
+
+function ReferalsComponent(props){
+  referals.map((items)=>{
+    return(
+      items
+    )
+  })
+}
+
+function referal(props){
+  return <>
+    <Form.Label className=" d-flex justify-content-start">First name</Form.Label>
+    <Form.Control type="text" placeholder="" name="firstName" onChange={(e) => inputChangeHandler(e)}/>
+  </>
+}
+
+function addReferals(){
+  setshowReferals(true)
+  referals.push()
+}
 
 
 
@@ -89,8 +112,9 @@ function saspReportSumbitHandler(){
 
                   <Form.Label className=" d-flex justify-content-start">Summary</Form.Label>
                   <Form.Control as="textarea" placeholder="" name="summary" onChange={(e) => inputChangeHandler(e)}/>
-
-      
+                  
+                  { showReferals ? <ReferalsComponent/> : null }
+                  <Button variant="primary" type="button" onClick={() => addReferals()}>Add Referals</Button>
                   <Button variant="primary" type="button" onClick={() => saspReportSumbitHandler()}>Register</Button>
             
                   </div>
