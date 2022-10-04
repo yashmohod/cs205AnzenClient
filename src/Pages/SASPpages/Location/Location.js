@@ -8,11 +8,11 @@ import { API_URL, get, post } from '../../../Utils/API';
 import DeleteButton from './DeleteButton'
 import EditButton from './EditButton'
 import { Button, Form } from "react-bootstrap";
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
 
     const [Location, setLocation] = useState("")
-    const [locations, setLocations] = useState(null)
     let tempLocation
     function locationChangeHandler(e) {
         setLocation(e.target.value);
@@ -24,6 +24,7 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
             document.getElementById("locationInput").value = "";
             getLocations();
             console.log(Location+" added!")
+            toast.success(String(localStorage.getItem("message"))+" : "+Location);
         }
     }
     async function deleteLocationHandler(locationId){
@@ -51,9 +52,10 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
 
     async function getLocations(){
         let response = await get(API_URL + "/getLocations?token=" +  localStorage.getItem("token"));
-        setRowData(response.locations);
-        console.log(response.locations)
-        return response.locations
+        response = JSON.parse(response.locations)
+        setRowData(response);
+        console.log(response)
+        return response
     }
 
 
@@ -104,6 +106,7 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
     return (
         <div className="location-page">
              <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
+             <ToastContainer />
             <h1>Add Location</h1>
             <div className="container-fluid m-5">
                 <div className="row">

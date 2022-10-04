@@ -7,7 +7,7 @@ import Card from "../../Components/Card/Card";
 export function Features(props) {
 
     // let accessLevel= null
-    const[accessLevel,setaccessLevel]=useEffect(null)
+    let accessLevel= null
     const[sortedFeatures,setSortedFeatures] = useState([])
     
 
@@ -25,16 +25,13 @@ export function Features(props) {
 
         if(props.org==='SASP'){
             if(props.pos === "Probationary Member"){
-                // accessLevel=0;
-                setaccessLevel(0);
+                accessLevel=0;
             }
             else if(props.pos === "Junior Member"){
-                // accessLevel=1;
-                setaccessLevel(1);
+                accessLevel=1;
             }
             else if(props.pos === "Senior Member"){
-                // accessLevel=2;
-                setaccessLevel(0);
+                accessLevel=2;
             }
             else if(props.pos === "Executive Board Member"){
                 accessLevel=3;

@@ -121,8 +121,6 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
     function inputChangeHandler(e) {
         setFormData({...formData,  [e.target.name] : e.target.value})
         console.log(e.target.name)
-      
-
     }
     function setpos(){
       const org = localStorage.getItem("organization")
