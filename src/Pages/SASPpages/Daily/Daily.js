@@ -20,10 +20,17 @@ export default function Daily({setLoggedIn, loggedInUser, autoLogin}) {
   const [referalData, setreferalData] = useState([]);
   const [referalsCount,setreferalsCount] = useState(0);
   const [showReferals,setshowReferals]=useState(false);
+//   const [, updateState] = React.useState();
+// const forceUpdate = React.useCallback(() => updateState({}), []);
 
 
 useEffect(() => 
 {   
+  // setData(referals,referalData)
+  console.log(referals)
+  console.log(referalData)
+  console.log(referalsCount)
+  console.log(showReferals)
   
 },[referals,referalData,referalsCount,showReferals])
 
@@ -152,10 +159,12 @@ function addReferals(){
   }
   const newreferalData = [...referalData,dataTemp]
   const refer = [...referals,{"index":referalsCount,"component": <Referal referalData={dataTemp} index = {parseInt(referalsCount)} referalInputhandler={referalInputhandler}/>}]
-  setData(refer, newreferalData )
+  
+  setreferalData(referalData => newreferalData)
+  setreferals(referals => refer)
 }
 
-const setData=(ref,datas)=> {
+const setData= (ref,datas)=> {
 
   const setref = ref.map((refs)=>{
     const data = datas.map((item)=>{
@@ -165,10 +174,9 @@ const setData=(ref,datas)=> {
     })
     return{"index":refs.index,"component": <Referal referalData={data} index = {parseInt(refs.index)} referalInputhandler={referalInputhandler}/>}    
   })
-
-  // console.log(setref)
-  setreferalData(referalData => [...referalData,datas])
+if (setref != referals){
   setreferals(setref)
+}
 
 }
 
