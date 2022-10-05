@@ -11,13 +11,14 @@ import { useNavigate } from "react-router-dom";
 import SaspIncidents from "../../../Components/SaspIncidents/SaspIncidents"
 import SaspLocations from "../../../Components/SaspLocations/SaspLocations"
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
+import CloseButton from 'react-bootstrap/CloseButton'
 
 export default function Daily({setLoggedIn, loggedInUser, autoLogin}) {
   <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
   const navigate = useNavigate();
-  let referals=[];
-  let referalsCount =0;
-  const [showReferals,setshowReferals]=useEffect(false);
+  const [referals,setreferals]=useState([]);
+  const [referalsCount,setreferalsCount] = useState(0);
+  const [showReferals,setshowReferals]=useState(false);
 
   const [formData, setFormData] = useState({
     incident: "",
@@ -42,31 +43,49 @@ function saspReportSumbitHandler(){
 }
 
 
-function ReferalsComponent(props){
-  referals.map((items)=>{
-    return(
-      items
-    )
-  })
+const ReferalsComponent= (props) => {
+  return(<div>
+        { referals.map((items)=>{
+      return(
+        items.component
+      )
+    })}
+  </div>
+  )
 }
 
-function referal(props){
-  return <>
+const Referal = (props) => {
+
+  return(<div>
+    <div>
+    <Form.Label className=" d-flex justify-content-start">Referal #{props.index+1}</Form.Label>
+    </div>
     <Form.Label className=" d-flex justify-content-start">First name</Form.Label>
-    <Form.Control type="text" placeholder="" name="firstName" onChange={(e) => inputChangeHandler(e)}/>
-  </>
+    <Form.Control type="text" placeholder="" name="firstName"/>
+  </div>
+  )
 }
 
 function addReferals(){
   setshowReferals(true)
-  referals.push()
+  setreferalsCount(referalsCount+1)
+  setreferals(referals => [...referals,{"index":referalsCount,"component": <Referal  index = {parseInt(referalsCount)}/>}])
+}
+
+function removeReferals(){
+  setreferalsCount(referalsCount-1)
+  const removeItem = referals.filter((item) => {
+    return item.index !== referalsCount;
+  });
+  setreferals(removeItem);
+  setshowReferals(true)
 }
 
 
 
   useEffect(() => 
   {   
-  },[])
+  },[autoLogin])
 
 
     return (
@@ -114,7 +133,10 @@ function addReferals(){
                   <Form.Control as="textarea" placeholder="" name="summary" onChange={(e) => inputChangeHandler(e)}/>
                   
                   { showReferals ? <ReferalsComponent/> : null }
-                  <Button variant="primary" type="button" onClick={() => addReferals()}>Add Referals</Button>
+                  <div>
+                  <Button variant="warning" type="button" onClick={() => addReferals()}>Add Referals</Button>
+                  { showReferals ? <Button variant="danger" onClick={()=>removeReferals()}>Delete Referal</Button> : null }
+                  </div>
                   <Button variant="primary" type="button" onClick={() => saspReportSumbitHandler()}>Register</Button>
             
                   </div>
