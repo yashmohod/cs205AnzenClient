@@ -17,8 +17,15 @@ export default function Daily({setLoggedIn, loggedInUser, autoLogin}) {
   <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
   const navigate = useNavigate();
   const [referals,setreferals]=useState([]);
+  const [referalData, setreferalData] = useState([]);
   const [referalsCount,setreferalsCount] = useState(0);
   const [showReferals,setshowReferals]=useState(false);
+
+
+useEffect(() => 
+{   
+  
+},[referals,referalData,referalsCount,showReferals])
 
   const [formData, setFormData] = useState({
     incident: "",
@@ -31,11 +38,10 @@ export default function Daily({setLoggedIn, loggedInUser, autoLogin}) {
     locationDetail: "",
     summary: "",
   });
+  
 
   function inputChangeHandler(e) {
     setFormData({...formData,  [e.target.name] : e.target.value})
-    console.log(e.target.name)
-    console.log(e.target.value)
 }
 
 function saspReportSumbitHandler(){
@@ -54,14 +60,78 @@ const ReferalsComponent= (props) => {
   )
 }
 
+function referalInputhandler(index,newpushedData){
+
+  console.log(newpushedData)
+  console.log(referalData)
+  // console.log(referals)
+  // const newdata = referalData.map((data)=>{
+  //   if(data.index == index){
+  //     return {
+  //       newpushedData
+  //     }
+  //   }
+  //   else{
+  //     return data
+  //   }
+  // })
+  // console.log(newdata)
+  // setData(referals,newdata)
+}
+
 const Referal = (props) => {
+  const [refdata,setrefdata] =useState({
+    "index":props.index,
+    "firstName" :"",
+    "middleInitial" :"",
+    "lastName" :"",
+    "ICID" :"",
+    "dob" :"",
+    "phoneNo" :"",
+    "address" :"",
+    
+  })
+  function inputHandler(e){
+    const refTdata = {...refdata,  [e.target.name] : e.target.value}
+    props.referalInputhandler(props.index,refTdata)
+    setrefdata(refTdata)
+  }
+
 
   return(<div>
-    <div>
-    <Form.Label className=" d-flex justify-content-start">Referal #{props.index+1}</Form.Label>
+    <div className="padding">
+    <div className="row">
+      <div className="col-0 col-md-2"></div>
+        <div className="col-12 col-md-8">
+          <Form className="register-form-container p-5">
+            <div>
+              <Form.Label className=" d-flex justify-content-start">Referal #{props.index+1}</Form.Label>
+
+              <Form.Label className=" d-flex justify-content-start">First name</Form.Label>
+              <Form.Control type="text" placeholder="" name="firstName" onChange={(e)=>inputHandler(e)} value={props.referalData.firstName}/>
+
+              <Form.Label className=" d-flex justify-content-start">Middle int.</Form.Label>
+              <Form.Control type="text" placeholder="" name="middleInitial" onChange={(e)=>inputHandler(e)} value={props.referalData.middleInitial}/>
+
+              <Form.Label className=" d-flex justify-content-start">Last name</Form.Label>
+              <Form.Control type="text" placeholder="" name="lastName" onChange={(e)=>inputHandler(e)} value={props.referalData.lastName}/>
+
+              <Form.Label className=" d-flex justify-content-start">ICID</Form.Label>
+              <Form.Control type="text" placeholder="" name="ICID" onChange={(e)=>inputHandler(e)} value={props.referalData.ICID}/>
+
+              <Form.Label className=" d-flex justify-content-start">DOB</Form.Label>
+              <Form.Control type="date" placeholder="" name="dob" onChange={(e)=>inputHandler(e)} value={props.referalData.dob}/>
+
+              <Form.Label className=" d-flex justify-content-start">Phone no.</Form.Label>
+              <Form.Control type="text" placeholder="" name="phoneNo" onChange={(e)=>inputHandler(e)} value={props.referalData.phoneNo}/>
+
+              <Form.Label className=" d-flex justify-content-start">Local Address</Form.Label>
+              <Form.Control as="textarea" placeholder="" name="address" onChange={(e)=>inputHandler(e)} value={props.referalData.address}/>
+            </div>
+          </Form>
+        </div>
+      </div>
     </div>
-    <Form.Label className=" d-flex justify-content-start">First name</Form.Label>
-    <Form.Control type="text" placeholder="" name="firstName"/>
   </div>
   )
 }
@@ -69,23 +139,56 @@ const Referal = (props) => {
 function addReferals(){
   setshowReferals(true)
   setreferalsCount(referalsCount+1)
-  setreferals(referals => [...referals,{"index":referalsCount,"component": <Referal  index = {parseInt(referalsCount)}/>}])
+  const dataTemp = {
+    "index":referalsCount,
+    "firstName" :"",
+    "middleInitial" :"",
+    "lastName" :"",
+    "ICID" :"",
+    "dob" :"",
+    "phoneNo" :"",
+    "address" :"",
+    
+  }
+  const newreferalData = [...referalData,dataTemp]
+  const refer = [...referals,{"index":referalsCount,"component": <Referal referalData={dataTemp} index = {parseInt(referalsCount)} referalInputhandler={referalInputhandler}/>}]
+  setData(refer, newreferalData )
+}
+
+const setData=(ref,datas)=> {
+
+  const setref = ref.map((refs)=>{
+    const data = datas.map((item)=>{
+      if(item.index === refs.index){
+        return item
+      }
+    })
+    return{"index":refs.index,"component": <Referal referalData={data} index = {parseInt(refs.index)} referalInputhandler={referalInputhandler}/>}    
+  })
+
+  // console.log(setref)
+  setreferalData(referalData => [...referalData,datas])
+  setreferals(setref)
+
 }
 
 function removeReferals(){
   setreferalsCount(referalsCount-1)
   const removeItem = referals.filter((item) => {
-    return item.index !== referalsCount;
+    return item.index !== referalsCount-1;
+  });
+  const removedata = referalData.filter((item) => {
+    return item.index !== referalsCount-1;
   });
   setreferals(removeItem);
-  setshowReferals(true)
+  setreferalData(removedata);
+  if(referalsCount-1 === 0){
+    setshowReferals(false)
+  }
 }
 
 
 
-  useEffect(() => 
-  {   
-  },[autoLogin])
 
 
     return (
@@ -131,14 +234,18 @@ function removeReferals(){
 
                   <Form.Label className=" d-flex justify-content-start">Summary</Form.Label>
                   <Form.Control as="textarea" placeholder="" name="summary" onChange={(e) => inputChangeHandler(e)}/>
-                  
+  
                   { showReferals ? <ReferalsComponent/> : null }
-                  <div>
+
+                  <div className="padding">
                   <Button variant="warning" type="button" onClick={() => addReferals()}>Add Referals</Button>
                   { showReferals ? <Button variant="danger" onClick={()=>removeReferals()}>Delete Referal</Button> : null }
                   </div>
+
+                  <div className="padding">
                   <Button variant="primary" type="button" onClick={() => saspReportSumbitHandler()}>Register</Button>
-            
+                  </div>
+
                   </div>
                   </Form>
 
