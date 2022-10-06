@@ -158,10 +158,11 @@ function addReferals(){
     
   }
   const newreferalData = [...referalData,dataTemp]
-  const refer = [...referals,{"index":referalsCount,"component": <Referal referalData={dataTemp} index = {parseInt(referalsCount)} referalInputhandler={referalInputhandler}/>}]
+  const refer = [...referals,{"index":referalsCount,"component": <Referal  referalData={dataTemp} index = {parseInt(referalsCount)} referalInputhandler={referalInputhandler}/>}]
   
-  setreferalData(referalData => newreferalData)
-  setreferals(referals => refer)
+  // setreferalData(newreferalData)
+  // setreferals(refer)
+  setData(refer,newreferalData)
 }
 
 const setData= (ref,datas)=> {
@@ -174,9 +175,8 @@ const setData= (ref,datas)=> {
     })
     return{"index":refs.index,"component": <Referal referalData={data} index = {parseInt(refs.index)} referalInputhandler={referalInputhandler}/>}    
   })
-if (setref != referals){
+  setreferalData(datas)
   setreferals(setref)
-}
 
 }
 
