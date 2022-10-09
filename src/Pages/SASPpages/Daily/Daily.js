@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 import SaspIncidents from "../../../Components/SaspIncidents/SaspIncidents"
 import SaspLocations from "../../../Components/SaspLocations/SaspLocations"
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
-import CloseButton from 'react-bootstrap/CloseButton'
 
 export default function Daily({setLoggedIn, loggedInUser, autoLogin}) {
   <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
@@ -20,17 +19,12 @@ export default function Daily({setLoggedIn, loggedInUser, autoLogin}) {
   const [referalData, setreferalData] = useState([]);
   const [referalsCount,setreferalsCount] = useState(0);
   const [showReferals,setshowReferals]=useState(false);
-//   const [, updateState] = React.useState();
-// const forceUpdate = React.useCallback(() => updateState({}), []);
+
 
 
 useEffect(() => 
 {   
-  // setData(referals,referalData)
-  console.log(referals)
-  console.log(referalData)
-  console.log(referalsCount)
-  console.log(showReferals)
+
   
 },[referals,referalData,referalsCount,showReferals])
 
@@ -44,6 +38,7 @@ useEffect(() =>
     location: "",
     locationDetail: "",
     summary: "",
+    judicialReferal:false,
   });
   
 
@@ -51,40 +46,21 @@ useEffect(() =>
     setFormData({...formData,  [e.target.name] : e.target.value})
 }
 
-function saspReportSumbitHandler(){
+  async function saspReportSumbitHandler(){
   console.log(formData)
-}
-
-
-const ReferalsComponent= (props) => {
-  return(<div>
-        { referals.map((items)=>{
-      return(
-        items.component
-      )
-    })}
-  </div>
-  )
-}
-
-function referalInputhandler(index,newpushedData){
-
-  console.log(newpushedData)
   console.log(referalData)
-  // console.log(referals)
-  // const newdata = referalData.map((data)=>{
-  //   if(data.index == index){
-  //     return {
-  //       newpushedData
-  //     }
-  //   }
-  //   else{
-  //     return data
-  //   }
-  // })
-  // console.log(newdata)
-  // setData(referals,newdata)
+  let response = await post(API_URL + "/enterSaspReport", {token: localStorage.getItem("token"),saspReportData:formData, referalData:referalData})
+  console.log(response)
+  if(response.message === "New SASP incident report was successfully entered."){
+    localStorage.setItem("message", response.message);
+    navigate("/");
+  }else{
+    toast.warning(String((response.message)));
+  }
 }
+
+
+
 
 const Referal = (props) => {
   const [refdata,setrefdata] =useState({
@@ -100,18 +76,31 @@ const Referal = (props) => {
   })
   function inputHandler(e){
     const refTdata = {...refdata,  [e.target.name] : e.target.value}
-    props.referalInputhandler(props.index,refTdata)
-    setrefdata(refTdata)
+
+    const newdata = props.allrefdata.map((data)=>{
+    if(data.index === props.index){
+      return {...refdata,  [e.target.name] : e.target.value}
+    }
+    else{
+      return data
+    }
+  })
+
+  props.setData(props.allrefs, newdata)
+  setrefdata(refTdata)
   }
 
 
+
   return(<div>
+    <ToastContainer />
     <div className="padding">
     <div className="row">
       <div className="col-0 col-md-2"></div>
         <div className="col-12 col-md-8">
           <Form className="register-form-container p-5">
             <div>
+              {/* {console.log(props.referalData)} */}
               <Form.Label className=" d-flex justify-content-start">Referal #{props.index+1}</Form.Label>
 
               <Form.Label className=" d-flex justify-content-start">First name</Form.Label>
@@ -134,6 +123,8 @@ const Referal = (props) => {
 
               <Form.Label className=" d-flex justify-content-start">Local Address</Form.Label>
               <Form.Control as="textarea" placeholder="" name="address" onChange={(e)=>inputHandler(e)} value={props.referalData.address}/>
+              
+
             </div>
           </Form>
         </div>
@@ -157,26 +148,22 @@ function addReferals(){
     "address" :"",
     
   }
+  console.log(referalData)
+  console.log(referals)
   const newreferalData = [...referalData,dataTemp]
-  const refer = [...referals,{"index":referalsCount,"component": <Referal  referalData={dataTemp} index = {parseInt(referalsCount)} referalInputhandler={referalInputhandler}/>}]
-  
-  // setreferalData(newreferalData)
-  // setreferals(refer)
+  const refer = [...referals,{"index":referalsCount,"component": <Referal setData={setData} allrefs={referals} allrefdata={referalData} referalData={dataTemp} index = {parseInt(referalsCount)} />}]
+
   setData(refer,newreferalData)
 }
 
 const setData= (ref,datas)=> {
 
   const setref = ref.map((refs)=>{
-    const data = datas.map((item)=>{
-      if(item.index === refs.index){
-        return item
-      }
-    })
-    return{"index":refs.index,"component": <Referal referalData={data} index = {parseInt(refs.index)} referalInputhandler={referalInputhandler}/>}    
+    return{"index":refs.index,"component": <Referal setData={setData} allrefs={ref} allrefdata={datas}  referalData={datas[refs.index]} index = {parseInt(refs.index)} />}    
   })
   setreferalData(datas)
   setreferals(setref)
+  
 
 }
 
@@ -207,7 +194,7 @@ function removeReferals(){
         <div className="container-fluid">
             <div className="row">
               <div className="col-0 col-md-2"></div>
-                <div className="col-12 col-md-8">
+                <div className="col-12 col-md-8 justify-content-center">
                    
                   <Form className="register-form-container p-5">
                   <div className="register-form">
@@ -243,8 +230,18 @@ function removeReferals(){
                   <Form.Label className=" d-flex justify-content-start">Summary</Form.Label>
                   <Form.Control as="textarea" placeholder="" name="summary" onChange={(e) => inputChangeHandler(e)}/>
   
-                  { showReferals ? <ReferalsComponent/> : null }
-
+                  { showReferals ? (<div>
+                                        { referals.map((items)=>{
+                                      return(
+                                        items.component
+                                      )
+                                    })}
+                                  </div>) : null }
+                  
+                
+                  <div className="padding">
+                  { showReferals ? <Form.Check inline className="checkbox"  name="judicialReferal"  type={'checkbox'} aria-label="option 1"  label="Judicial Referal" onChange={(e) => inputChangeHandler(e)}/> : null }
+                  </div>
                   <div className="padding">
                   <Button variant="warning" type="button" onClick={() => addReferals()}>Add Referals</Button>
                   { showReferals ? <Button variant="danger" onClick={()=>removeReferals()}>Delete Referal</Button> : null }

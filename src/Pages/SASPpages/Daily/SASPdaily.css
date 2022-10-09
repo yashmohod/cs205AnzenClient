@@ -10,8 +10,14 @@
 
 .register-form {
     width: 80%;
+    justify-content: center;
+    align-content: center;
 }
 
 .padding{
     margin-top: 10px;
+    
+}
+.checkbox{
+    width: 200px;
 }
