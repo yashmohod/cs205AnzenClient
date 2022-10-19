@@ -1,7 +1,6 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 import './EmployeeAccounts.css'
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Nav from "../../Components/Nav/Nav";
 import {AgGridReact} from 'ag-grid-react';
@@ -11,6 +10,7 @@ import {Form, Button} from 'react-bootstrap'
 import { API_URL, get, post } from "../../Utils/API";
 import EditButton from '../../Components/Buttons/EditButton'
 import DeleteButton from '../../Components/Buttons/DeleteButton'
+import CommonButton from '../../Components/Buttons/CommonButton'
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 
@@ -19,6 +19,14 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
     const gridRef = useRef();
     const [rowData, setRowData] = useState();
     const navigate = useNavigate();
+
+    // buttons
+    const promote = () =>{return (<CommonButton buttonText={"Promote"} variant ={"outline-success"}/>)}
+    const demote = () =>{return (<CommonButton buttonText={"Demote"} variant ={"outline-danger"}/>)}
+    const changeStatue = () =>{return (<CommonButton buttonText={"Change Statue"} variant ={"outline-info"}/>)}
+    const ChangePassword = () =>{return (<CommonButton buttonText={"Change Password"} variant ={"outline-dark"}/>)}
+
+
     const columnDefs = [
         {field: 'position', headerName: 'Position' ,cellStyle: { 'text-align': 'center' },},
         {field: 'status', headerName: 'Status' ,cellStyle: { 'text-align': 'center' },},
@@ -29,7 +37,9 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
         {field: 'email', headerName: 'Email' ,cellStyle: { 'text-align': 'center' },},
         {field: 'id', 
         headerName: '' ,
-        cellRenderer: EditButton, 
+        cellRenderer: EditButton,
+        
+        cellStyle: { 'text-align': 'center' }, 
         cellRendererParams: {
           clicked: function(field) {
             editIncidentHandler(field);
@@ -38,6 +48,7 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
         {field: 'id',
         headerName: '' ,
         cellRenderer: DeleteButton, 
+        cellStyle: { 'text-align': 'center' },
         cellRendererParams: {
           clicked: function(field) {
             deleteIncidentHandler(field)
@@ -45,7 +56,35 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
         }},
         {field: 'id',
         headerName: '' ,
-        cellRenderer: DeleteButton, 
+        cellRenderer: promote, 
+        cellStyle: { 'text-align': 'center' },
+        cellRendererParams: {
+          clicked: function(field) {
+            deleteIncidentHandler(field)
+          }
+        }},
+        {field: 'id',
+        headerName: '' ,
+        cellRenderer: demote, 
+        cellStyle: { 'text-align': 'center' },
+        cellRendererParams: {
+          clicked: function(field) {
+            deleteIncidentHandler(field)
+          }
+        }},
+        {field: 'id',
+        headerName: '' ,
+        cellRenderer: changeStatue, 
+        cellStyle: { 'text-align': 'center' },
+        cellRendererParams: {
+          clicked: function(field) {
+            deleteIncidentHandler(field)
+          }
+        }},
+        {field: 'id',
+        headerName: '' ,
+        cellRenderer: ChangePassword, 
+        cellStyle: { 'text-align': 'center' },
         cellRendererParams: {
           clicked: function(field) {
             deleteIncidentHandler(field)
@@ -103,11 +142,14 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
 
 
             <div className="ag-theme-alpine incident-grid">
-				<AgGridReact
-                    ref={gridRef}
-					columnDefs={columnDefs}
-					rowData={rowData}>
-				</AgGridReact>
+        
+              <AgGridReact
+                ref={gridRef}
+                columnDefs={columnDefs}
+                rowData={rowData}>
+              </AgGridReact>
+
+
 			</div>
 
         </div>
