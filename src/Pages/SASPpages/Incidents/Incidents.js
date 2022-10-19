@@ -9,8 +9,8 @@ import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-alpine.css';
 import {Form, Button} from 'react-bootstrap'
 import { API_URL, get, post } from "../../../Utils/API";
-import EditButton from '../Location/EditButton'
-import DeleteButton from '../Location/DeleteButton'
+import EditButton from '../../../Components/Buttons/EditButton'
+import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import { ToastContainer, toast } from 'react-toastify';
 
 export default function Incidents({setLoggedIn, loggedInUser, autoLogin}) {

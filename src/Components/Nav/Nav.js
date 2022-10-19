@@ -23,7 +23,7 @@ export default function Nav({setLoggedIn, loggedInUser}) {
                             <div className="col-3 col-md-2"></div>
                             <div className="col-2 col-md-5">
                                 <div className="logout-logo-container">
-                                { loggedInUser &&   <p className="m-2">{loggedInUser.email}</p>}
+                                { loggedInUser &&   <p className="m-2"> Hi, {loggedInUser.firstName}</p>}
                                   
                                     <img src="https://cdn-icons-png.flaticon.com/512/126/126467.png" alt="Logout" onClick={() => logoutUserHandler()} className="logout-logo"/>
                                 </div>

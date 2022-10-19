@@ -5,8 +5,8 @@ import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-alpine.css';
 import { API_URL, get, post } from '../../../Utils/API';
-import DeleteButton from './DeleteButton'
-import EditButton from './EditButton'
+import DeleteButton from '../../../Components/Buttons/DeleteButton'
+import EditButton from '../../../Components/Buttons/EditButton'
 import { Button, Form } from "react-bootstrap";
 import { ToastContainer, toast } from 'react-toastify';
 

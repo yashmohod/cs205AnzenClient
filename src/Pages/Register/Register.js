@@ -44,6 +44,7 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
 
   useEffect(() => 
   {
+    setpos()
     console.log("Form Position")
     console.log(formData.position)
    
@@ -136,9 +137,7 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
 
     }
 
-    useEffect(() => {
-      setpos()
-  }, [])
+
 
     return (
     <div>

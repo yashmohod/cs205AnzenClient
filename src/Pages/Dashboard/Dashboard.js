@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Card from "../../Components/Card/Card";
 import Nav from "../../Components/Nav/Nav";
 import './Dashboard.css'
-import { API_URL, post } from "../../Utils/API";
+import { API_URL, post,get } from "../../Utils/API";
 import { ToastContainer, toast } from 'react-toastify';
 import {Features} from "./features"
 
@@ -35,8 +35,8 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
     }
     
     async function setFeatures(){
-        const orgres = (await post(API_URL + "/getOrganization", {token: localStorage.getItem("token")}))
-        const posres = (await post(API_URL + "/getPosition", {token: localStorage.getItem("token")}))
+        const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
+        const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
         setorg(orgres["organization"])
         setpos(posres["position"])
         console.log(org)
@@ -58,18 +58,40 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
         setFeatures()
     },[])
     const features = 
-    [{org:"SASP",accessLevel:0,title: "Daily", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/SASPpages/daily"},
-     {org:"SASP",accessLevel:0,title: "Records", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/SASPpages/record"},
-     {org:"SASP",accessLevel:0,title: "Referrals", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/SASPpages/referrals"},
-     {org:"SASP",accessLevel:2,title: "Senior Evaluation for Probationary Members", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/senior-eval-for-proba-member", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSdhKZICw5BhHMp1ubDEJlFZEeVRVEOnx5iPDQieziG-fRl_vA/viewform"},
-     {org:"SASP",accessLevel:2,title: "Senior Evaluation for Junior Member", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/senior-eval-for-junior-member", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSc1Ihg_MKrxUjs37x1tjAtun0zCW7UznTrUbUzOpL0N25Oj_Q/viewform"},
-     {org:"SASP",accessLevel:0,title: "SASP Evaluation for a Trainee", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/sasp-eval-for-trainee", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSdoUWDh2nKgE8lSAvnRFQb0llbqCiYhjVBMDmkXhJQsP2d35Q/viewform"},
-     {org:"SASP",accessLevel:4,title: "Incidents", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/SASPpages/incidents"},
-     {org:"SASP",accessLevel:4,title: "Locations", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/SASPpages/locations"},
-     {org:"SASP",accessLevel:3,title: "Employee Accounts", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/employee-accounts"},
-     {org:"SASP",accessLevel:4,title: "Register Accounts", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/register-accounts"},
-     {org:"SASP",accessLevel:4,title: "Change Passwords", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/change-passwords"},
+    [{org:"SASP",accessLevel:0,title: "Daily", description:"", url: "/SASPpages/daily"},
+     {org:"SASP",accessLevel:0,title: "Records", description:"", url: "/SASPpages/record"},
+     {org:"SASP",accessLevel:0,title: "Referrals", description:"", url: "/SASPpages/referrals"},
+     {org:"SASP",accessLevel:2,title: "Senior Evaluation for Probationary Members", description:"", url: "/senior-eval-for-proba-member", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSdhKZICw5BhHMp1ubDEJlFZEeVRVEOnx5iPDQieziG-fRl_vA/viewform"},
+     {org:"SASP",accessLevel:2,title: "Senior Evaluation for Junior Member", description:"", url: "/senior-eval-for-junior-member", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSc1Ihg_MKrxUjs37x1tjAtun0zCW7UznTrUbUzOpL0N25Oj_Q/viewform"},
+     {org:"SASP",accessLevel:0,title: "SASP Evaluation for a Trainee", description:"", url: "/sasp-eval-for-trainee", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSdoUWDh2nKgE8lSAvnRFQb0llbqCiYhjVBMDmkXhJQsP2d35Q/viewform"},
+     {org:"SASP",accessLevel:4,title: "Incidents", description:"", url: "/SASPpages/incidents"},
+     {org:"SASP",accessLevel:4,title: "Locations", description:"", url: "/SASPpages/locations"},
+     {org:"SASP",accessLevel:3,title: "Employee Accounts", description:"", url: "/employee-accounts"},
+
+     {org:"RESLIFE",accessLevel:0,title: "Employee Accounts", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/employee-accounts"},
     ]
+    const Gstyle ={
+        "height": "100px",
+        "display": "flex",
+        "flex-direction": "column",
+        "justify-content": "center",
+        "align-items": "center",
+        "margin": "5px",
+        "background-color": "#8EC5FC",
+        "background-image": "linear-gradient(62deg, #8EC5FC 50%, #00D100 100%)",
+        "border-radius": "15px",
+    }
+    const Rstyle ={
+        "height": "100px",
+        "display": "flex",
+        "flex-direction": "column",
+        "justify-content": "center",
+        "align-items": "center",
+        "margin": "5px",
+        "background-color": "#8EC5FC",
+        "background-image": "linear-gradient(62deg, #8EC5FC 50%, #D10000 100%)",
+        "border-radius": "15px",
+    }
 
     return (
         
@@ -80,12 +102,13 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
         <div className="features container-fluid mt-5 ">
             <div className="row">
                 <div className="col-12">
-                    {clockin ?  <div onClick={() => clockOut()}><Card title="Clock Out" description="End your work shift"/></div> : <div onClick={() => clockIn()}><Card title="Clock In" description="Start your work shift"/></div> }
+                    {clockin ?  <div onClick={() => clockOut()}><Card title="Clock Out" description="End your work shift" style={Rstyle}/></div> : <div onClick={() => clockIn()}><Card title="Clock In" description="Start your work shift" style={Gstyle}/></div> }
                 </div>
             </div>
-            <div className="row  justify-content-center"  >
-                    
-            { showFeatures ? <Features features={features} pos ={pos} org ={org}/> : null }
+            <div className="row justify-content-center"  >
+    
+                { showFeatures ? <Features features={features} pos ={pos} org ={org}/> : null }
+
             </div>
         </div>
 
