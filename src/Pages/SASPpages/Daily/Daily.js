@@ -248,7 +248,7 @@ function removeReferals(){
                   </div>
 
                   <div className="padding">
-                  <Button variant="primary" type="button" onClick={() => saspReportSumbitHandler()}>Register</Button>
+                  <Button variant="primary" type="button" onClick={() => saspReportSumbitHandler()}>Submit</Button>
                   </div>
 
                   </div>

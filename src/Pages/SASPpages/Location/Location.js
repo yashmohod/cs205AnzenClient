@@ -20,12 +20,20 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
 
     async function addLocationHandler(e){
         let response = await post(API_URL + "/enterLocation",  {location: Location,token: localStorage.getItem("token")});
-        if (response["message"] =="New location was successfully entered."){
-            document.getElementById("locationInput").value = "";
-            getLocations();
-            console.log(Location+" added!")
-            toast.success(String(localStorage.getItem("message"))+" : "+Location);
+        if(Location != ""){
+            if (response.message =="New location was successfully entered."){
+                document.getElementById("locationInput").value = "";
+                getLocations();
+                toast.success(response.message+" : "+Location);
+                setLocation("")
+            }else{
+                toast.warning(response.message);
+            }
+        }else{
+            toast.warning("Empty incident was entered!")
         }
+
+        
     }
     async function deleteLocationHandler(locationId){
         let response = await post(API_URL + "/deleteLocation",  {id :locationId ,token: localStorage.getItem("token")});

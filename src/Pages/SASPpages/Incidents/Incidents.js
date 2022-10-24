@@ -66,13 +66,14 @@ export default function Incidents({setLoggedIn, loggedInUser, autoLogin}) {
     }
 
     async function addIncidentHandler() {
-        if(incident != null || incident != ""){
+        if( incident != ""){
             let response = await post(API_URL + "/enterIncident", {incident : incident, token: localStorage.getItem("token")}) 
-            if (response["message"] =="New incident was successfully entered."){
+            if (response.message =="New incident was successfully entered"){
                 document.getElementById("locationInput").value = "";
                 setIncident("")
                 getIncidents();
                 toast.success(String(response["message"])+" : "+incident);
+                getIncidents()
             }else{
                 toast.warning(response["message"] )
             }

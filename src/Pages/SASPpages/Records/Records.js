@@ -65,8 +65,9 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
 
     // Each Column Definition results in one Column.
+    const[columnDefs,setColumnDefs]= useState([])
   
-    const [columnDefs, setColumnDefs] = useState([
+    const [generalCols, setGeneralCols] = useState([
     {field: 'date'},
     {field: 'inceident'},
     {field: 'location'},
@@ -75,39 +76,47 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     {field: 'enrouteTime'},
     {field: 'arivedTime'},
     {field: 'clearTime'},
-    {field: 'reportedBy'},
+    {field: 'reportedByName'},
     {field: 'summary'},
-    // {field: 'id', 
-    // headerName: '' ,
-    // cellRenderer: EditButton, 
-    // cellRendererParams: {
-    //   clicked: function(field) {
-        
-
-        
-    //   }
-    // }},
-    // {field: 'id',
-    // headerName: '' ,
-    // cellRenderer: DeleteButton, 
-    // cellRendererParams: {
-    //   clicked: function(field) {
-       
-    //   }
-    // }}
     ]);
+
+    const [morecolumns, setmoreColumns] = useState([
+    {field: 'id', 
+    headerName: '' ,
+    cellRenderer: EditButton, 
+    cellRendererParams: {
+      clicked: function(field) {
+        
+      }
+    }},
+    {field: 'id',
+    headerName: '' ,
+    cellRenderer: DeleteButton, 
+    cellRendererParams: {
+      clicked: function(field) {
+       
+      }
+    }}]);
 
     // DefaultColDef sets props common to all Columns
     const defaultColDef = useMemo( ()=> ({
         sortable: true
     }));
 
+    const [pos,setpos] = useState("")
 
+    async function setPos(){
+        const posres = await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token"))
+        setpos(posres["position"])
+    }
 
 
 
     useEffect(() => {
         autoLogin();
+        if(setPos()== "admin"){
+            
+        }
         getReports();
     }, [])
 
