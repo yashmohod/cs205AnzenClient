@@ -16,4 +16,3 @@ export default class CommonButton extends Component {
       )
     }
   }
-  // "outline-success"

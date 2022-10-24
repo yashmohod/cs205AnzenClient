@@ -64,11 +64,6 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
 
     )
   
-  //   SasporgsNpos.map((item) => {
-  //     return (
-  //       <Form.Check inline label={item.pos} value ={item.pos} name="position" type={"radio"} id={item.pos} onChange={(e) => inputChangeHandler(e)}/>
-
-  // )})
 }
   const RESLIFEPosButton = (props) => {
     return (
@@ -84,13 +79,6 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
  
 }
 
-  //Working
-  function inputposHandler(e){
-    formData[e.target.name] = e.target.value
-    console.log(e.target.name)
-    console.log(e.target.value)
-
-  }
     async function registerHandler() {
 
       let response = await post(API_URL + "/register", {
@@ -108,7 +96,7 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
       console.log(response)
       if(response.message === "registered successfully"){
         localStorage.setItem("message", response.message);
-        navigate("/");
+        navigate("/employee-accounts");
       }
   
         
@@ -166,18 +154,6 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
 
               <Form.Label className=" d-flex justify-content-start">Email address</Form.Label>
               <Form.Control type="text" placeholder="" name="email" onChange={(e) => inputChangeHandler(e)}/>
-
-            </Form.Group>
-
-            {/* <Form.Group>
-              <Form.Label className=" d-flex justify-content-start">Organization</Form.Label>
-              <Form.Check inline label="SASP" value ="SASP" name="organization" type={"radio"} id="SASP" onChange={(e) => inputChangeHandler(e)}/>
-            <Form.Check inline label="ResLife" value ="RESLIFE" name="organization" type={"radio"} id="RESLIFE" onChange={(e) => inputChangeHandler(e)}/>
-
-            <Button variant="primary" type="button" onClick={() => clearOrgPos()}>Clear</Button>
-            </Form.Group> */}
-
-            <Form.Group>
               
             <Form.Label className=" d-flex justify-content-start">Position</Form.Label>
             { SASPshowPos ? <SASPPosButton changePosition = {changePosition} formData={formData}/> : null }

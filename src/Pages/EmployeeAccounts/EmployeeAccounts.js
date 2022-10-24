@@ -13,6 +13,8 @@ import DeleteButton from '../../Components/Buttons/DeleteButton'
 import CommonButton from '../../Components/Buttons/CommonButton'
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
+// import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 
 export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin}) {
     const [accounts, setAccounts] = useState("")
@@ -20,115 +22,233 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
     const [rowData, setRowData] = useState();
     const navigate = useNavigate();
 
-    // buttons
-    const promote = () =>{return (<CommonButton buttonText={"Promote"} variant ={"outline-success"}/>)}
-    const demote = () =>{return (<CommonButton buttonText={"Demote"} variant ={"outline-danger"}/>)}
-    const changeStatue = () =>{return (<CommonButton buttonText={"Change Statue"} variant ={"outline-info"}/>)}
-    const ChangePassword = () =>{return (<CommonButton buttonText={"Change Password"} variant ={"outline-dark"}/>)}
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    const [editshow, seteditShow] = useState(false);
+    const handleditClose = () => seteditShow(false);
+    const handlediteShow = () => seteditShow(true);
+
+    const [formData, setFormData] = useState({
+      userID: "",
+      firstName: "",
+      lastName: "",
+      collegeId: "",
+      dob: "",
+      email: "",
+      userName: "",
+
+  })
+  function inputChangeHandleracc(e) {
+    setFormData({...formData,  [e.target.name] : e.target.value})
+    console.log(e.target.name)
+}
+async function registerHandler() {
+
+  let response = await post(API_URL + "/editAccountDetails", {
+    token: localStorage.getItem("token"),
+    userID: formData.userID,
+    email: formData.email,
+    userName: formData.userName,
+    firstName: formData.firstName,
+    lastName: formData.lastName,
+    collegeId: formData.collegeId,
+    dob: formData.dob,
+    })
+  console.log(response)
+  if(response.status === 200){
+    toast.success(response.message)
+    getAccounts()
+    handleditClose()
+  }else{
+    toast.warning(response.message)
+  }
+
+}
+
+    const [userID, setUserID] = useState('')
+    const [passwords, setPassword] = useState({
+      password:'',
+      password_confirm:''
+    })
+    async function passwordChangeSubmit(){
+      if(passwords.password === passwords.password_confirm){
+        let response = await post(API_URL + "/editAccountPassword",  {userID: userID,password:passwords.password,token: localStorage.getItem("token")});
+        if(response.status === 200){
+          toast.success(response.message);
+          handleClose()
+        }else{
+          toast.warning(response.message);
+        }
+      }else{
+        toast.warning("Passwords do not match!")
+      }
+    }
+
+    function inputChangeHandler(e){
+      setPassword({...passwords,  [e.target.name] : e.target.value})
+    }
+
+    function checkMessage(){
+      if(!(localStorage.getItem("message") === null)){
+          toast.success(String(localStorage.getItem("message")));
+          localStorage.removeItem("message");
+      }
+  }
 
 
     const columnDefs = [
-        {field: 'position', headerName: 'Position' ,cellStyle: { 'text-align': 'center' },},
-        {field: 'status', headerName: 'Status' ,cellStyle: { 'text-align': 'center' },},
-        {field: 'lastName', headerName: 'Last Name' ,cellStyle: { 'text-align': 'center' },},
-        {field: 'firstName', headerName: 'First Name' ,cellStyle: { 'text-align': 'center' },},
-        {field: 'dob', headerName: ' DOB' ,cellStyle: { 'text-align': 'center' },},
-        {field: 'collegeId', headerName: 'IC ID' ,cellStyle: { 'text-align': 'center' },},
-        {field: 'email', headerName: 'Email' ,cellStyle: { 'text-align': 'center' },},
+        {field: 'position', headerName: 'Position' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
+        {field: 'status', headerName: 'Status' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
+        {field: 'lastName', headerName: 'Last Name' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
+        {field: 'firstName', headerName: 'First Name' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
+        {field: 'dob', headerName: ' DOB' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
+        {field: 'collegeId', headerName: 'IC ID' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
+        {field: 'email', headerName: 'Email' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
         {field: 'id', 
         headerName: '' ,
         cellRenderer: EditButton,
-        
-        cellStyle: { 'text-align': 'center' }, 
+        cellStyle: { 'textAlign': 'center' }, 
         cellRendererParams: {
           clicked: function(field) {
-            editIncidentHandler(field);
+            editAccount(field);
           }
         }},
         {field: 'id',
         headerName: '' ,
         cellRenderer: DeleteButton, 
-        cellStyle: { 'text-align': 'center' },
+        cellStyle: { 'textAlign': 'center' },
         cellRendererParams: {
           clicked: function(field) {
-            deleteIncidentHandler(field)
+            deleteAccount(field)
           }
         }},
         {field: 'id',
         headerName: '' ,
-        cellRenderer: promote, 
-        cellStyle: { 'text-align': 'center' },
+        cellRenderer: CommonButton, 
+        cellStyle: { 'textAlign': 'center' },
         cellRendererParams: {
           clicked: function(field) {
-            deleteIncidentHandler(field)
-          }
+            promoteAccount(field)
+          },
+          buttonText: "Promote",
+          variant:"outline-success",
         }},
         {field: 'id',
         headerName: '' ,
-        cellRenderer: demote, 
-        cellStyle: { 'text-align': 'center' },
+        cellRenderer: CommonButton, 
+        cellStyle: { 'textAlign': 'center' },
         cellRendererParams: {
           clicked: function(field) {
-            deleteIncidentHandler(field)
-          }
+            demoteAccount(field)
+          },
+          buttonText: "Demote",
+          variant:"outline-danger",
         }},
         {field: 'id',
         headerName: '' ,
-        cellRenderer: changeStatue, 
-        cellStyle: { 'text-align': 'center' },
+        cellRenderer: CommonButton, 
+        cellStyle: { 'textAlign': 'center' },
         cellRendererParams: {
           clicked: function(field) {
-            deleteIncidentHandler(field)
-          }
+            changeAccountStatue(field)
+          },
+          buttonText: "Change Status",
+          variant:"outline-info",
+
         }},
         {field: 'id',
         headerName: '' ,
-        cellRenderer: ChangePassword, 
-        cellStyle: { 'text-align': 'center' },
+        cellRenderer: CommonButton, 
+        cellStyle: { 'textAlign': 'center' },
         cellRendererParams: {
           clicked: function(field) {
-            deleteIncidentHandler(field)
-          }
+            setUserID(field)
+            handleShow()
+          },
+          buttonText: "Change Password",
+          variant:"outline-dark",
         }},
         ]
+        const defaultColDef= { resizable: true, suppressSizeToFit: true }
 
 
-    async function editIncidentHandler(incidentId) {
-        // let tempIncidents = await getIncidents()
-        // console.log(tempIncidents)
-        // let incidentName = "";
-        // for(let x =0; x <tempIncidents.length; x++){
-        //     if(tempIncidents[x].id == incidentId){
-        //         incidentName = tempIncidents[x].incidentName;
-        //     }
-        // }
-        // var newIncidentName = String(window.prompt("Enter the updated name", incidentName));
-        // if( newIncidentName != "" && newIncidentName != null &&  newIncidentName != "null")  {
-        //     await post(API_URL + "/editIncident",  {id : incidentId , editedIncident: newIncidentName, token: localStorage.getItem("token")});
-        //     getIncidents();
-        // }
+    async function editAccount(accountId) {
+      let curAccount = {}
+      accounts.map((acc)=>{
+        if (accountId == acc.id){
+          curAccount= acc
+        }
+      })
+
+      console.log(curAccount)
+      const oldData = {
+        userID:accountId,
+        firstName: curAccount.firstName,
+        lastName: curAccount.lastName,
+        collegeId: curAccount.collegeId,
+        dob: curAccount.dob,
+        email: curAccount.email,
+        userName: curAccount.userName,
+  
+    }
+    setFormData(oldData)
+      
+      handlediteShow(true)
+
+    }
+    async function deleteAccount(accountId) {
+      commonApiRequest("/deleteAccount",accountId)
+    }
+    async function promoteAccount(accountId) {
+      commonApiRequest("/promoteAccount",accountId)
+    }
+    async function demoteAccount(accountId) {
+      commonApiRequest("/demoteAccount",accountId)
+    }
+    async function changeAccountStatue(accountId) {
+      commonApiRequest("/changeAccountStatus",accountId)
+    }
+ 
+
+    async function commonApiRequest(endpoint,accountId){
+      let response = await post(API_URL + endpoint,  {userID: accountId,token: localStorage.getItem("token")});
+      console.log(response.status);
+      if(response.status === 200){
+        toast.success(response.message);
+      }else{
+        toast.warning(response.message);
+      }
+      getAccounts()
     }
 
-    async function deleteIncidentHandler(incidentId) {
-        // let response = await post(API_URL + "/deleteIncident",  {id : incidentId, token: localStorage.getItem("token")});
-        // console.log(response);
-        // getIncidents();
-    }
+
+  
 
   
 
     async function getAccounts() {
         let response = await get(API_URL + "/getAllAccounts?token=" +  localStorage.getItem("token"))
         response = JSON.parse(response.accounts)
-        console.log("here")
-        console.log(response)
+
+        for(let x =0; x< response.length; x++){
+          if(response[x].status === true){
+            response[x].status = "Active"
+          }else{
+            response[x].status = "Deactive"
+          }
+        }
+
         setRowData(response)
+        setAccounts(response)
         return response
     }
 
     useEffect(() => {
         autoLogin()
         getAccounts()
+        checkMessage()
     }, [])
 
     return (
@@ -138,6 +258,9 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
             <h1>Employee Accounts</h1>
             <Form className="incident-form">
                 <Button variant="outline-dark" onClick={() => navigate("/register-accounts")}>Add Account</Button>
+                {/* <Button variant="primary" onClick={handleShow}>
+                  Launch static backdrop modal
+                </Button> */}
             </Form>
 
 
@@ -146,11 +269,77 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
               <AgGridReact
                 ref={gridRef}
                 columnDefs={columnDefs}
-                rowData={rowData}>
+                defaultColDef={defaultColDef}
+                rowData={rowData}
+                >
               </AgGridReact>
 
 
-			</div>
+			      </div>
+
+
+
+            <Modal
+              show={show}
+              onHide={handleClose}
+              backdrop="static"
+              keyboard={false}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>New Password</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Form>
+                <Form.Label className=" d-flex justify-content-start">Password</Form.Label>
+                <Form.Control type="password" placeholder="Password" name="password" onChange={(e) => inputChangeHandler(e)}/>
+                <Form.Label className=" d-flex justify-content-start">Confirm Password</Form.Label>
+                <Form.Control type="password" placeholder="Re-enter Password" name="password_confirm" onChange={(e) => inputChangeHandler(e)}/>
+                </Form>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="primary" onClick={()=>passwordChangeSubmit()}>Submit</Button>
+              </Modal.Footer>
+            </Modal>
+
+
+            <Modal
+              show={editshow}
+              onHide={handleditClose}
+              backdrop="static"
+              keyboard={false}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Edit Account Details</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label className=" d-flex justify-content-start">First Name</Form.Label>
+              <Form.Control type="text" placeholder="" value={formData.firstName}  name="firstName" onChange={(e) => inputChangeHandleracc(e)} />
+
+              <Form.Label className=" d-flex justify-content-start">Last Name</Form.Label>
+              <Form.Control type="text" placeholder="" value={formData.lastName}  name="lastName" onChange={(e) => inputChangeHandleracc(e)}/>
+
+              <Form.Label className=" d-flex justify-content-start">Student ID</Form.Label>
+              <Form.Control type="text" placeholder="" value={formData.collegeId}  name="collegeId" onChange={(e) => inputChangeHandleracc(e)}/>
+
+              <Form.Label className=" d-flex justify-content-start">Date of Birth </Form.Label>
+              <Form.Control type="date" placeholder="" value={formData.dob}   name="dob" onChange={(e) => inputChangeHandleracc(e)}/>
+
+              <Form.Label className=" d-flex justify-content-start">Email address</Form.Label>
+              <Form.Control type="text" placeholder="" value={formData.email}   name="email" onChange={(e) => inputChangeHandleracc(e)}/>
+                        
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label className=" d-flex justify-content-start">Username</Form.Label>
+              <Form.Control type="text" placeholder="Enter Username" value={formData.userName}   name="userName" onChange={(e) => inputChangeHandleracc(e)}/>
+            </Form.Group>
+
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="primary" onClick={()=>registerHandler()}>Submit</Button>
+              </Modal.Footer>
+            </Modal>
 
         </div>
     )

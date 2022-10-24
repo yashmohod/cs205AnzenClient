@@ -16,7 +16,6 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
     function checkMessage(){
         if(!(localStorage.getItem("message") === null)){
             toast.success(String(localStorage.getItem("message")));
-            console.log(localStorage.getItem("message"));
             localStorage.removeItem("message");
         }
     }
@@ -39,8 +38,6 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
         const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
         setorg(orgres["organization"])
         setpos(posres["position"])
-        console.log(org)
-        console.log(pos)
         setshowFeatures(true)
     }
 
@@ -58,17 +55,19 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
         setFeatures()
     },[])
     const features = 
-    [{org:"SASP",accessLevel:0,title: "Daily", description:"", url: "/SASPpages/daily"},
-     {org:"SASP",accessLevel:0,title: "Records", description:"", url: "/SASPpages/record"},
-     {org:"SASP",accessLevel:0,title: "Referrals", description:"", url: "/SASPpages/referrals"},
+    [{org:"SASP",accessLevel:0,title: "Daily", description:"", url: "/SASPpages/daily", external_url:''},
+     {org:"SASP",accessLevel:0,title: "Records", description:"", url: "/SASPpages/Records", external_url:''},
+     {org:"SASP",accessLevel:0,title: "Referrals", description:"", url: "/SASPpages/referrals", external_url:''},
+     {org:"SASP",accessLevel:0,title: "Time Cards", description:"", url: "/time-cards", external_url:''},
      {org:"SASP",accessLevel:2,title: "Senior Evaluation for Probationary Members", description:"", url: "/senior-eval-for-proba-member", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSdhKZICw5BhHMp1ubDEJlFZEeVRVEOnx5iPDQieziG-fRl_vA/viewform"},
      {org:"SASP",accessLevel:2,title: "Senior Evaluation for Junior Member", description:"", url: "/senior-eval-for-junior-member", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSc1Ihg_MKrxUjs37x1tjAtun0zCW7UznTrUbUzOpL0N25Oj_Q/viewform"},
      {org:"SASP",accessLevel:0,title: "SASP Evaluation for a Trainee", description:"", url: "/sasp-eval-for-trainee", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSdoUWDh2nKgE8lSAvnRFQb0llbqCiYhjVBMDmkXhJQsP2d35Q/viewform"},
-     {org:"SASP",accessLevel:4,title: "Incidents", description:"", url: "/SASPpages/incidents"},
-     {org:"SASP",accessLevel:4,title: "Locations", description:"", url: "/SASPpages/locations"},
-     {org:"SASP",accessLevel:3,title: "Employee Accounts", description:"", url: "/employee-accounts"},
+     {org:"SASP",accessLevel:4,title: "Incidents", description:"", url: "/SASPpages/incidents", external_url:''},
+     {org:"SASP",accessLevel:4,title: "Locations", description:"", url: "/SASPpages/locations", external_url:''},
+     {org:"SASP",accessLevel:3,title: "Employee Accounts", description:"", url: "/employee-accounts", external_url:''},
 
-     {org:"RESLIFE",accessLevel:0,title: "Employee Accounts", description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", url: "/employee-accounts"},
+     {org:"RESLIFE",accessLevel:0,title: "Time Cards", description:"", url: "/time-cards", external_url:''},
+     {org:"RESLIFE",accessLevel:0,title: "Employee Accounts", description:"", url: "/employee-accounts",external_url:''},
     ]
     const Gstyle ={
         "height": "100px",

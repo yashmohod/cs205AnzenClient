@@ -10,7 +10,6 @@ export default function Card(props) {
         if(props.description!="" && props.description!=null){
             setshowDes(true)
         }
-        console.log(style)
         setstyle(style)
     });
 

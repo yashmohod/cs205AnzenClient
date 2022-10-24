@@ -76,13 +76,20 @@ export function Features(props) {
     return (
         <>
         {sortedFeatures.map((item) => {
-                    return (
-                        <div className="col-lg-6 col-md-6 col-sm-12">
-                            <Link to={item.url} className="feature-url" >
-                                <Card title={item.title} description={item.description} style={style}/>
-                            </Link>
-                        </div>
-                    )
+                        return (
+                            <div className="col-lg-6 col-md-6 col-sm-12">
+                                {item.external_url ?    
+                                <a href={item.external_url} target="_blank">
+                                    <Card title={item.title} description={item.description} style={style}/>
+                                </a>
+                            :    <Link to={item.url} className="feature-url">
+                                    <Card title={item.title} description={item.description} style={style}/>
+                                </Link>
+                             
+                                }
+                            </div>
+                        )
+
                     
                 })}
         </>
