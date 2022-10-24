@@ -9,10 +9,20 @@ import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import EditButton from '../../../Components/Buttons/EditButton'
 import { Button, Form } from "react-bootstrap";
 import { ToastContainer, toast } from 'react-toastify';
+import SaspIncidents from "../../../Components/SaspIncidents/SaspIncidents"
+import SaspLocations from "../../../Components/SaspLocations/SaspLocations"
+import EmployeeList from "../../../Components/EmployeeList/EmployeeList"
 
 export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
 
     const [Records, setRecords] = useState("")
+    const [searchData, setSearchData] = useState({
+        "employeeId":"",
+        "location":"",
+        "inceident":"",
+        "dateFrom":"",
+        "dateTo":"",
+    })
 
 
 
@@ -26,9 +36,26 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
             dateFrom:"",
             })
         console.log(response)
-        // response = JSON.parse(response.locations)
-        // setRowData(response);
-        // return response
+        let data = response.SaspIncidentReports;
+        
+        // date formating
+        data = data.map((item)=>{
+            var date = item.date.split(' ');
+            item.date = date[0]
+            return(
+                item
+            )
+        })
+        setRowData(response.SaspIncidentReports);
+        return response
+    }
+
+    function searchInputHandeler(e){
+        setSearchData({...searchData,  [e.target.name] : e.target.value})
+    }
+
+    function searchButtonHandeler(){
+        console.log(searchData)
     }
 
 
@@ -40,25 +67,34 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     // Each Column Definition results in one Column.
   
     const [columnDefs, setColumnDefs] = useState([
-    {field: 'locationName'},
-    {field: 'id', 
-    headerName: '' ,
-    cellRenderer: EditButton, 
-    cellRendererParams: {
-      clicked: function(field) {
+    {field: 'date'},
+    {field: 'inceident'},
+    {field: 'location'},
+    {field: 'locationDetail'},
+    {field: 'receivedTime'},
+    {field: 'enrouteTime'},
+    {field: 'arivedTime'},
+    {field: 'clearTime'},
+    {field: 'reportedBy'},
+    {field: 'summary'},
+    // {field: 'id', 
+    // headerName: '' ,
+    // cellRenderer: EditButton, 
+    // cellRendererParams: {
+    //   clicked: function(field) {
         
 
         
-      }
-    }},
-    {field: 'id',
-    headerName: '' ,
-    cellRenderer: DeleteButton, 
-    cellRendererParams: {
-      clicked: function(field) {
+    //   }
+    // }},
+    // {field: 'id',
+    // headerName: '' ,
+    // cellRenderer: DeleteButton, 
+    // cellRendererParams: {
+    //   clicked: function(field) {
        
-      }
-    }}
+    //   }
+    // }}
     ]);
 
     // DefaultColDef sets props common to all Columns
@@ -81,12 +117,49 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
              <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
              <ToastContainer />
             <h1>Records</h1>
-            <div className="container-fluid m-5">
+            <div className="container">
                 <div className="row">
-                    <div className="col-12">
-                        <Form className="location-form">
+                    <div className="col">
+                        <div className="row" id = "location-form">
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">Employee</Form.Label>
+                            <Form.Select aria-label="Default select example"  name="employeeId" onChange={(e) => searchInputHandeler(e)}>
+                            <EmployeeList  />
+                            </Form.Select>
+                            </div>
+
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">Incident</Form.Label>
+                            <Form.Select aria-label="Default select example"  name="incident" onChange={(e) => searchInputHandeler(e)}>
+                            <SaspIncidents  />
+                            </Form.Select>
+                            </div>
+
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">Location</Form.Label>
+                            <Form.Select aria-label="Default select example" name="location" onChange={(e) => searchInputHandeler(e)}>
+                            <SaspLocations />
+                            </Form.Select>
+                            </div>
+
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">Date From</Form.Label>
+                            <Form.Control type="date" placeholder="" name="dateFrom" onChange={(e) => searchInputHandeler(e)}/>
+                            </div>
+
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">Date To</Form.Label>
+                            <Form.Control type="date" placeholder="" name="dateTo" onChange={(e) => searchInputHandeler(e)}/>
+                            </div>
+                            <div className="col" id="searchFormElement">
+                                <div>
+                                <Button variant="outline-info" type="button" onClick={() => searchButtonHandeler()}>Search All</Button>
+                                </div>
+                            <Button variant="outline-primary" type="button" onClick={() => searchButtonHandeler()}>Search</Button>
+                            <Button variant="outline-dark" type="button" onClick={() => searchButtonHandeler()}>Download File</Button>
+                            </div>
                             
-                        </Form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -94,13 +167,17 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
 
        
         
-            <div className="ag-theme-alpine location-grid">
-                
-				<AgGridReact
-                    ref={gridRef}
-					columnDefs={columnDefs}
-					rowData={rowData}>
-				</AgGridReact>
+            <div className="ag-theme-alpine incident-grid">
+        
+              <AgGridReact
+                ref={gridRef}
+                columnDefs={columnDefs}
+                defaultColDef={defaultColDef}
+                rowData={rowData}
+                >
+              </AgGridReact>
+
+
 			</div>
            
         </div>

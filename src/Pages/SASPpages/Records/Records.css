@@ -7,7 +7,11 @@
     width: 300px;
 }
 
-.location-form {
+#location-form {
     display: flex;
     justify-content: center;
+}
+
+#searchFormElement{
+    margin: 10px;
 }
