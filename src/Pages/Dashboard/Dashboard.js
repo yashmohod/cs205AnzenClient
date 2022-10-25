@@ -38,6 +38,8 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
         const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
         setorg(orgres["organization"])
         setpos(posres["position"])
+        localStorage.setItem("organization", orgres["organization"])
+        localStorage.setItem("position", posres["token"])
         setshowFeatures(true)
     }
 

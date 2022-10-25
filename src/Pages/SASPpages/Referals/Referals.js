@@ -1,6 +1,6 @@
 import React, {Component, useEffect, useRef, useState,useMemo } from "react";
 import Nav from "../../../Components/Nav/Nav";
-import './Records.css'
+import './Referals.css'
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-alpine.css';
@@ -13,9 +13,9 @@ import SaspIncidents from "../../../Components/SaspIncidents/SaspIncidents"
 import SaspLocations from "../../../Components/SaspLocations/SaspLocations"
 import EmployeeList from "../../../Components/EmployeeList/EmployeeList"
 import CommonButton from '../../../Components/Buttons/CommonButton'
-export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
+export default function Referals({setLoggedIn, loggedInUser, autoLogin}) {
 
-    const [Records, setRecords] = useState("")
+    const [Referals, setReferals] = useState("")
     const [searchData, setSearchData] = useState({
         "employeeId":"",
         "location":"",
@@ -27,7 +27,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
 
 
     async function getReports(){
-        let response = await post(API_URL + "/getSaspReports", {
+        let response = await post(API_URL + "/getSaspReferals", {
             token: localStorage.getItem("token"),
             employeeId:"",
             location:"",
@@ -35,13 +35,20 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
             dateTo:"",
             dateFrom:"",
             })
-        console.log(response)
-        let data = response.SaspIncidentReports;
+        console.log(response.referals)
+        let data = response.referals;
         
         // date formating
         data = data.map((item)=>{
             var date = item.date.split(' ');
+            var dob = item.dob.split(' ');
             item.date = date[0]
+            item.dob = dob[0]
+            if(item.judicialReferal == true){
+                item.judicialReferal = "Yes"
+            }else{
+                item.judicialReferal = "No"
+            }
             return(
                 item
             )
@@ -71,13 +78,14 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     {field: 'date'},
     {field: 'inceident'},
     {field: 'location'},
-    {field: 'locationDetail'},
-    {field: 'receivedTime'},
-    {field: 'enrouteTime'},
-    {field: 'arivedTime'},
-    {field: 'clearTime'},
-    {field: 'reportedByName'},
-    {field: 'summary'},
+    {field: 'judicialReferal'},
+    {field: 'firstName'},
+    {field: 'lastName'},
+    {field: 'middleInitial'},
+    {field: 'ICID'},
+    {field: 'dob'},
+    {field: 'address'},
+    {field: 'phoneNo'},
     {field: 'id', 
     headerName: '' ,
     cellRenderer: CommonButton, 
@@ -85,7 +93,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
       clicked: function(field) {
         
       },
-      buttonText: "View Referals",
+      buttonText: "View Report",
       variant:"outline-dark",
     }},
     ]);
@@ -137,7 +145,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
         <div className="location-page">
              <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
              <ToastContainer />
-            <h1>Records</h1>
+            <h1>Referals</h1>
             <div className="container">
                 <div className="row">
                     <div className="col">

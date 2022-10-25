@@ -7,6 +7,7 @@ import Dashboard from './Pages/Dashboard/Dashboard';
 import Location from './Pages/SASPpages/Location/Location';
 import Daily from "./Pages/SASPpages/Daily/Daily"
 import Records from "./Pages/SASPpages/Records/Records"
+import Referals from "./Pages/SASPpages/Referals/Referals"
 import { Routes, Route, Link, Navigate} from "react-router-dom";
 import Incidents from './Pages/SASPpages/Incidents/Incidents';
 import { post } from './Utils/API';
@@ -52,6 +53,7 @@ function App() {
           <Route path="/SASPpages/locations" element={<Location setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/SASPpages/incidents" element={<Incidents setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/SASPpages/Records" element={<Records setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
+          <Route path="/SASPpages/referrals" element={<Referals setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
 
         </Routes>                 
     </div>
