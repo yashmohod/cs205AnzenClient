@@ -9,8 +9,8 @@ import {Features} from "./features"
 
 export default function({loggedIn, setLoggedIn, loggedInUser}) {
     const [clockin, setClockin] = useState(false)
-    const [org,setorg] = useState("")
-    const [pos,setpos]= useState("")
+    const [org,setOrg] = useState("")
+    const [pos,setPos]= useState("")
     const [showFeatures,setshowFeatures] =useState(false)
 
     function checkMessage(){
@@ -36,8 +36,8 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
     async function setFeatures(){
         const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
         const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
-        setorg(orgres["organization"])
-        setpos(posres["position"])
+        setOrg(orgres["organization"])
+        setPos(posres["position"])
         localStorage.setItem("organization", orgres["organization"])
         localStorage.setItem("position", posres["token"])
         setshowFeatures(true)
@@ -57,19 +57,19 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
         setFeatures()
     },[])
     const features = 
-    [{org:"SASP",accessLevel:0,title: "Daily", description:"", url: "/SASPpages/daily", external_url:''},
-     {org:"SASP",accessLevel:0,title: "Records", description:"", url: "/SASPpages/Records", external_url:''},
-     {org:"SASP",accessLevel:0,title: "Referrals", description:"", url: "/SASPpages/referrals", external_url:''},
-     {org:"SASP",accessLevel:0,title: "Time Cards", description:"", url: "/time-cards", external_url:''},
+    [{org:"SASP",accessLevel:0,title: "Daily", description:"", url: "/SASPpages/daily", },
+     {org:"SASP",accessLevel:0,title: "Records", description:"", url: "/SASPpages/Records", },
+     {org:"SASP",accessLevel:0,title: "Referrals", description:"", url: "/SASPpages/referrals", },
+     {org:"SASP",accessLevel:0,title: "Time Cards", description:"", url: "/time-cards",},
      {org:"SASP",accessLevel:2,title: "Senior Evaluation for Probationary Members", description:"", url: "/senior-eval-for-proba-member", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSdhKZICw5BhHMp1ubDEJlFZEeVRVEOnx5iPDQieziG-fRl_vA/viewform"},
      {org:"SASP",accessLevel:2,title: "Senior Evaluation for Junior Member", description:"", url: "/senior-eval-for-junior-member", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSc1Ihg_MKrxUjs37x1tjAtun0zCW7UznTrUbUzOpL0N25Oj_Q/viewform"},
      {org:"SASP",accessLevel:0,title: "SASP Evaluation for a Trainee", description:"", url: "/sasp-eval-for-trainee", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSdoUWDh2nKgE8lSAvnRFQb0llbqCiYhjVBMDmkXhJQsP2d35Q/viewform"},
-     {org:"SASP",accessLevel:4,title: "Incidents", description:"", url: "/SASPpages/incidents", external_url:''},
-     {org:"SASP",accessLevel:4,title: "Locations", description:"", url: "/SASPpages/locations", external_url:''},
-     {org:"SASP",accessLevel:3,title: "Employee Accounts", description:"", url: "/employee-accounts", external_url:''},
+     {org:"SASP",accessLevel:4,title: "Incidents", description:"", url: "/SASPpages/incidents"},
+     {org:"SASP",accessLevel:4,title: "Locations", description:"", url: "/SASPpages/locations",},
+     {org:"SASP",accessLevel:3,title: "Employee Accounts", description:"", url: "/employee-accounts",},
 
-     {org:"RESLIFE",accessLevel:0,title: "Time Cards", description:"", url: "/time-cards", external_url:''},
-     {org:"RESLIFE",accessLevel:0,title: "Employee Accounts", description:"", url: "/employee-accounts",external_url:''},
+     {org:"RESLIFE",accessLevel:0,title: "Time Cards", description:"", url: "/time-cards",},
+     {org:"RESLIFE",accessLevel:0,title: "Employee Accounts", description:"", url: "/employee-accounts",},
     ]
     const Gstyle ={
         "height": "100px",

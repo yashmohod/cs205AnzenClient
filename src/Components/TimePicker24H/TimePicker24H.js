@@ -49,9 +49,17 @@ export default function TimePicker24H(props) {
             <Form.Select aria-label="Default select example" name="Hours" onChange={(e) =>setTimeH(e.target.value)}>
                 {
                     hours.map((item) => {
-                        return (
-                        <option key={item}  >{item}</option>
-                        )
+                        let hr = String(props.time).split(":")[0]
+                        if (item == hr){
+                            return (
+                                <option key={item} selected  >{item}</option>
+                                )
+                        }
+                        else{
+                            return (
+                                <option key={item}  >{item}</option>
+                                )
+                        }
                         
                         })
                 }
@@ -62,9 +70,17 @@ export default function TimePicker24H(props) {
             <Form.Select aria-label="Default select example" name="Min" onChange={(e) =>setTimeM(e.target.value)}>
                 {
                     minutes.map((item) => {
-                        return (
-                        <option key={item}  >{item}</option>
-                        )
+                        let min = String(props.time).split(":")[1]
+                        if (item == min){
+                            return (
+                                <option key={item} selected  >{item}</option>
+                                )
+                        }
+                        else{
+                            return (
+                                <option key={item}  >{item}</option>
+                                )
+                        }
                         
                         })
                 }

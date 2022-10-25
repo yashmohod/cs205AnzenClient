@@ -1,7 +1,7 @@
 import { useState , React, useEffect} from "react";
 import { API_URL, post,get } from "../../Utils/API";
 
-export default function SaspLocations() {
+export default function SaspLocations(props) {
 
     const [locations,setlocations]= useState([]);
 
@@ -25,9 +25,15 @@ export default function SaspLocations() {
     return ( 
         <>{
           locations.map((item) => {
-                return (
-                  <option key={item.id}  >{item.locationName}</option>
-                )
+                if(item.locationName ==props.selected ){
+                  return (
+                    <option key={item.id} selected >{item.locationName}</option>
+                  )
+                }else{
+                  return (
+                    <option key={item.id} >{item.locationName}</option>
+                  )
+                }
                 
                 })
         }

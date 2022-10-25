@@ -13,9 +13,57 @@ import SaspIncidents from "../../../Components/SaspIncidents/SaspIncidents"
 import SaspLocations from "../../../Components/SaspLocations/SaspLocations"
 import EmployeeList from "../../../Components/EmployeeList/EmployeeList"
 import CommonButton from '../../../Components/Buttons/CommonButton'
+import Modal from 'react-bootstrap/Modal';
+import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
+    
+    // edit records 
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
-    const [Records, setRecords] = useState("")
+    const [formData, setFormData] = useState({
+        reportID:'',
+        incident: "",
+        date: "",
+        receivedTime: "00:00",
+        enrouteTime: "00:00",
+        arivedTime: "00:00",
+        clearTime: "00:00",
+        location: "",
+        locationDetail: "",
+        summary: "",
+      });
+
+    async function reportChangeSubmit(){
+        //editSaspReport
+        console.log(formData)
+        let response = await post(API_URL + "/editSaspReport", {
+            token: localStorage.getItem("token"),
+            reportID:formData.reportID,
+            incident: formData.incident,
+            date:  formData.date,
+            receivedTime: formData.receivedTime,
+            enrouteTime: formData.enrouteTime,
+            arivedTime:  formData.arivedTime,
+            clearTime: formData.clearTime,
+            location:  formData.location,
+            locationDetail: formData.locationDetail,
+            summary: formData.summary,
+            })
+        if(response.status ==200){
+            toast.success(response.message)
+            handleClose()
+            getReports()
+        }else{
+            toast.warning(response.message)
+        }
+    }
+    function reportInputChangeHandler(e){
+        setFormData({...formData,  [e.target.name] : e.target.value})
+    }
+
+
     const [searchData, setSearchData] = useState({
         "employeeId":"",
         "location":"",
@@ -35,7 +83,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
             dateTo:"",
             dateFrom:"",
             })
-        console.log(response)
+        // console.log(response)
         let data = response.SaspIncidentReports;
         
         // date formating
@@ -55,7 +103,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     }
 
     function searchButtonHandeler(){
-        console.log(searchData)
+        // console.log(searchData)
     }
 
 
@@ -96,7 +144,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     cellRenderer: EditButton, 
     cellRendererParams: {
       clicked: function(field) {
-        
+        reportEdit(field)
       }
     }},
     {field: 'id',
@@ -104,9 +152,42 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     cellRenderer: DeleteButton, 
     cellRendererParams: {
       clicked: function(field) {
-       
+        reportDelete(field)
       }
     }}]);
+
+    async function reportDelete(reportId){
+        let response = await post(API_URL + "/deleteSaspReports", {reportID:reportId,token: localStorage.getItem("token")})
+        if(response.status== 200){
+            toast.success(response.message)
+            getReports()
+        }else{
+            toast.warning(response.message)
+        }
+    }
+
+    async function reportEdit(reportId){
+        let response = await get(API_URL + "/getSaspReport?token=" +  localStorage.getItem("token")+"&reportID="+reportId)
+        let oldData = response.SaspIncidentReport;
+        console.log(oldData)
+        let data = {
+        reportID:reportId,
+        incident: oldData.incident,
+        date:  oldData.date,
+        receivedTime: oldData.receivedTime,
+        enrouteTime: oldData.enrouteTime,
+        arivedTime:  oldData.arivedTime,
+        clearTime: oldData.clearTime,
+        location:  oldData.location,
+        locationDetail: oldData.locationDetail,
+        summary: oldData.summary,
+        }
+        console.log(data)
+        setFormData(data)
+        handleShow()
+    }
+
+
 
     // DefaultColDef sets props common to all Columns
     const defaultColDef = useMemo( ()=> ({
@@ -120,7 +201,6 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
         autoLogin();
         setColumnDefs( generalCols);
         const pos = localStorage.getItem("position")
-        console.log(pos)
         if(pos== "admin"){
             let cols = generalCols
             for(let i=0; i<morecolumns.length; i++){
@@ -200,7 +280,56 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
 
 
 			</div>
-           
+            <Modal
+              show={show}
+              onHide={handleClose}
+              backdrop="static"
+              keyboard={false}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>New Password</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Form>
+                <div className="register-form">
+                  
+                  <Form.Label className=" d-flex justify-content-start">Incident</Form.Label>
+                  <Form.Select aria-label="Default select example"  name="incident" onChange={(e) => reportInputChangeHandler(e)}>
+                  <SaspIncidents selected = {formData.incident}  />
+                  </Form.Select>
+              
+                  <Form.Label className=" d-flex justify-content-start">Date </Form.Label>
+                  <Form.Control type="date" value={formData.date} name="date" onChange={(e) => reportInputChangeHandler(e)}/>
+
+                  <Form.Label className=" d-flex justify-content-start">Recived Time </Form.Label>
+                  <TimePicker24H time = {formData.receivedTime} inputChangeHandler={ reportInputChangeHandler} name = {"receivedTime"}/>
+
+                  <Form.Label className=" d-flex justify-content-start">Enroute Time </Form.Label>
+                  <TimePicker24H time = {formData.enrouteTime} inputChangeHandler={ reportInputChangeHandler} name = {"enrouteTime"}/>
+                  
+                  <Form.Label className=" d-flex justify-content-start">Arrived Time </Form.Label>
+                  <TimePicker24H time = {formData.arivedTime} inputChangeHandler={ reportInputChangeHandler} name = {"arivedTime"}/>
+
+                  <Form.Label className=" d-flex justify-content-start">Clear Time </Form.Label>
+                  <TimePicker24H time = {formData.clearTime} inputChangeHandler={ reportInputChangeHandler} name = {"clearTime"}/>
+
+                  <Form.Label className=" d-flex justify-content-start">Location</Form.Label>
+                  <Form.Select aria-label="Default select example" name="location" onChange={(e) => reportInputChangeHandler(e)}>
+                  <SaspLocations selected = {formData.location} />
+                  </Form.Select>
+
+                  <Form.Label className=" d-flex justify-content-start">Location Detail</Form.Label>
+                  <Form.Control type="text" placeholder="" value={formData.locationDetail} name="locationDetail" onChange={(e) => reportInputChangeHandler(e)}/>
+
+                  <Form.Label className=" d-flex justify-content-start">Summary</Form.Label>
+                  <Form.Control as="textarea" placeholder="" value={formData.summary} name="summary" onChange={(e) => reportInputChangeHandler(e)}/>
+                  </div>
+                </Form>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="primary" onClick={()=>reportChangeSubmit()}>Submit</Button>
+              </Modal.Footer>
+            </Modal>
         </div>
     )
 }
