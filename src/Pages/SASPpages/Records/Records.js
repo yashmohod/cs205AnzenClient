@@ -1,4 +1,4 @@
-import React, {Component, useEffect, useRef, useState,useMemo } from "react";
+import React, {useCallback, useEffect, useRef, useState,useMemo } from "react";
 import Nav from "../../../Components/Nav/Nav";
 import './Records.css'
 import {AgGridReact} from 'ag-grid-react';
@@ -17,7 +17,7 @@ import Modal from 'react-bootstrap/Modal';
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 import Dropdown from 'react-bootstrap/Dropdown';
 import Referals from "../Referals/Referals";
-export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
+export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersion,reportID}) {
     
     // edit records 
     const [show, setShow] = useState(false);
@@ -191,13 +191,13 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
 
 
 
-    const gridRef = useRef(); // Optional - for accessing Grid's API
+    const gridRef = useRef(null); // Optional - for accessing Grid's API
     const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
 
     // Each Column Definition results in one Column.
     const[columnDefs,setColumnDefs]= useState([])
   
-    const [generalCols, setGeneralCols] = useState([
+    const [miniverFeatures, setMiniverFeatures] = useState([
     {field: 'date'},
     {field: 'incident'},
     {field: 'location'},
@@ -208,7 +208,9 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     {field: 'clearTime'},
     {field: 'reportedByName'},
     {field: 'summary'},
-    {field: 'id', 
+    ]);
+    const [fullverFeatures, setFullverFeatures] =useState([
+        {field: 'id', 
     headerName: '' ,
     cellRenderer: CommonButton, 
     cellRendererParams: {
@@ -218,7 +220,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
       buttonText: "View Referals",
       variant:"outline-dark",
     }},
-    ]);
+    ])
 
     const [morecolumns, setmoreColumns] = useState([
     {field: 'id', 
@@ -290,22 +292,50 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     var encodedUri = encodeURI(csvContent);
     window.open(encodedUri);
     }
+    // const [org,setOrg] = useState("")
+    // const [pos,setPos]= useState("")
 
 
 
+    async function getOrgNPos(){
+        const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
+        const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
+        let locOrg = posres["organization"]
+        let locPos = posres["position"]
+        // setOrg(locOrg)
+        // setPos(locPos)
 
-    useEffect(() => {
-        autoLogin();
-        setColumnDefs( generalCols);
-        const pos = localStorage.getItem("position")
-        if(pos== "admin"){
-            let cols = generalCols
+        //set mini version features
+        setColumnDefs( miniverFeatures);
+        //set full version features
+        if(fullVersion){
+            let cols = miniverFeatures
+            for(let i=0; i<fullverFeatures.length; i++){
+                cols.push(fullverFeatures[i])
+            }
+            setColumnDefs(cols);
+
+        }
+        //set admin version features
+        if(locPos== "admin"){
+            let cols = miniverFeatures
             for(let i=0; i<morecolumns.length; i++){
                 cols.push(morecolumns[i])
             }
             setColumnDefs(cols);
 
         }
+
+        gridRef.current.api.sizeColumnsToFit();
+
+    }
+
+
+
+    useEffect(() => {
+        autoLogin();
+        getOrgNPos();
+        
     }, [])
 
 

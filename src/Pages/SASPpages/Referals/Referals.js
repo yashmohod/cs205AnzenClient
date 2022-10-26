@@ -76,20 +76,22 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
 
     // Each Column Definition results in one Column.
     const[columnDefs,setColumnDefs]= useState([])
-  
-    const [generalCols, setGeneralCols] = useState([
-    {field: 'date'},
-    {field: 'inceident'},
-    {field: 'location'},
-    {field: 'judicialReferal'},
-    {field: 'firstName'},
-    {field: 'lastName'},
-    {field: 'middleInitial'},
-    {field: 'ICID'},
-    {field: 'dob'},
-    {field: 'address'},
-    {field: 'phoneNo'},
-    {field: 'id', 
+
+    const [miniverFeatures,setMiniverFeatures]=useState([
+        {field: 'date'},
+        {field: 'inceident'},
+        {field: 'location'},
+        {field: 'judicialReferal'},
+        {field: 'firstName'},
+        {field: 'lastName'},
+        {field: 'middleInitial'},
+        {field: 'ICID'},
+        {field: 'dob'},
+        {field: 'address'},
+        {field: 'phoneNo'},
+    ])
+    const [fullverFeatures,setFullverFeatures]=useState([
+        {field: 'id', 
     headerName: '' ,
     cellRenderer: CommonButton, 
     cellRendererParams: {
@@ -99,9 +101,9 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
       buttonText: "View Report",
       variant:"outline-dark",
     }},
-    ]);
+    ])
 
-    const [morecolumns, setmoreColumns] = useState([
+    const [adminverFeatures, setadminverFeatures] = useState([
     {field: 'id', 
     headerName: '' ,
     cellRenderer: EditButton, 
@@ -118,29 +120,51 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
        
       }
     }}]);
+    
+
+
 
     // DefaultColDef sets props common to all Columns
     const defaultColDef = useMemo( ()=> ({
         sortable: true
     }));
 
+    async function getOrgNPos(){
+        const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
+        const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
+        let locOrg = posres["organization"]
+        let locPos = posres["position"]
+        // setOrg(locOrg)
+        // setPos(locPos)
+
+        //set mini version features
+        setColumnDefs( miniverFeatures);
+        //set full version features
+        if(fullVersion){
+            let cols = miniverFeatures
+            for(let i=0; i<fullverFeatures.length; i++){
+                cols.push(fullverFeatures[i])
+            }
+            setColumnDefs(cols);
+
+        }
+        //set admin version features
+        if(locPos== "admin"){
+            let cols = miniverFeatures
+            for(let i=0; i<adminverFeatures.length; i++){
+                cols.push(adminverFeatures[i])
+            }
+            setColumnDefs(cols);
+
+        }
+    }
 
 
 
     useEffect(() => {
         getRefsOFrep(reportID)
         autoLogin();
-        setColumnDefs( generalCols);
-        const pos = localStorage.getItem("position")
-        console.log(pos)
-        if(pos== "admin"){
-            let cols = generalCols
-            for(let i=0; i<morecolumns.length; i++){
-                cols.push(morecolumns[i])
-            }
-            setColumnDefs(cols);
-
-        }
+        getOrgNPos();
         getReports();
     }, [])
 

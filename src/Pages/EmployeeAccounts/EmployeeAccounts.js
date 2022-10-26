@@ -18,7 +18,7 @@ import Modal from 'react-bootstrap/Modal';
 
 export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin}) {
     const [accounts, setAccounts] = useState("")
-    const gridRef = useRef();
+    const gridRef = useRef(null);
     const [rowData, setRowData] = useState();
     const navigate = useNavigate();
 
@@ -242,21 +242,14 @@ async function registerHandler() {
 
         setRowData(response)
         setAccounts(response)
+      gridRef.current.api.sizeColumnsToFit();
+
         return response
     }
 
-    const [org,setOrg] = useState("")
-    const [pos,setPos]= useState("")
-
-    async function getOrgNPos(){
-      const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
-      const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
-      setOrg(orgres["organization"])
-      setPos(posres["position"])
-    }
+ 
 
     useEffect(() => {
-      getOrgNPos()
       autoLogin()
       getAccounts()
       checkMessage()

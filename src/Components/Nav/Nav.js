@@ -1,5 +1,5 @@
 import { hover } from "@testing-library/user-event/dist/hover";
-import React, { useEffect, useState, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { API_URL } from "../../Utils/API";
 import './Nav.css'
 import { useNavigate,useLocation } from "react-router-dom";
@@ -24,6 +24,7 @@ export default function Nav({setLoggedIn, loggedInUser}) {
             setshowmore(true)
         }
     })
+    const [hovered,setHovered] = useState(false)
     function changeHoverFalse() {
         setHovered(false)
     }
