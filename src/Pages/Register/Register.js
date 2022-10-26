@@ -1,39 +1,128 @@
-import { useState , React} from "react";
+/* eslint-disable no-undef */
+import { useState , React, useEffect} from "react";
 import Nav from "../../Components/Nav/Nav";
 import { Form, Button } from 'react-bootstrap';
 import './Register.css'
 import { API_URL, post } from "../../Utils/API";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from "react-router-dom";
+
 
 export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
-    const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
-        collegeId: "",
-        dob: "",
-        organization: "",
-        position: "",
-        email: "",
-        email_confirm: "",
-        password: "",
-        password_confirm: ""
-    })
+  const navigate = useNavigate();
+  const [SASPshowPos, setSASPshowPos] = useState(false)
+  const [RESLIFEshowPos, setRESLIFEshowPos] = useState(false)
+  const SasporgsNpos = [
+    {pos:"Probationary Member"},
+    {pos:"Junior Member"},
+    {pos:"Senior Member"},
+    {pos:"Executive Board Member"},
+  ]
+  const RESLIFEorgsNpos = [
+    {pos:"RA"},
+    {pos:"Senior RA"},
 
+  ]
+  const [formData, setFormData] = useState({
+      firstName: "",
+      lastName: "",
+      collegeId: "",
+      dob: "",
+      organization: "",
+      position: "",
+      email: "",
+      userName: "",
+      userName_confirm: "",
+      password: "",
+      password_confirm: "",
+  })
+
+  function changePosition(e) {
+    setFormData({...formData, position : e.target.value})
+  }
+
+  useEffect(() => 
+  {
+    setpos()
+    console.log("Form Position")
+    console.log(formData.position)
+   
+  }
+, [formData])
+
+  const SASPPosButton = (props) => {
+
+    return (
+      <div>
+        {SasporgsNpos.map((item) => {
+        return (
+          <Form.Check inline label={item.pos} value ={item.pos} name="position" type={"radio"} id={item.pos} checked={props.formData.position == item.pos} onChange={(e) => props.changePosition(e)}/>
+                )})
+        }
+    </div>
+
+    )
+  
+}
+  const RESLIFEPosButton = (props) => {
+    return (
+      <div>
+      {
+        RESLIFEorgsNpos.map((item) => {
+        return (
+            <Form.Check inline label={item.pos} value ={item.pos} name="position" type={"radio"} id={item.pos} checked={props.formData.position == item.pos} onChange={(e) => props.changePosition(e)}/>
+      )})
+      }
+      </div>
+    )
+ 
+}
 
     async function registerHandler() {
-       // let response = await post(API_URL + "/register", formData)
-      //  console.log(response)
-        toast.success("Account with email: " + formData.email + " has been created.")
+
+      let response = await post(API_URL + "/register", {
+        token: localStorage.getItem("token"),
+        email: formData.email,
+        userName: formData.userName,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        collegeId: formData.collegeId,
+        dob: formData.dob,
+        organization:localStorage.getItem("organization"),
+        position: formData.position,
+        })
+      console.log(response)
+      if(response.message === "registered successfully"){
+        localStorage.setItem("message", response.message);
+        navigate("/employee-accounts");
+      }
+  
         
     }
 
     function validateFormData() {
+      
 
     }
     
     function inputChangeHandler(e) {
         setFormData({...formData,  [e.target.name] : e.target.value})
+        console.log(e.target.name)
+    }
+    function setpos(){
+      const org = localStorage.getItem("organization")
+      
+      if(org === "SASP"){
+        setSASPshowPos(true)
+        setRESLIFEshowPos(false)
+      }
+      if(org === "RESLIFE"){
+        setSASPshowPos(false)
+        setRESLIFEshowPos(true)
+      }
+
     }
 
 
@@ -63,19 +152,21 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
               <Form.Label className=" d-flex justify-content-start">Date of Birth </Form.Label>
               <Form.Control type="date" placeholder="" name="dob" onChange={(e) => inputChangeHandler(e)}/>
 
-              <Form.Label className=" d-flex justify-content-start">Organization</Form.Label>
-              <Form.Control type="text" placeholder="" name="organization" onChange={(e) => inputChangeHandler(e)}/>
-
-              
-              <Form.Label className=" d-flex justify-content-start">Position</Form.Label>
-              <Form.Control type="text" placeholder="" name="position" onChange={(e) => inputChangeHandler(e)}/>
-
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label className=" d-flex justify-content-start">Email address</Form.Label>
-              <Form.Control type="email" placeholder="Enter email" name="email" onChange={(e) => inputChangeHandler(e)}/>
-              <Form.Label className=" d-flex justify-content-start">Confirm Email address</Form.Label>
-              <Form.Control type="email" placeholder="Re-enter email" name="email_confirm" onChange={(e) => inputChangeHandler(e)}/>
+              <Form.Control type="text" placeholder="" name="email" onChange={(e) => inputChangeHandler(e)}/>
+              
+            <Form.Label className=" d-flex justify-content-start">Position</Form.Label>
+            { SASPshowPos ? <SASPPosButton changePosition = {changePosition} formData={formData}/> : null }
+            { RESLIFEshowPos ? <RESLIFEPosButton  changePosition = {changePosition} formData={formData}/> : null }
+        
+              
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label className=" d-flex justify-content-start">Username</Form.Label>
+              <Form.Control type="text" placeholder="Enter Username" name="userName" onChange={(e) => inputChangeHandler(e)}/>
+              <Form.Label className=" d-flex justify-content-start">Confirm Username</Form.Label>
+              <Form.Control type="text" placeholder="Re-enter Username" name="userName_confirm" onChange={(e) => inputChangeHandler(e)}/>
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="formBasicPassword">

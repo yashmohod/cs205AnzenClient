@@ -1,18 +1,18 @@
 import React, {Component, useEffect, useRef, useState,useMemo } from "react";
-import Nav from "../../Components/Nav/Nav";
+import Nav from "../../../Components/Nav/Nav";
 import './Location.css'
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-alpine.css';
-import { API_URL, get, post } from '../../Utils/API';
-import DeleteButton from './DeleteButton'
-import EditButton from './EditButton'
+import { API_URL, get, post } from '../../../Utils/API';
+import DeleteButton from '../../../Components/Buttons/DeleteButton'
+import EditButton from '../../../Components/Buttons/EditButton'
 import { Button, Form } from "react-bootstrap";
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
 
     const [Location, setLocation] = useState("")
-    const [locations, setLocations] = useState(null)
     let tempLocation
     function locationChangeHandler(e) {
         setLocation(e.target.value);
@@ -20,11 +20,20 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
 
     async function addLocationHandler(e){
         let response = await post(API_URL + "/enterLocation",  {location: Location,token: localStorage.getItem("token")});
-        if (response["message"] =="New location was successfully entered."){
-            document.getElementById("locationInput").value = "";
-            getLocations();
-            console.log(Location+" added!")
+        if(Location != ""){
+            if (response.message =="New location was successfully entered."){
+                document.getElementById("locationInput").value = "";
+                getLocations();
+                toast.success(response.message+" : "+Location);
+                setLocation("")
+            }else{
+                toast.warning(response.message);
+            }
+        }else{
+            toast.warning("Empty incident was entered!")
         }
+
+        
     }
     async function deleteLocationHandler(locationId){
         let response = await post(API_URL + "/deleteLocation",  {id :locationId ,token: localStorage.getItem("token")});
@@ -51,9 +60,10 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
 
     async function getLocations(){
         let response = await get(API_URL + "/getLocations?token=" +  localStorage.getItem("token"));
-        setRowData(response.locations);
-        console.log(response.locations)
-        return response.locations
+        response = JSON.parse(response.locations)
+        setRowData(response);
+        console.log(response)
+        return response
     }
 
 
@@ -104,7 +114,8 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
     return (
         <div className="location-page">
              <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
-            <h1>Add Location</h1>
+             <ToastContainer />
+            <h1>Locations</h1>
             <div className="container-fluid m-5">
                 <div className="row">
                     <div className="col-12">

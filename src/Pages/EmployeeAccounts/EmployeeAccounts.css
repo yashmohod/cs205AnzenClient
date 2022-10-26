@@ -1,0 +1,22 @@
+.incident-page {
+    overflow-x: hidden;
+}
+
+.incident-form-container {
+    width: 100vw;
+}
+
+.incident-form {
+    display: flex;
+    margin: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.incident-grid {
+    height: 75vh;
+    width: 100%;
+}
+.ag-header-cell-label {
+    justify-content: center;
+ }

@@ -1,0 +1,17 @@
+.location-grid {
+    height: 1000px;
+    width: 100vw;
+}
+
+#locationInput {
+    width: 300px;
+}
+
+#location-form {
+    display: flex;
+    justify-content: center;
+}
+
+#searchFormElement{
+    margin: 10px;
+}

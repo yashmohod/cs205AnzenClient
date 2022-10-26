@@ -12,7 +12,7 @@ export default class DeleteButton extends Component {
     }
     render() {
       return (
-        <Button onClick={this.btnClickedHandler} variant="danger" className="p-1">Delete</Button>
+        <Button variant="outline-danger" onClick={this.btnClickedHandler} className="p-1">Delete</Button>
       )
     }
   }
