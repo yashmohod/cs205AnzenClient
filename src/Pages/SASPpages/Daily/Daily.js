@@ -48,9 +48,9 @@ useEffect(() =>
 
   async function saspReportSumbitHandler(){
   console.log(formData)
-  console.log(referalData)
+  // console.log(referalData)
   let response = await post(API_URL + "/enterSaspReport", {token: localStorage.getItem("token"),saspReportData:formData, referalData:referalData})
-  console.log(response)
+  // console.log(response)
   if(response.message === "New SASP incident report was successfully entered."){
     localStorage.setItem("message", response.message);
     navigate("/");

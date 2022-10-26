@@ -13,7 +13,7 @@ import SaspIncidents from "../../../Components/SaspIncidents/SaspIncidents"
 import SaspLocations from "../../../Components/SaspLocations/SaspLocations"
 import EmployeeList from "../../../Components/EmployeeList/EmployeeList"
 import CommonButton from '../../../Components/Buttons/CommonButton'
-export default function Referals({setLoggedIn, loggedInUser, autoLogin}) {
+export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVersion,reportID}) {
 
     const [Referals, setReferals] = useState("")
     const [searchData, setSearchData] = useState({
@@ -24,6 +24,9 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin}) {
         "dateTo":"",
     })
 
+    async function getRefsOFrep(repId){
+        
+    }
 
 
     async function getReports(){
@@ -125,6 +128,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin}) {
 
 
     useEffect(() => {
+        getRefsOFrep(reportID)
         autoLogin();
         setColumnDefs( generalCols);
         const pos = localStorage.getItem("position")
@@ -143,9 +147,10 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin}) {
 
     return (
         <div className="location-page">
-             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
-             <ToastContainer />
+            {fullVersion?
+             <><Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} /><ToastContainer /></>: null }
             <h1>Referals</h1>
+            {fullVersion?
             <div className="container">
                 <div className="row">
                     <div className="col">
@@ -192,7 +197,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin}) {
                     </div>
                 </div>
             </div>
-          
+          : null }
 
        
         

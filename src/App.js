@@ -53,7 +53,7 @@ function App() {
           <Route path="/SASPpages/locations" element={<Location setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/SASPpages/incidents" element={<Incidents setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/SASPpages/Records" element={<Records setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
-          <Route path="/SASPpages/referrals" element={<Referals setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
+          <Route path="/SASPpages/referrals" element={<Referals setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()} fullVersion={true} reportID={""}/>}/>
 
         </Routes>                 
     </div>

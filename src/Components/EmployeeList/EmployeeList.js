@@ -26,7 +26,7 @@ export default function EmployeeList() {
           employeeList.map((item) => {
             if(item.id!=""){
               return (
-                <option key={item.id}  >{item.lastName+","+item.firstName}</option>
+                <option value={item.id}  >{item.lastName+","+item.firstName}</option>
               )
             } else{
               return (

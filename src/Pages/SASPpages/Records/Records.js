@@ -15,12 +15,18 @@ import EmployeeList from "../../../Components/EmployeeList/EmployeeList"
 import CommonButton from '../../../Components/Buttons/CommonButton'
 import Modal from 'react-bootstrap/Modal';
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
+import Dropdown from 'react-bootstrap/Dropdown';
+import Referals from "../Referals/Referals";
 export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     
     // edit records 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+    // view refs 
+    const [showref, setShowref] = useState(false);
+    const handleCloseref = () => setShowref(false);
+    const handleShowref = () => setShowref(true);
 
     const [formData, setFormData] = useState({
         reportID:'',
@@ -54,7 +60,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
         if(response.status ==200){
             toast.success(response.message)
             handleClose()
-            getReports()
+            setPreviousSearchedData()
         }else{
             toast.warning(response.message)
         }
@@ -67,25 +73,64 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     const [searchData, setSearchData] = useState({
         "employeeId":"",
         "location":"",
-        "inceident":"",
+        "incident":"",
+        "dateFrom":"",
+        "dateTo":"",
+    })
+    const [previousSearchData, setPreviousSearchData] = useState({
+        "employeeId":"",
+        "location":"",
+        "incident":"",
         "dateFrom":"",
         "dateTo":"",
     })
 
+    async function setPreviousSearchedData(){
+
+        let response = await post(API_URL + "/getSaspReports", {
+            token: localStorage.getItem("token"),
+            employeeId:previousSearchData.employeeId,
+            location:previousSearchData.location,
+            incident:previousSearchData.incident,
+            dateTo:previousSearchData.dateTo,
+            dateFrom:previousSearchData.dateFrom,
+            })
+        if(response.status == 200){
+            let data = response.SaspIncidentReports;
+
+            // data formating
+            data = data.map((item)=>{
+            var date = item.date.split(' ');
+            item.date = date[0]
+            return(
+                item
+            )
+             })
+            setRowData(data);
+        }
+    }
+
+   
 
 
-    async function getReports(){
+    async function getAllReports(){
         let response = await post(API_URL + "/getSaspReports", {
             token: localStorage.getItem("token"),
             employeeId:"",
             location:"",
-            inceident:"",
+            incident:"",
             dateTo:"",
             dateFrom:"",
             })
-        // console.log(response)
-        let data = response.SaspIncidentReports;
         
+        let data = response.SaspIncidentReports;
+        setPreviousSearchData({
+            "employeeId":"",
+            "location":"",
+            "incident":"",
+            "dateFrom":"",
+            "dateTo":"",
+        })
         // date formating
         data = data.map((item)=>{
             var date = item.date.split(' ');
@@ -95,29 +140,66 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
             )
         })
         setRowData(data);
-        return response
+        clearSearchFields()
     }
 
     function searchInputHandeler(e){
-        setSearchData({...searchData,  [e.target.name] : e.target.value})
+        setSearchData({...searchData,  [e.target.name] : e.target.value})   
+
     }
 
-    function searchButtonHandeler(){
-        // console.log(searchData)
+    const EmployeeDropdown = useRef(null)
+    const incidentDropdown = useRef(null)
+    const LocationDropdown = useRef(null)
+    const dateToChooser = useRef(null)
+    const dateFromChooser = useRef(null)
+
+    function clearSearchFields(){
+        EmployeeDropdown.current.selectedIndex=0
+        incidentDropdown.current.selectedIndex=0
+        LocationDropdown.current.selectedIndex=0
+        dateToChooser.current.value=""
+        dateFromChooser.current.value=""
+    }
+
+    async function searchButtonHandeler(){
+        let response = await post(API_URL + "/getSaspReports", {
+            token: localStorage.getItem("token"),
+            employeeId:searchData.employeeId,
+            location:searchData.location,
+            incident:searchData.incident,
+            dateTo:searchData.dateTo,
+            dateFrom:searchData.dateFrom,
+            })
+        if(response.status == 200){
+            let data = response.SaspIncidentReports;
+
+            // data formating
+            data = data.map((item)=>{
+            var date = item.date.split(' ');
+            item.date = date[0]
+            return(
+                item
+            )
+             })
+            setRowData(data);
+            setPreviousSearchData(searchData)
+            clearSearchFields()
+        }
     }
 
 
 
 
     const gridRef = useRef(); // Optional - for accessing Grid's API
-    const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
+    const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
 
     // Each Column Definition results in one Column.
     const[columnDefs,setColumnDefs]= useState([])
   
     const [generalCols, setGeneralCols] = useState([
     {field: 'date'},
-    {field: 'inceident'},
+    {field: 'incident'},
     {field: 'location'},
     {field: 'locationDetail'},
     {field: 'receivedTime'},
@@ -131,7 +213,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     cellRenderer: CommonButton, 
     cellRendererParams: {
       clicked: function(field) {
-        
+        viewReferals(field)
       },
       buttonText: "View Referals",
       variant:"outline-dark",
@@ -160,7 +242,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
         let response = await post(API_URL + "/deleteSaspReports", {reportID:reportId,token: localStorage.getItem("token")})
         if(response.status== 200){
             toast.success(response.message)
-            getReports()
+            setPreviousSearchedData()
         }else{
             toast.warning(response.message)
         }
@@ -182,17 +264,32 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
         locationDetail: oldData.locationDetail,
         summary: oldData.summary,
         }
-        console.log(data)
         setFormData(data)
         handleShow()
     }
-
+    const [reportIdForRef,setreportIdForRef]= useState("")
+    function viewReferals(reportID){
+        setreportIdForRef(reportID)
+        handleShowref()
+    }
 
 
     // DefaultColDef sets props common to all Columns
     const defaultColDef = useMemo( ()=> ({
         sortable: true
     }));
+
+    function SaveAsCSV(){
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Incident,Date,ReceivedTime,EnrouteTime,ArivedTime,ClearTime,Location,LocationDetail,Summary,"  + "\r\n";
+        rowData.forEach(function(rowArray) {
+            let row = rowArray.incident+","+rowArray.date+","+rowArray.receivedTime+","+rowArray.enrouteTime+","+rowArray.arivedTime+","+rowArray.clearTime+","+rowArray.location+","+","+rowArray.locationDetail+","+","+rowArray.summary
+            
+            csvContent += row + "\r\n";
+        });
+    var encodedUri = encodeURI(csvContent);
+    window.open(encodedUri);
+    }
 
 
 
@@ -209,7 +306,6 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
             setColumnDefs(cols);
 
         }
-        getReports();
     }, [])
 
 
@@ -224,40 +320,56 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
                         <div className="row" id = "location-form">
                             <div className="col" id="searchFormElement">
                             <Form.Label className=" d-flex justify-content-start">Employee</Form.Label>
-                            <Form.Select aria-label="Default select example"  name="employeeId" onChange={(e) => searchInputHandeler(e)}>
+                            <Form.Select aria-label="Default select example" ref={EmployeeDropdown}  name="employeeId" onChange={(e) => searchInputHandeler(e)}>
                             <EmployeeList  />
                             </Form.Select>
                             </div>
 
                             <div className="col" id="searchFormElement">
                             <Form.Label className=" d-flex justify-content-start">Incident</Form.Label>
-                            <Form.Select aria-label="Default select example"  name="incident" onChange={(e) => searchInputHandeler(e)}>
+                            <Form.Select aria-label="Default select example"  ref={incidentDropdown} name="incident" onChange={(e) => searchInputHandeler(e)}>
                             <SaspIncidents  />
                             </Form.Select>
                             </div>
 
                             <div className="col" id="searchFormElement">
                             <Form.Label className=" d-flex justify-content-start">Location</Form.Label>
-                            <Form.Select aria-label="Default select example" name="location" onChange={(e) => searchInputHandeler(e)}>
+                            <Form.Select aria-label="Default select example" ref={LocationDropdown} name="location" onChange={(e) => searchInputHandeler(e)}>
                             <SaspLocations />
                             </Form.Select>
                             </div>
 
                             <div className="col" id="searchFormElement">
                             <Form.Label className=" d-flex justify-content-start">Date From</Form.Label>
-                            <Form.Control type="date" placeholder="" name="dateFrom" onChange={(e) => searchInputHandeler(e)}/>
+                            <Form.Control type="date" placeholder=""  ref={dateFromChooser} name="dateFrom" onChange={(e) => searchInputHandeler(e)}/>
                             </div>
 
                             <div className="col" id="searchFormElement">
                             <Form.Label className=" d-flex justify-content-start">Date To</Form.Label>
-                            <Form.Control type="date" placeholder="" name="dateTo" onChange={(e) => searchInputHandeler(e)}/>
+                            <Form.Control type="date" placeholder="" name="dateTo" ref={dateToChooser} onChange={(e) => searchInputHandeler(e)}/>
                             </div>
                             <div className="col" id="searchFormElement">
-                                <div>
-                                <Button variant="outline-info" type="button" onClick={() => searchButtonHandeler()}>Search All</Button>
+                                <div className="col">
+                                <div className="row">
+                                <Button variant="outline-primary" type="button" onClick={() => searchButtonHandeler()}>Search</Button>
+                                <Button variant="outline-info" type="button" onClick={() => getAllReports()}>Search All</Button>
                                 </div>
-                            <Button variant="outline-primary" type="button" onClick={() => searchButtonHandeler()}>Search</Button>
-                            <Button variant="outline-dark" type="button" onClick={() => searchButtonHandeler()}>Download File</Button>
+                                </div>
+                                <div className="col">
+                                {(rowData.length > 0)? 
+                                    <Dropdown>
+                                        <Dropdown.Toggle variant="outline-black" id="dropdown-basic">
+                                            Export File
+                                        </Dropdown.Toggle>
+
+                                        <Dropdown.Menu>
+                                            <Dropdown.Item onClick={()=>SaveAsCSV()}>CSV </Dropdown.Item>
+                                            <Dropdown.Item >PDF</Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown> 
+                                : null}
+                                </div>
+                            
                             </div>
                             
                         </div>
@@ -329,6 +441,25 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
               <Modal.Footer>
                 <Button variant="primary" onClick={()=>reportChangeSubmit()}>Submit</Button>
               </Modal.Footer>
+            </Modal>
+
+
+            <Modal
+              show={showref}
+              onHide={handleCloseref}
+              backdrop="static"
+              keyboard={false}
+              fullscreen={true}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>New Password</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+
+            <Referals setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()} fullVersion={false} reportID={reportIdForRef}/>
+
+
+            </Modal.Body>
             </Modal>
         </div>
     )
