@@ -167,7 +167,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
         getRefsOFrep(reportID)
         autoLogin();
         getOrgNPos();
-        getReports();
+        // getReports();
     }, [])
 
 

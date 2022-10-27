@@ -200,11 +200,9 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
 
 
 
-    const gridRef = useRef(null); // Optional - for accessing Grid's API
-    const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
 
   
-    const [generalCols, setGeneralCols] = useState([
+    const [miniverFeatures, setminiverFeatures] = useState([
     {field: 'date',headerName:'Date'},
     {field: 'incident',headerName:'Incident'},
     {field: 'location',headerName:'Location'},
@@ -215,7 +213,11 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
     {field: 'clearTime',headerName:'Clear Time'},
     {field: 'reportedByName',headerName:'Reported By'},
     {field: 'summary',headerName:'Summary'},
-    {field: 'id', 
+
+    ])
+
+    const [fullverFeatures, setfullverFeatures] = useState([
+        {field: 'id', 
     headerName: '' ,
     cellRenderer: CommonButton, 
     cellRendererParams: {
