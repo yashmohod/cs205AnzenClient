@@ -28,6 +28,12 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     const handleCloseref = () => setShowref(false);
     const handleShowref = () => setShowref(true);
 
+    const gridRef = useRef(null); // Optional - for accessing Grid's API
+    const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
+
+    // Each Column Definition results in one Column.
+    const[columnDefs,setColumnDefs]= useState([])
+
     const [formData, setFormData] = useState({
         reportID:'',
         incident: "",
@@ -43,7 +49,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
 
     async function reportChangeSubmit(){
         //editSaspReport
-        console.log(formData)
+
         let response = await post(API_URL + "/editSaspReport", {
             token: localStorage.getItem("token"),
             reportID:formData.reportID,
@@ -140,6 +146,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
             )
         })
         setRowData(data);
+        gridRef.current.api.sizeColumnsToFit();
         clearSearchFields()
     }
 
@@ -184,30 +191,28 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
              })
             setRowData(data);
             setPreviousSearchData(searchData)
+            gridRef.current.api.sizeColumnsToFit();
             clearSearchFields()
+            
         }
     }
 
 
 
 
-    const gridRef = useRef(); // Optional - for accessing Grid's API
-    const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
 
-    // Each Column Definition results in one Column.
-    const[columnDefs,setColumnDefs]= useState([])
   
     const [generalCols, setGeneralCols] = useState([
-    {field: 'date'},
-    {field: 'incident'},
-    {field: 'location'},
-    {field: 'locationDetail'},
-    {field: 'receivedTime'},
-    {field: 'enrouteTime'},
-    {field: 'arivedTime'},
-    {field: 'clearTime'},
-    {field: 'reportedByName'},
-    {field: 'summary'},
+    {field: 'date',headerName:'Date'},
+    {field: 'incident',headerName:'Incident'},
+    {field: 'location',headerName:'Location'},
+    {field: 'locationDetail',headerName:'Loc. Details'},
+    {field: 'receivedTime',headerName:'Recived Time'},
+    {field: 'enrouteTime',headerName:'Enroute Time'},
+    {field: 'arivedTime',headerName:'Arrived Time'},
+    {field: 'clearTime',headerName:'Clear Time'},
+    {field: 'reportedByName',headerName:'Reported By'},
+    {field: 'summary',headerName:'Summary'},
     {field: 'id', 
     headerName: '' ,
     cellRenderer: CommonButton, 
@@ -290,7 +295,6 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     var encodedUri = encodeURI(csvContent);
     window.open(encodedUri);
     }
-
 
 
 

@@ -18,7 +18,7 @@ import Modal from 'react-bootstrap/Modal';
 
 export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin}) {
     const [accounts, setAccounts] = useState("")
-    const gridRef = useRef();
+    const gridRef = useRef(null);
     const [rowData, setRowData] = useState();
     const navigate = useNavigate();
 
@@ -99,13 +99,13 @@ async function registerHandler() {
 
 
     const columnDefs = [
-        {field: 'position', headerName: 'Position' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
-        {field: 'status', headerName: 'Status' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
-        {field: 'lastName', headerName: 'Last Name' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
-        {field: 'firstName', headerName: 'First Name' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
-        {field: 'dob', headerName: ' DOB' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
-        {field: 'collegeId', headerName: 'IC ID' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
-        {field: 'email', headerName: 'Email' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
+        {field: 'position', headerName: 'Position' ,cellStyle: { 'text-align': 'center' }},
+        {field: 'status', headerName: 'Status' ,cellStyle: { 'text-align': 'center' }},
+        {field: 'lastName', headerName: 'Last Name' ,cellStyle: { 'text-align': 'center' }},
+        {field: 'firstName', headerName: 'First Name' ,cellStyle: { 'text-align': 'center' }},
+        {field: 'dob', headerName: ' DOB' ,cellStyle: { 'text-align': 'center' }},
+        {field: 'collegeId', headerName: 'IC ID' ,cellStyle: { 'text-align': 'center' }},
+        {field: 'email', headerName: 'Email' ,cellStyle: { 'text-align': 'center' }},
         {field: 'id', 
         headerName: '' ,
         cellRenderer: EditButton,
@@ -171,7 +171,7 @@ async function registerHandler() {
           variant:"outline-dark",
         }},
         ]
-        const defaultColDef= { resizable: true, suppressSizeToFit: true }
+        const defaultColDef= { resizable: true}
 
 
     async function editAccount(accountId) {
@@ -242,14 +242,36 @@ async function registerHandler() {
 
         setRowData(response)
         setAccounts(response)
+        console.log(gridRef)
+        gridRef.current.api.sizeColumnsToFit();
         return response
     }
+
+
+    // const [dimensions, setDimensions] = React.useState({ 
+    //   height: window.innerHeight,
+    //   width: window.innerWidth
+    // })
+    
+    // function handleResize() {
+    //   setDimensions({
+    //     height: window.innerHeight,
+    //     width: window.innerWidth
+    //   })
+    //   if(window.innerHeight !== dimensions.height || window.innerWidth !== dimensions.width){
+    //     gridRef.current.api.sizeColumnsToFit();
+    //   }
+    // }
 
     useEffect(() => {
         autoLogin()
         getAccounts()
         checkMessage()
+        
     }, [])
+
+
+    // window.addEventListener('resize', handleResize)
 
     return (
         <div className="incident-page">

@@ -1,4 +1,4 @@
-import React, {Component, useEffect, useRef, useState,useMemo } from "react";
+import React, {useCallback, useEffect, useRef, useState,useMemo } from "react";
 import Nav from "../../../Components/Nav/Nav";
 import './Referals.css'
 import {AgGridReact} from 'ag-grid-react';
@@ -24,12 +24,8 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
         "dateTo":"",
     })
 
+
     async function getRefsOFrep(repId){
-        
-    }
-
-
-    async function getReports(){
         let response = await post(API_URL + "/getSaspReferals", {
             token: localStorage.getItem("token"),
             employeeId:"",
@@ -37,6 +33,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
             inceident:"",
             dateTo:"",
             dateFrom:"",
+            reportID:repId,
             })
         console.log(response.referals)
         let data = response.referals;
@@ -57,8 +54,13 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
             )
         })
         setRowData(data);
+        gridRef.current.api.sizeColumnsToFit();
+        
+
         return response
     }
+
+   
 
     function searchInputHandeler(e){
         setSearchData({...searchData,  [e.target.name] : e.target.value})
@@ -71,14 +73,14 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
 
 
 
-    const gridRef = useRef(); // Optional - for accessing Grid's API
+    const gridRef = useRef(null); // Optional - for accessing Grid's API
     const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
 
     // Each Column Definition results in one Column.
     const[columnDefs,setColumnDefs]= useState([])
   
     const [generalCols, setGeneralCols] = useState([
-    {field: 'date'},
+    {field: 'date',},
     {field: 'inceident'},
     {field: 'location'},
     {field: 'judicialReferal'},
@@ -141,7 +143,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
             setColumnDefs(cols);
 
         }
-        getReports();
+        // getReports();
     }, [])
 
 
