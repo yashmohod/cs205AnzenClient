@@ -42,7 +42,7 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
   })
   function inputChangeHandleracc(e) {
     setFormData({...formData,  [e.target.name] : e.target.value})
-    console.log(e.target.name)
+    // console.log(e.target.name)
 }
 async function registerHandler() {
 
@@ -56,7 +56,7 @@ async function registerHandler() {
     collegeId: formData.collegeId,
     dob: formData.dob,
     })
-  console.log(response)
+  // console.log(response)
   if(response.status === 200){
     toast.success(response.message)
     getAccounts()
@@ -182,7 +182,7 @@ async function registerHandler() {
         }
       })
 
-      console.log(curAccount)
+      // console.log(curAccount)
       const oldData = {
         userID:accountId,
         firstName: curAccount.firstName,

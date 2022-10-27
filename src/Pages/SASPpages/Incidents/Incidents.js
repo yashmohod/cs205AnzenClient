@@ -93,6 +93,18 @@ export default function Incidents({setLoggedIn, loggedInUser, autoLogin}) {
         autoLogin()
         getIncidents()
     }, [])
+/*
+     <div className="container-fluid m-5">
+                <div className="row">
+                    <div className="col-12">
+                        <Form className="text-center">
+                            <Form.Control type="text" placeholder="Enter new incident" onChange={(e) => incidentChangeHandler(e)} value={incident}/>
+                            <Button type="button" onClick={() => addIncidentHandler()}>Add Incident</Button>
+                        </Form>
+                    </div>
+                </div>
+            </div>
+*/
 
     return (
         <div className="incident-page">
