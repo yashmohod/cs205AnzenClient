@@ -12,7 +12,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import SaspIncidents from "../../../Components/SaspIncidents/SaspIncidents"
 import SaspLocations from "../../../Components/SaspLocations/SaspLocations"
 import EmployeeList from "../../../Components/EmployeeList/EmployeeList"
+import Dropdown from 'react-bootstrap/Dropdown';
 import CommonButton from '../../../Components/Buttons/CommonButton'
+import Modal from 'react-bootstrap/Modal';
+import Records from "../Records/Records";
 export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVersion,reportID}) {
 
     const [Referals, setReferals] = useState("")
@@ -23,6 +26,82 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
         "dateFrom":"",
         "dateTo":"",
     })
+    const [prevSearchData, setPrevSearchData] = useState({
+        "employeeId":"",
+        "location":"",
+        "inceident":"",
+        "dateFrom":"",
+        "dateTo":"",
+    })
+
+    async function getRefs(sData){
+        setPrevSearchData(sData)
+        let response = await post(API_URL + "/getSaspReferals", {
+            token: localStorage.getItem("token"),
+            employeeId:sData.employeeId,
+            location:sData.location,
+            inceident:sData.inceident,
+            dateTo:sData.dateTo,
+            dateFrom:sData.dateFrom,
+            reportID:sData.reportID,
+            })
+        let data = response.referals;
+        
+        // date formating
+        data = data.map((item)=>{
+            var date = item.date.split(' ');
+            var dob = item.dob.split(' ');
+            item.date = date[0]
+            item.dob = dob[0]
+            if(item.judicialReferal == true){
+                item.judicialReferal = "Yes"
+            }else{
+                item.judicialReferal = "No"
+            }
+            return(
+                item
+            )
+        })
+        setRowData(data);
+        gridRef.current.api.sizeColumnsToFit();
+    }
+
+    async function getAllReferals(){
+        let response = await post(API_URL + "/getSaspReferals", {
+            token: localStorage.getItem("token"),
+            employeeId:"",
+            location:"",
+            inceident:"",
+            dateTo:"",
+            dateFrom:"",
+            reportID:"",
+            })
+        let data = response.referals;
+        setPrevSearchData({
+            "employeeId":"",
+            "location":"",
+            "inceident":"",
+            "dateFrom":"",
+            "dateTo":"",
+        })
+        // date formating
+        data = data.map((item)=>{
+            var date = item.date.split(' ');
+            var dob = item.dob.split(' ');
+            item.date = date[0]
+            item.dob = dob[0]
+            if(item.judicialReferal == true){
+                item.judicialReferal = "Yes"
+            }else{
+                item.judicialReferal = "No"
+            }
+            return(
+                item
+            )
+        })
+        setRowData(data);
+        gridRef.current.api.sizeColumnsToFit();
+    }
 
 
     async function getRefsOFrep(repId){
@@ -60,21 +139,41 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
         return response
     }
 
+    // view reps
+    const [showrep, setShowrep] = useState(false);
+    const handleCloserep = () => setShowrep(false);
+    const handleShowrep = () => setShowrep(true);
+
+    const [reftIdForRep,setreportIdForRef]= useState("")
+    function viewReport(reportID){
+        setreportIdForRef(reportID)
+        handleShowrep()
+    }
+
+    function SaveAsCSV(){
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Incident,Date,ReceivedTime,EnrouteTime,ArivedTime,ClearTime,Location,LocationDetail,Summary,"  + "\r\n";
+        rowData.forEach(function(rowArray) {
+            let row = rowArray.incident+","+rowArray.date+","+rowArray.receivedTime+","+rowArray.enrouteTime+","+rowArray.arivedTime+","+rowArray.clearTime+","+rowArray.location+","+","+rowArray.locationDetail+","+","+rowArray.summary
+            
+            csvContent += row + "\r\n";
+        });
+    var encodedUri = encodeURI(csvContent);
+    window.open(encodedUri);
+    }
+
    
 
     function searchInputHandeler(e){
         setSearchData({...searchData,  [e.target.name] : e.target.value})
     }
 
-    function searchButtonHandeler(){
-        console.log(searchData)
-    }
 
 
 
 
     const gridRef = useRef(null); // Optional - for accessing Grid's API
-    const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
+    const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
 
     // Each Column Definition results in one Column.
     const[columnDefs,setColumnDefs]= useState([])
@@ -134,7 +233,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
     async function getOrgNPos(){
         const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
         const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
-        let locOrg = posres["organization"]
+        let locOrg = orgres["organization"]
         let locPos = posres["position"]
         // setOrg(locOrg)
         // setPos(locPos)
@@ -164,10 +263,11 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
 
 
     useEffect(() => {
-        getRefsOFrep(reportID)
         autoLogin();
         getOrgNPos();
-        // getReports();
+        if(reportID!==""){
+            getRefsOFrep(reportID)
+        }
     }, [])
 
 
@@ -212,11 +312,26 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
                             <Form.Control type="date" placeholder="" name="dateTo" onChange={(e) => searchInputHandeler(e)}/>
                             </div>
                             <div className="col" id="searchFormElement">
-                                <div>
-                                <Button variant="outline-info" type="button" onClick={() => searchButtonHandeler()}>Search All</Button>
+                            <div className="col">
+                                <div className="row">
+                                <Button variant="outline-primary" type="button" onClick={() => getRefs(searchData)}>Search</Button>
+                                <Button variant="outline-info" type="button" onClick={() => getAllReferals()}>Search All</Button>
                                 </div>
-                            <Button variant="outline-primary" type="button" onClick={() => searchButtonHandeler()}>Search</Button>
-                            <Button variant="outline-dark" type="button" onClick={() => searchButtonHandeler()}>Download File</Button>
+                                </div>
+                                <div className="col">
+                                {(rowData.length > 0)? 
+                                    <Dropdown>
+                                        <Dropdown.Toggle variant="outline-black" id="dropdown-basic">
+                                            Export File
+                                        </Dropdown.Toggle>
+
+                                        <Dropdown.Menu>
+                                            <Dropdown.Item onClick={()=>SaveAsCSV()}>CSV </Dropdown.Item>
+                                            <Dropdown.Item >PDF</Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown> 
+                                : null}
+                                </div>
                             </div>
                             
                         </div>
@@ -239,6 +354,26 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
 
 
 			</div>
+
+
+
+            <Modal
+              show={showrep}
+              onHide={handleCloserep}
+              backdrop="static"
+              keyboard={false}
+              fullscreen={true}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>New Password</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+
+            <Records setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()} fullVersion={false} reportID={reftIdForRep}/>
+
+
+            </Modal.Body>
+            </Modal>
            
         </div>
     )

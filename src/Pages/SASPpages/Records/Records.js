@@ -66,7 +66,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
         if(response.status ==200){
             toast.success(response.message)
             handleClose()
-            setPreviousSearchedData()
+            getReps(previousSearchData)
         }else{
             toast.warning(response.message)
         }
@@ -91,15 +91,16 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
         "dateTo":"",
     })
 
-    async function setPreviousSearchedData(){
+    async function getReps(sData){
+        setPreviousSearchData(sData)
 
         let response = await post(API_URL + "/getSaspReports", {
             token: localStorage.getItem("token"),
-            employeeId:previousSearchData.employeeId,
-            location:previousSearchData.location,
-            incident:previousSearchData.incident,
-            dateTo:previousSearchData.dateTo,
-            dateFrom:previousSearchData.dateFrom,
+            employeeId:sData.employeeId,
+            location:sData.location,
+            incident:sData.incident,
+            dateTo:sData.dateTo,
+            dateFrom:sData.dateFrom,
             })
         if(response.status == 200){
             let data = response.SaspIncidentReports;
@@ -169,33 +170,6 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
         dateFromChooser.current.value=""
     }
 
-    async function searchButtonHandeler(){
-        let response = await post(API_URL + "/getSaspReports", {
-            token: localStorage.getItem("token"),
-            employeeId:searchData.employeeId,
-            location:searchData.location,
-            incident:searchData.incident,
-            dateTo:searchData.dateTo,
-            dateFrom:searchData.dateFrom,
-            })
-        if(response.status == 200){
-            let data = response.SaspIncidentReports;
-
-            // data formating
-            data = data.map((item)=>{
-            var date = item.date.split(' ');
-            item.date = date[0]
-            return(
-                item
-            )
-             })
-            setRowData(data);
-            setPreviousSearchData(searchData)
-            gridRef.current.api.sizeColumnsToFit();
-            clearSearchFields()
-            
-        }
-    }
 
 
 
@@ -251,7 +225,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
         let response = await post(API_URL + "/deleteSaspReports", {reportID:reportId,token: localStorage.getItem("token")})
         if(response.status== 200){
             toast.success(response.message)
-            setPreviousSearchedData()
+            getReps(previousSearchData)
         }else{
             toast.warning(response.message)
         }
@@ -307,7 +281,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
     async function getOrgNPos(){
         const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
         const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
-        let locOrg = posres["organization"]
+        let locOrg = orgres["organization"]
         let locPos = posres["position"]
         // setOrg(locOrg)
         // setPos(locPos)
@@ -388,7 +362,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
                             <div className="col" id="searchFormElement">
                                 <div className="col">
                                 <div className="row">
-                                <Button variant="outline-primary" type="button" onClick={() => searchButtonHandeler()}>Search</Button>
+                                <Button variant="outline-primary" type="button" onClick={() => getReps(searchData)}>Search</Button>
                                 <Button variant="outline-info" type="button" onClick={() => getAllReports()}>Search All</Button>
                                 </div>
                                 </div>
