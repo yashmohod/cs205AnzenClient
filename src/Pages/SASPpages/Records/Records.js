@@ -66,7 +66,11 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
         if(response.status ==200){
             toast.success(response.message)
             handleClose()
-            getReps(previousSearchData)
+            if(fullVersion){    
+                getReps(previousSearchData)
+            }else{
+                getRep(reportID)
+            }
         }else{
             toast.warning(response.message)
         }
@@ -117,39 +121,51 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
         }
     }
 
+    async function getRep(repID){
+
+        let response = await get(API_URL + "/getSaspReport?token="+localStorage.getItem("token")+"&reportID="+repID)
+        if(response.status == 200){
+            let data = response.SaspIncidentReport;
+            // data formating
+            var date = data.date.split(' ');
+            data.date = date[0]
+            setRowData([data]);
+        }
+    }
+
    
 
 
-    async function getAllReports(){
-        let response = await post(API_URL + "/getSaspReports", {
-            token: localStorage.getItem("token"),
-            employeeId:"",
-            location:"",
-            incident:"",
-            dateTo:"",
-            dateFrom:"",
-            })
+    // async function getAllReports(){
+    //     let response = await post(API_URL + "/getSaspReports", {
+    //         token: localStorage.getItem("token"),
+    //         employeeId:"",
+    //         location:"",
+    //         incident:"",
+    //         dateTo:"",
+    //         dateFrom:"",
+    //         })
         
-        let data = response.SaspIncidentReports;
-        setPreviousSearchData({
-            "employeeId":"",
-            "location":"",
-            "incident":"",
-            "dateFrom":"",
-            "dateTo":"",
-        })
-        // date formating
-        data = data.map((item)=>{
-            var date = item.date.split(' ');
-            item.date = date[0]
-            return(
-                item
-            )
-        })
-        setRowData(data);
-        gridRef.current.api.sizeColumnsToFit();
-        clearSearchFields()
-    }
+    //     let data = response.SaspIncidentReports;
+    //     setPreviousSearchData({
+    //         "employeeId":"",
+    //         "location":"",
+    //         "incident":"",
+    //         "dateFrom":"",
+    //         "dateTo":"",
+    //     })
+    //     // date formating
+    //     data = data.map((item)=>{
+    //         var date = item.date.split(' ');
+    //         item.date = date[0]
+    //         return(
+    //             item
+    //         )
+    //     })
+    //     setRowData(data);
+    //     gridRef.current.api.sizeColumnsToFit();
+    //     clearSearchFields()
+    // }
 
     function searchInputHandeler(e){
         setSearchData({...searchData,  [e.target.name] : e.target.value})   
@@ -225,7 +241,11 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
         let response = await post(API_URL + "/deleteSaspReports", {reportID:reportId,token: localStorage.getItem("token")})
         if(response.status== 200){
             toast.success(response.message)
-            getReps(previousSearchData)
+            if(fullVersion){    
+                getReps(previousSearchData)
+            }else{
+                getRep(reportID)
+            }
         }else{
             toast.warning(response.message)
         }
@@ -316,15 +336,22 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
     useEffect(() => {
         autoLogin();
         getOrgNPos();
+        if(!fullVersion){getRep(reportID)}
         
     }, [])
 
 
     return (
         <div className="location-page">
-             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
+            {fullVersion?
+            <>
+            <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
              <ToastContainer />
+             </>
+             :null}
+
             <h1>Records</h1>
+            {fullVersion?
             <div className="container">
                 <div className="row">
                     <div className="col">
@@ -360,14 +387,12 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
                             <Form.Control type="date" placeholder="" name="dateTo" ref={dateToChooser} onChange={(e) => searchInputHandeler(e)}/>
                             </div>
                             <div className="col" id="searchFormElement">
-                                <div className="col">
                                 <div className="row">
                                 <Button variant="outline-primary" type="button" onClick={() => getReps(searchData)}>Search</Button>
-                                <Button variant="outline-info" type="button" onClick={() => getAllReports()}>Search All</Button>
+                                {/* <Button variant="outline-info" type="button" onClick={() => getAllReports()}>Search All</Button> */}
                                 </div>
-                                </div>
-                                <div className="col">
                                 {(rowData.length > 0)? 
+                                <div className="row">
                                     <Dropdown>
                                         <Dropdown.Toggle variant="outline-black" id="dropdown-basic">
                                             Export File
@@ -378,16 +403,14 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
                                             <Dropdown.Item >PDF</Dropdown.Item>
                                         </Dropdown.Menu>
                                     </Dropdown> 
-                                : null}
                                 </div>
-                            
+                                : null}
                             </div>
                             
                         </div>
                     </div>
                 </div>
-            </div>
-          
+            </div>:null}
 
        
         
@@ -410,7 +433,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
               keyboard={false}
             >
               <Modal.Header closeButton>
-                <Modal.Title>New Password</Modal.Title>
+                <Modal.Title>Report Edit</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Form>

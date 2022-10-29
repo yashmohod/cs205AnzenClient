@@ -66,42 +66,42 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
         gridRef.current.api.sizeColumnsToFit();
     }
 
-    async function getAllReferals(){
-        let response = await post(API_URL + "/getSaspReferals", {
-            token: localStorage.getItem("token"),
-            employeeId:"",
-            location:"",
-            inceident:"",
-            dateTo:"",
-            dateFrom:"",
-            reportID:"",
-            })
-        let data = response.referals;
-        setPrevSearchData({
-            "employeeId":"",
-            "location":"",
-            "inceident":"",
-            "dateFrom":"",
-            "dateTo":"",
-        })
-        // date formating
-        data = data.map((item)=>{
-            var date = item.date.split(' ');
-            var dob = item.dob.split(' ');
-            item.date = date[0]
-            item.dob = dob[0]
-            if(item.judicialReferal == true){
-                item.judicialReferal = "Yes"
-            }else{
-                item.judicialReferal = "No"
-            }
-            return(
-                item
-            )
-        })
-        setRowData(data);
-        gridRef.current.api.sizeColumnsToFit();
-    }
+    // async function getAllReferals(){
+    //     let response = await post(API_URL + "/getSaspReferals", {
+    //         token: localStorage.getItem("token"),
+    //         employeeId:"",
+    //         location:"",
+    //         inceident:"",
+    //         dateTo:"",
+    //         dateFrom:"",
+    //         reportID:"",
+    //         })
+    //     let data = response.referals;
+    //     setPrevSearchData({
+    //         "employeeId":"",
+    //         "location":"",
+    //         "inceident":"",
+    //         "dateFrom":"",
+    //         "dateTo":"",
+    //     })
+    //     // date formating
+    //     data = data.map((item)=>{
+    //         var date = item.date.split(' ');
+    //         var dob = item.dob.split(' ');
+    //         item.date = date[0]
+    //         item.dob = dob[0]
+    //         if(item.judicialReferal == true){
+    //             item.judicialReferal = "Yes"
+    //         }else{
+    //             item.judicialReferal = "No"
+    //         }
+    //         return(
+    //             item
+    //         )
+    //     })
+    //     setRowData(data);
+    //     gridRef.current.api.sizeColumnsToFit();
+    // }
 
 
     async function getRefsOFrep(repId){
@@ -192,12 +192,12 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
         {field: 'phoneNo'},
     ])
     const [fullverFeatures,setFullverFeatures]=useState([
-        {field: 'id', 
+        {field: 'reportID', 
     headerName: '' ,
     cellRenderer: CommonButton, 
     cellRendererParams: {
       clicked: function(field) {
-        
+        viewReport(field)
       },
       buttonText: "View Report",
       variant:"outline-dark",
@@ -218,12 +218,29 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
     cellRenderer: DeleteButton, 
     cellRendererParams: {
       clicked: function(field) {
-       
+        referalDelete(field)
       }
     }}]);
+
+
+    async function referalDelete(refID){
+        let response = await post(API_URL + "/deleteSaspReferal", {referalID:refID,token: localStorage.getItem("token")})
+        console.log(response)
+        if(response.status== 200){
+            toast.success(response.message)
+            if(fullVersion){    
+                getRefs(prevSearchData)
+            }else{
+                getRefsOFrep(reportID)
+            }
+        }else{
+            toast.warning(response.message)
+        }
+    }
+    function referalEdit(refID){
+
+    }
     
-
-
 
     // DefaultColDef sets props common to all Columns
     const defaultColDef = useMemo( ()=> ({
@@ -261,6 +278,25 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
     }
 
 
+    const firstName = useRef(null);
+    const lastName = useRef(null);
+    const ICID = useRef(null);
+    const incidentDropdown = useRef(null);
+    const LocationDropdown = useRef(null);
+    const dateToChooser = useRef(null);
+    const dateFromChooser = useRef(null);
+
+    function clearSearchFields(){
+        firstName.current.value = ""
+        lastName.current.value = ""
+        ICID.current.value = ""
+        incidentDropdown.current.selectedIndex=0
+        LocationDropdown.current.selectedIndex=0
+        dateToChooser.current.value=""
+        dateFromChooser.current.value=""
+    }
+
+
 
     useEffect(() => {
         autoLogin();
@@ -282,10 +318,16 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
                     <div className="col">
                         <div className="row" id = "location-form">
                             <div className="col" id="searchFormElement">
-                            <Form.Label className=" d-flex justify-content-start">Employee</Form.Label>
-                            <Form.Select aria-label="Default select example"  name="employeeId" onChange={(e) => searchInputHandeler(e)}>
-                            <EmployeeList  />
-                            </Form.Select>
+                            <Form.Label className=" d-flex justify-content-start">First name</Form.Label>
+                            <Form.Control type="text" placeholder="" name="firstName" onChange={(e) => searchInputHandeler(e)} />
+                            </div>
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">Last name</Form.Label>
+                            <Form.Control type="text" placeholder="" name="lastName" onChange={(e) => searchInputHandeler(e)} />
+                            </div>
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">ICID</Form.Label>
+                            <Form.Control type="text" placeholder="" name="ICID" onChange={(e) => searchInputHandeler(e)} />
                             </div>
 
                             <div className="col" id="searchFormElement">
@@ -315,7 +357,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
                             <div className="col">
                                 <div className="row">
                                 <Button variant="outline-primary" type="button" onClick={() => getRefs(searchData)}>Search</Button>
-                                <Button variant="outline-info" type="button" onClick={() => getAllReferals()}>Search All</Button>
+                                {/* <Button variant="outline-info" type="button" onClick={() => getAllReferals()}>Search All</Button> */}
                                 </div>
                                 </div>
                                 <div className="col">
@@ -365,10 +407,10 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
               fullscreen={true}
             >
               <Modal.Header closeButton>
-                <Modal.Title>New Password</Modal.Title>
+                <Modal.Title>Records</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-
+                                    
             <Records setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()} fullVersion={false} reportID={reftIdForRep}/>
 
 
