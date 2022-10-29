@@ -97,6 +97,8 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
       if(response.message === "registered successfully"){
         localStorage.setItem("message", response.message);
         navigate("/employee-accounts");
+      }else{
+        toast.warning(response.message)
       }
   
         

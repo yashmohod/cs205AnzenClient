@@ -69,7 +69,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
             if(fullVersion){    
                 getReps(previousSearchData)
             }else{
-                getRep(reportID)
+                // getRep(reportID)
             }
         }else{
             toast.warning(response.message)
@@ -118,20 +118,22 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
             )
              })
             setRowData(data);
+            gridRef.current.api.sizeColumnsToFit();
         }
     }
 
-    async function getRep(repID){
+    // async function getRep(repID){
 
-        let response = await get(API_URL + "/getSaspReport?token="+localStorage.getItem("token")+"&reportID="+repID)
-        if(response.status == 200){
-            let data = response.SaspIncidentReport;
-            // data formating
-            var date = data.date.split(' ');
-            data.date = date[0]
-            setRowData([data]);
-        }
-    }
+    //     let response = await get(API_URL + "/getSaspReport?token="+localStorage.getItem("token")+"&reportID="+repID)
+    //     if(response.status == 200){
+    //         let data = response.SaspIncidentReport;
+    //         // data formating
+    //         var date = data.date.split(' ');
+    //         data.date = date[0]
+    //         gridRef.current.api.sizeColumnsToFit();
+    //         setRowData([data]);
+    //     }
+    // }
 
    
 
@@ -244,7 +246,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
             if(fullVersion){    
                 getReps(previousSearchData)
             }else{
-                getRep(reportID)
+                // getRep(reportID)
             }
         }else{
             toast.warning(response.message)
@@ -336,7 +338,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
     useEffect(() => {
         autoLogin();
         getOrgNPos();
-        if(!fullVersion){getRep(reportID)}
+        // if(!fullVersion){getRep(reportID)}
         
     }, [])
 

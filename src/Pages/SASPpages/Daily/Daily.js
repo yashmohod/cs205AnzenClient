@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import SaspIncidents from "../../../Components/SaspIncidents/SaspIncidents"
 import SaspLocations from "../../../Components/SaspLocations/SaspLocations"
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
+import SaspReferal from "../../../Components/SaspReferal/SaspReferal"
 
 export default function Daily({setLoggedIn, loggedInUser, autoLogin}) {
   <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
@@ -60,77 +61,77 @@ useEffect(() =>
 
 
 
-const Referal = (props) => {
-  const [refdata,setrefdata] =useState({
-    "index":props.index,
-    "firstName" :"",
-    "middleInitial" :"",
-    "lastName" :"",
-    "ICID" :"",
-    "dob" :"",
-    "phoneNo" :"",
-    "address" :"",
+// const Referal = (props) => {
+//   const [refdata,setrefdata] =useState({
+//     "index":props.index,
+//     "firstName" :"",
+//     "middleInitial" :"",
+//     "lastName" :"",
+//     "ICID" :"",
+//     "dob" :"",
+//     "phoneNo" :"",
+//     "address" :"",
     
-  })
-  function inputHandler(e){
-    const refTdata = {...refdata,  [e.target.name] : e.target.value}
+//   })
+//   function inputHandler(e){
+//     const refTdata = {...refdata,  [e.target.name] : e.target.value}
 
-    const newdata = props.allrefdata.map((data)=>{
-    if(data.index === props.index){
-      return {...refdata,  [e.target.name] : e.target.value}
-    }
-    else{
-      return data
-    }
-  })
+//     const newdata = props.allrefdata.map((data)=>{
+//     if(data.index === props.index){
+//       return {...refdata,  [e.target.name] : e.target.value}
+//     }
+//     else{
+//       return data
+//     }
+//   })
 
-  props.setData(props.allrefs, newdata)
-  setrefdata(refTdata)
-  }
+//   props.setData(props.allrefs, newdata)
+//   setrefdata(refTdata)
+//   }
 
 
 
-  return(<div>
-    <ToastContainer />
-    <div className="padding">
-    <div className="row">
-      <div className="col-0 col-md-2"></div>
-        <div className="col-12 col-md-8">
-          <Form className="register-form-container p-5">
-            <div>
-              {/* {console.log(props.referalData)} */}
-              <Form.Label className=" d-flex justify-content-start">Referal #{props.index+1}</Form.Label>
+//   return(<div>
+//     <ToastContainer />
+//     <div className="padding">
+//     <div className="row">
+//       <div className="col-0 col-md-2"></div>
+//         <div className="col-12 col-md-8">
+//           <Form className="register-form-container p-5">
+//             <div>
+//               {/* {console.log(props.referalData)} */}
+//               <Form.Label className=" d-flex justify-content-start">Referal #{props.index+1}</Form.Label>
 
-              <Form.Label className=" d-flex justify-content-start">First name</Form.Label>
-              <Form.Control type="text" placeholder="" name="firstName" onChange={(e)=>inputHandler(e)} value={props.referalData.firstName}/>
+//               <Form.Label className=" d-flex justify-content-start">First name</Form.Label>
+//               <Form.Control type="text" placeholder="" name="firstName" onChange={(e)=>inputHandler(e)} value={props.referalData.firstName}/>
 
-              <Form.Label className=" d-flex justify-content-start">Middle int.</Form.Label>
-              <Form.Control type="text" placeholder="" name="middleInitial" onChange={(e)=>inputHandler(e)} value={props.referalData.middleInitial}/>
+//               <Form.Label className=" d-flex justify-content-start">Middle int.</Form.Label>
+//               <Form.Control type="text" placeholder="" name="middleInitial" onChange={(e)=>inputHandler(e)} value={props.referalData.middleInitial}/>
 
-              <Form.Label className=" d-flex justify-content-start">Last name</Form.Label>
-              <Form.Control type="text" placeholder="" name="lastName" onChange={(e)=>inputHandler(e)} value={props.referalData.lastName}/>
+//               <Form.Label className=" d-flex justify-content-start">Last name</Form.Label>
+//               <Form.Control type="text" placeholder="" name="lastName" onChange={(e)=>inputHandler(e)} value={props.referalData.lastName}/>
 
-              <Form.Label className=" d-flex justify-content-start">ICID</Form.Label>
-              <Form.Control type="text" placeholder="" name="ICID" onChange={(e)=>inputHandler(e)} value={props.referalData.ICID}/>
+//               <Form.Label className=" d-flex justify-content-start">ICID</Form.Label>
+//               <Form.Control type="text" placeholder="" name="ICID" onChange={(e)=>inputHandler(e)} value={props.referalData.ICID}/>
 
-              <Form.Label className=" d-flex justify-content-start">DOB</Form.Label>
-              <Form.Control type="date" placeholder="" name="dob" onChange={(e)=>inputHandler(e)} value={props.referalData.dob}/>
+//               <Form.Label className=" d-flex justify-content-start">DOB</Form.Label>
+//               <Form.Control type="date" placeholder="" name="dob" onChange={(e)=>inputHandler(e)} value={props.referalData.dob}/>
 
-              <Form.Label className=" d-flex justify-content-start">Phone no.</Form.Label>
-              <Form.Control type="text" placeholder="" name="phoneNo" onChange={(e)=>inputHandler(e)} value={props.referalData.phoneNo}/>
+//               <Form.Label className=" d-flex justify-content-start">Phone no.</Form.Label>
+//               <Form.Control type="text" placeholder="" name="phoneNo" onChange={(e)=>inputHandler(e)} value={props.referalData.phoneNo}/>
 
-              <Form.Label className=" d-flex justify-content-start">Local Address</Form.Label>
-              <Form.Control as="textarea" placeholder="" name="address" onChange={(e)=>inputHandler(e)} value={props.referalData.address}/>
+//               <Form.Label className=" d-flex justify-content-start">Local Address</Form.Label>
+//               <Form.Control as="textarea" placeholder="" name="address" onChange={(e)=>inputHandler(e)} value={props.referalData.address}/>
               
 
-            </div>
-          </Form>
-        </div>
-      </div>
-    </div>
-  </div>
-  )
-}
+//             </div>
+//           </Form>
+//         </div>
+//       </div>
+//     </div>
+//   </div>
+//   )
+// }
 
 function addReferals(){
   setshowReferals(true)
@@ -147,7 +148,7 @@ function addReferals(){
     
   }
   const newreferalData = [...referalData,dataTemp]
-  const refer = [...referals,{"index":referalsCount,"component": <Referal setData={setData} allrefs={referals} allrefdata={referalData} referalData={dataTemp} index = {parseInt(referalsCount)} />}]
+  const refer = [...referals,{"index":referalsCount,"component": <SaspReferal setData={setData} allrefs={referals} allrefdata={referalData} referalData={dataTemp} index = {parseInt(referalsCount)} editVer={false} />}]
 
   setData(refer,newreferalData)
 }
@@ -155,7 +156,7 @@ function addReferals(){
 const setData= (ref,datas)=> {
 
   const setref = ref.map((refs)=>{
-    return{"index":refs.index,"component": <Referal setData={setData} allrefs={ref} allrefdata={datas}  referalData={datas[refs.index]} index = {parseInt(refs.index)} />}    
+    return{"index":refs.index,"component": <SaspReferal setData={setData} allrefs={ref} allrefdata={datas}  referalData={datas[refs.index]} index = {parseInt(refs.index)} editVer={false} />}    
   })
   setreferalData(datas)
   setreferals(setref)
