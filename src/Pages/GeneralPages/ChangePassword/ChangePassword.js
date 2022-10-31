@@ -1,10 +1,10 @@
 import React from "react";
 import './ChangePassword.css'
-import Nav from "../../Components/Nav/Nav";
+import Nav from "../../../Components/Nav/Nav";
 import {Form, Button} from 'react-bootstrap'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { API_URL, post } from "../../Utils/API";
+import { API_URL, post } from "../../../Utils/API";
 
 
 export default function ChangePassword({setLoggedIn, loggedInUser, autoLogin}) {

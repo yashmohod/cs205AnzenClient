@@ -2,15 +2,15 @@ import React from "react";
 import { useState, useEffect, useRef } from "react";
 import './EmployeeAccounts.css'
 import "react-datepicker/dist/react-datepicker.css";
-import Nav from "../../Components/Nav/Nav";
+import Nav from "../../../Components/Nav/Nav";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-alpine.css';
 import {Form, Button} from 'react-bootstrap'
-import { API_URL, get, post } from "../../Utils/API";
-import EditButton from '../../Components/Buttons/EditButton'
-import DeleteButton from '../../Components/Buttons/DeleteButton'
-import CommonButton from '../../Components/Buttons/CommonButton'
+import { API_URL, get, post } from "../../../Utils/API";
+import EditButton from '../../../Components/Buttons/EditButton'
+import DeleteButton from '../../../Components/Buttons/DeleteButton'
+import CommonButton from '../../../Components/Buttons/CommonButton'
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 // import Button from 'react-bootstrap/Button';

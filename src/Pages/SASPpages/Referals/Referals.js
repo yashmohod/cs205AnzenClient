@@ -76,6 +76,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
         if(response.status ==200){
             toast.success(response.message)
             handleCloserep()
+            getRefs(prevSearchData)
             // handleClose()
             // if(fullVersion){    
             //     getReps(previousSearchData)
