@@ -11,8 +11,7 @@ import { API_URL, get, post } from "../../../Utils/API";
 import CommonButton from '../../../Components/Buttons/CommonButton'
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
-
-import Modal from 'react-bootstrap/Modal';
+import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 
 export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
    
@@ -22,9 +21,9 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
 
         
     }, [])
-
-
+    const [value, onChange] = useState(new Date());
     // window.addEventListener('resize', handleResize)
+    function inputChangeHandler(){}
 
     return (
         <div className="incident-page">
@@ -36,9 +35,15 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
                 {/* <Button variant="primary" onClick={handleShow}>
                   Launch static backdrop modal
                 </Button> */}
+                <div className="row ">
+                <div className="col ">
+                <Form.Label className=" d-flex justify-content-start">Start Time </Form.Label>
+                <Form.Control type="date"placeholder="" name="date" />
+                </div>
+                <TimePicker24H inputChangeHandler={ inputChangeHandler} name = {"enrouteTime"}/>
+                </div>
             </Form>
-
-
+    
 
         </div>
     )

@@ -1,5 +1,6 @@
 .incident-page {
     overflow-x: hidden;
+    height: 100vh;
 }
 
 .incident-form-container {
