@@ -25,6 +25,7 @@ export default function Nav({setLoggedIn, loggedInUser}) {
         }
     })
     const [hovered,setHovered] = useState(false)
+
     function changeHoverFalse() {
         setHovered(false)
     }
