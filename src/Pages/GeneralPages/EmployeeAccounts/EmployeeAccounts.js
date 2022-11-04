@@ -2,15 +2,15 @@ import React from "react";
 import { useState, useEffect, useRef } from "react";
 import './EmployeeAccounts.css'
 import "react-datepicker/dist/react-datepicker.css";
-import Nav from "../../Components/Nav/Nav";
+import Nav from "../../../Components/Nav/Nav";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-alpine.css';
 import {Form, Button} from 'react-bootstrap'
-import { API_URL, get, post } from "../../Utils/API";
-import EditButton from '../../Components/Buttons/EditButton'
-import DeleteButton from '../../Components/Buttons/DeleteButton'
-import CommonButton from '../../Components/Buttons/CommonButton'
+import { API_URL, get, post } from "../../../Utils/API";
+import EditButton from '../../../Components/Buttons/EditButton'
+import DeleteButton from '../../../Components/Buttons/DeleteButton'
+import CommonButton from '../../../Components/Buttons/CommonButton'
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 // import Button from 'react-bootstrap/Button';
@@ -18,7 +18,7 @@ import Modal from 'react-bootstrap/Modal';
 
 export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin}) {
     const [accounts, setAccounts] = useState("")
-    const gridRef = useRef();
+    const gridRef = useRef(null);
     const [rowData, setRowData] = useState();
     const navigate = useNavigate();
 
@@ -99,13 +99,13 @@ async function registerHandler() {
 
 
     const columnDefs = [
-        {field: 'position', headerName: 'Position' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
-        {field: 'status', headerName: 'Status' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
-        {field: 'lastName', headerName: 'Last Name' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
-        {field: 'firstName', headerName: 'First Name' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
-        {field: 'dob', headerName: ' DOB' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
-        {field: 'collegeId', headerName: 'IC ID' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
-        {field: 'email', headerName: 'Email' ,cellStyle: { 'text-align': 'center' },suppressSizeToFit: true},
+        {field: 'position', headerName: 'Position' ,cellStyle: { 'text-align': 'center' }},
+        {field: 'status', headerName: 'Status' ,cellStyle: { 'text-align': 'center' }},
+        {field: 'lastName', headerName: 'Last Name' ,cellStyle: { 'text-align': 'center' }},
+        {field: 'firstName', headerName: 'First Name' ,cellStyle: { 'text-align': 'center' }},
+        {field: 'dob', headerName: ' DOB' ,cellStyle: { 'text-align': 'center' }},
+        {field: 'collegeId', headerName: 'IC ID' ,cellStyle: { 'text-align': 'center' }},
+        {field: 'email', headerName: 'Email' ,cellStyle: { 'text-align': 'center' }},
         {field: 'id', 
         headerName: '' ,
         cellRenderer: EditButton,
@@ -171,7 +171,7 @@ async function registerHandler() {
           variant:"outline-dark",
         }},
         ]
-        const defaultColDef= { resizable: true, suppressSizeToFit: true }
+        const defaultColDef= { resizable: true}
 
 
     async function editAccount(accountId) {
@@ -242,25 +242,36 @@ async function registerHandler() {
 
         setRowData(response)
         setAccounts(response)
+        console.log(gridRef)
+        gridRef.current.api.sizeColumnsToFit();
         return response
     }
 
-    const [org,setOrg] = useState("")
-    const [pos,setPos]= useState("")
 
-    async function getOrgNPos(){
-      const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
-      const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
-      setOrg(orgres["organization"])
-      setPos(posres["position"])
-    }
+    // const [dimensions, setDimensions] = React.useState({ 
+    //   height: window.innerHeight,
+    //   width: window.innerWidth
+    // })
+    
+    // function handleResize() {
+    //   setDimensions({
+    //     height: window.innerHeight,
+    //     width: window.innerWidth
+    //   })
+    //   if(window.innerHeight !== dimensions.height || window.innerWidth !== dimensions.width){
+    //     gridRef.current.api.sizeColumnsToFit();
+    //   }
+    // }
 
     useEffect(() => {
-      getOrgNPos()
-      autoLogin()
-      getAccounts()
-      checkMessage()
+        autoLogin()
+        getAccounts()
+        checkMessage()
+        
     }, [])
+
+
+    // window.addEventListener('resize', handleResize)
 
     return (
         <div className="incident-page">

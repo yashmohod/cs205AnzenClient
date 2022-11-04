@@ -1,9 +1,9 @@
 /* eslint-disable no-undef */
 import { useState , React, useEffect} from "react";
-import Nav from "../../Components/Nav/Nav";
+import Nav from "../../../Components/Nav/Nav";
 import { Form, Button } from 'react-bootstrap';
 import './Register.css'
-import { API_URL, post } from "../../Utils/API";
+import { API_URL, post } from "../../../Utils/API";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
@@ -97,6 +97,8 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
       if(response.message === "registered successfully"){
         localStorage.setItem("message", response.message);
         navigate("/employee-accounts");
+      }else{
+        toast.warning(response.message)
       }
   
         

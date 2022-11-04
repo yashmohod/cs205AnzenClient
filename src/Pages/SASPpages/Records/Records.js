@@ -1,4 +1,4 @@
-import React, {Component, useEffect, useRef, useState,useMemo } from "react";
+import React, {useCallback, useEffect, useRef, useState,useMemo } from "react";
 import Nav from "../../../Components/Nav/Nav";
 import './Records.css'
 import {AgGridReact} from 'ag-grid-react';
@@ -17,7 +17,7 @@ import Modal from 'react-bootstrap/Modal';
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 import Dropdown from 'react-bootstrap/Dropdown';
 import Referals from "../Referals/Referals";
-export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
+export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersion,reportID}) {
     
     // edit records 
     const [show, setShow] = useState(false);
@@ -27,6 +27,12 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     const [showref, setShowref] = useState(false);
     const handleCloseref = () => setShowref(false);
     const handleShowref = () => setShowref(true);
+
+    const gridRef = useRef(null); // Optional - for accessing Grid's API
+    const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
+
+    // Each Column Definition results in one Column.
+    const[columnDefs,setColumnDefs]= useState([])
 
     const [formData, setFormData] = useState({
         reportID:'',
@@ -43,7 +49,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
 
     async function reportChangeSubmit(){
         //editSaspReport
-        console.log(formData)
+
         let response = await post(API_URL + "/editSaspReport", {
             token: localStorage.getItem("token"),
             reportID:formData.reportID,
@@ -60,7 +66,11 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
         if(response.status ==200){
             toast.success(response.message)
             handleClose()
-            setPreviousSearchedData()
+            if(fullVersion){    
+                getReps(previousSearchData)
+            }else{
+                // getRep(reportID)
+            }
         }else{
             toast.warning(response.message)
         }
@@ -85,15 +95,16 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
         "dateTo":"",
     })
 
-    async function setPreviousSearchedData(){
+    async function getReps(sData){
+        setPreviousSearchData(sData)
 
         let response = await post(API_URL + "/getSaspReports", {
             token: localStorage.getItem("token"),
-            employeeId:previousSearchData.employeeId,
-            location:previousSearchData.location,
-            incident:previousSearchData.incident,
-            dateTo:previousSearchData.dateTo,
-            dateFrom:previousSearchData.dateFrom,
+            employeeId:sData.employeeId,
+            location:sData.location,
+            incident:sData.incident,
+            dateTo:sData.dateTo,
+            dateFrom:sData.dateFrom,
             })
         if(response.status == 200){
             let data = response.SaspIncidentReports;
@@ -107,41 +118,56 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
             )
              })
             setRowData(data);
+            gridRef.current.api.sizeColumnsToFit();
         }
     }
+
+    // async function getRep(repID){
+
+    //     let response = await get(API_URL + "/getSaspReport?token="+localStorage.getItem("token")+"&reportID="+repID)
+    //     if(response.status == 200){
+    //         let data = response.SaspIncidentReport;
+    //         // data formating
+    //         var date = data.date.split(' ');
+    //         data.date = date[0]
+    //         gridRef.current.api.sizeColumnsToFit();
+    //         setRowData([data]);
+    //     }
+    // }
 
    
 
 
-    async function getAllReports(){
-        let response = await post(API_URL + "/getSaspReports", {
-            token: localStorage.getItem("token"),
-            employeeId:"",
-            location:"",
-            incident:"",
-            dateTo:"",
-            dateFrom:"",
-            })
+    // async function getAllReports(){
+    //     let response = await post(API_URL + "/getSaspReports", {
+    //         token: localStorage.getItem("token"),
+    //         employeeId:"",
+    //         location:"",
+    //         incident:"",
+    //         dateTo:"",
+    //         dateFrom:"",
+    //         })
         
-        let data = response.SaspIncidentReports;
-        setPreviousSearchData({
-            "employeeId":"",
-            "location":"",
-            "incident":"",
-            "dateFrom":"",
-            "dateTo":"",
-        })
-        // date formating
-        data = data.map((item)=>{
-            var date = item.date.split(' ');
-            item.date = date[0]
-            return(
-                item
-            )
-        })
-        setRowData(data);
-        clearSearchFields()
-    }
+    //     let data = response.SaspIncidentReports;
+    //     setPreviousSearchData({
+    //         "employeeId":"",
+    //         "location":"",
+    //         "incident":"",
+    //         "dateFrom":"",
+    //         "dateTo":"",
+    //     })
+    //     // date formating
+    //     data = data.map((item)=>{
+    //         var date = item.date.split(' ');
+    //         item.date = date[0]
+    //         return(
+    //             item
+    //         )
+    //     })
+    //     setRowData(data);
+    //     gridRef.current.api.sizeColumnsToFit();
+    //     clearSearchFields()
+    // }
 
     function searchInputHandeler(e){
         setSearchData({...searchData,  [e.target.name] : e.target.value})   
@@ -162,53 +188,28 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
         dateFromChooser.current.value=""
     }
 
-    async function searchButtonHandeler(){
-        let response = await post(API_URL + "/getSaspReports", {
-            token: localStorage.getItem("token"),
-            employeeId:searchData.employeeId,
-            location:searchData.location,
-            incident:searchData.incident,
-            dateTo:searchData.dateTo,
-            dateFrom:searchData.dateFrom,
-            })
-        if(response.status == 200){
-            let data = response.SaspIncidentReports;
-
-            // data formating
-            data = data.map((item)=>{
-            var date = item.date.split(' ');
-            item.date = date[0]
-            return(
-                item
-            )
-             })
-            setRowData(data);
-            setPreviousSearchData(searchData)
-            clearSearchFields()
-        }
-    }
 
 
 
 
-    const gridRef = useRef(); // Optional - for accessing Grid's API
-    const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
 
-    // Each Column Definition results in one Column.
-    const[columnDefs,setColumnDefs]= useState([])
   
-    const [generalCols, setGeneralCols] = useState([
-    {field: 'date'},
-    {field: 'incident'},
-    {field: 'location'},
-    {field: 'locationDetail'},
-    {field: 'receivedTime'},
-    {field: 'enrouteTime'},
-    {field: 'arivedTime'},
-    {field: 'clearTime'},
-    {field: 'reportedByName'},
-    {field: 'summary'},
-    {field: 'id', 
+    const [miniverFeatures, setminiverFeatures] = useState([
+    {field: 'date',headerName:'Date'},
+    {field: 'incident',headerName:'Incident'},
+    {field: 'location',headerName:'Location'},
+    {field: 'locationDetail',headerName:'Loc. Details'},
+    {field: 'receivedTime',headerName:'Recived Time'},
+    {field: 'enrouteTime',headerName:'Enroute Time'},
+    {field: 'arivedTime',headerName:'Arrived Time'},
+    {field: 'clearTime',headerName:'Clear Time'},
+    {field: 'reportedByName',headerName:'Reported By'},
+    {field: 'summary',headerName:'Summary'},
+
+    ])
+
+    const [fullverFeatures, setfullverFeatures] = useState([
+        {field: 'id', 
     headerName: '' ,
     cellRenderer: CommonButton, 
     cellRendererParams: {
@@ -218,7 +219,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
       buttonText: "View Referals",
       variant:"outline-dark",
     }},
-    ]);
+    ])
 
     const [morecolumns, setmoreColumns] = useState([
     {field: 'id', 
@@ -242,7 +243,11 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
         let response = await post(API_URL + "/deleteSaspReports", {reportID:reportId,token: localStorage.getItem("token")})
         if(response.status== 200){
             toast.success(response.message)
-            setPreviousSearchedData()
+            if(fullVersion){    
+                getReps(previousSearchData)
+            }else{
+                // getRep(reportID)
+            }
         }else{
             toast.warning(response.message)
         }
@@ -290,30 +295,65 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
     var encodedUri = encodeURI(csvContent);
     window.open(encodedUri);
     }
+    // const [org,setOrg] = useState("")
+    // const [pos,setPos]= useState("")
 
 
 
+    async function getOrgNPos(){
+        const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
+        const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
+        let locOrg = orgres["organization"]
+        let locPos = posres["position"]
+        // setOrg(locOrg)
+        // setPos(locPos)
 
-    useEffect(() => {
-        autoLogin();
-        setColumnDefs( generalCols);
-        const pos = localStorage.getItem("position")
-        if(pos== "admin"){
-            let cols = generalCols
+        //set mini version features
+        setColumnDefs( miniverFeatures);
+        //set full version features
+        if(fullVersion){
+            let cols = miniverFeatures
+            for(let i=0; i<fullverFeatures.length; i++){
+                cols.push(fullverFeatures[i])
+            }
+            setColumnDefs(cols);
+
+        }
+        //set admin version features
+        if(locPos== "admin"){
+            let cols = miniverFeatures
             for(let i=0; i<morecolumns.length; i++){
                 cols.push(morecolumns[i])
             }
             setColumnDefs(cols);
 
         }
+
+        gridRef.current.api.sizeColumnsToFit();
+
+    }
+
+
+
+    useEffect(() => {
+        autoLogin();
+        getOrgNPos();
+        // if(!fullVersion){getRep(reportID)}
+        
     }, [])
 
 
     return (
         <div className="location-page">
-             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
+            {fullVersion?
+            <>
+            <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
              <ToastContainer />
+             </>
+             :null}
+
             <h1>Records</h1>
+            {fullVersion?
             <div className="container">
                 <div className="row">
                     <div className="col">
@@ -349,14 +389,12 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
                             <Form.Control type="date" placeholder="" name="dateTo" ref={dateToChooser} onChange={(e) => searchInputHandeler(e)}/>
                             </div>
                             <div className="col" id="searchFormElement">
-                                <div className="col">
                                 <div className="row">
-                                <Button variant="outline-primary" type="button" onClick={() => searchButtonHandeler()}>Search</Button>
-                                <Button variant="outline-info" type="button" onClick={() => getAllReports()}>Search All</Button>
+                                <Button variant="outline-primary" type="button" onClick={() => getReps(searchData)}>Search</Button>
+                                {/* <Button variant="outline-info" type="button" onClick={() => getAllReports()}>Search All</Button> */}
                                 </div>
-                                </div>
-                                <div className="col">
                                 {(rowData.length > 0)? 
+                                <div className="row">
                                     <Dropdown>
                                         <Dropdown.Toggle variant="outline-black" id="dropdown-basic">
                                             Export File
@@ -367,16 +405,14 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
                                             <Dropdown.Item >PDF</Dropdown.Item>
                                         </Dropdown.Menu>
                                     </Dropdown> 
-                                : null}
                                 </div>
-                            
+                                : null}
                             </div>
                             
                         </div>
                     </div>
                 </div>
-            </div>
-          
+            </div>:null}
 
        
         
@@ -399,7 +435,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin}) {
               keyboard={false}
             >
               <Modal.Header closeButton>
-                <Modal.Title>New Password</Modal.Title>
+                <Modal.Title>Report Edit</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Form>

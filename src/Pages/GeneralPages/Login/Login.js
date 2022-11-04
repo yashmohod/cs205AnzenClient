@@ -1,10 +1,22 @@
 import React from "react";
 import './Login.css';
-import Background from "../../Images/ithaca-background.jpg";
-import LoginForm from "../../Components/LoginForm/LoginForm";
+// import Background from "ithaca-background.jpg";
+import LoginForm from "../../../Components/LoginForm/LoginForm";
+import { ToastContainer, toast } from 'react-toastify';
+import { useState, useEffect, useRef } from "react";
 
 export default function Login({loggedIn, setLoggedIn, setLoggedInUser, autoLogin}) {
 //<img src={Background} alt="Ithaca College" className="background-image"/>
+
+useEffect(() => {
+    autoLogin()
+    if(!(localStorage.getItem("message") === null)){
+        toast.warning(String(localStorage.getItem("message")));
+        localStorage.removeItem("message");
+    }
+
+}, [])
+
     return (
         <div className="background" > 
             <div className="container-fluid">
@@ -12,6 +24,7 @@ export default function Login({loggedIn, setLoggedIn, setLoggedInUser, autoLogin
                     <div className="col-1 col-md-4"></div>
                     <div className="col-10 col-md-4">
                         <div className="login-form">
+                            <ToastContainer />
                             <LoginForm setLoggedIn={setLoggedIn} setLoggedInUser={setLoggedInUser} autoLogin={autoLogin}/>
                         </div>
                     </div>

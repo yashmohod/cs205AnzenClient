@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { API_URL, post } from "../../Utils/API";
+import { API_URL, post } from "../../../Utils/API";
 import { Link } from "react-router-dom";
-import Card from "../../Components/Card/Card";
+import Card from "../../../Components/Card/Card";
 
 
 export function Features(props) {

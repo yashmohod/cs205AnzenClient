@@ -1,11 +1,12 @@
 /* eslint-disable import/no-anonymous-default-export */
 import React, { useEffect, useState } from "react";
-import Card from "../../Components/Card/Card";
-import Nav from "../../Components/Nav/Nav";
+import Card from "../../../Components/Card/Card";
+import Nav from "../../../Components/Nav/Nav";
 import './Dashboard.css'
-import { API_URL, post,get } from "../../Utils/API";
+import { API_URL, post,get } from "../../../Utils/API";
 import { ToastContainer, toast } from 'react-toastify';
 import {Features} from "./features"
+import { useNavigate } from "react-router-dom";
 
 export default function({loggedIn, setLoggedIn, loggedInUser}) {
     const [clockin, setClockin] = useState(false)
@@ -14,10 +15,10 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
     const [showFeatures,setshowFeatures] =useState(false)
 
     function checkMessage(){
-        if(!(localStorage.getItem("message") === null)){
-            toast.success(String(localStorage.getItem("message")));
-            localStorage.removeItem("message");
-        }
+        // if(!(localStorage.getItem("message") === null)){
+        //     toast.success(String(localStorage.getItem("message")));
+        //     localStorage.removeItem("message");
+        // }
     }
     
 
@@ -38,12 +39,17 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
         const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
         setOrg(orgres["organization"])
         setPos(posres["position"])
-        localStorage.setItem("organization", orgres["organization"])
-        localStorage.setItem("position", posres["token"])
+        // localStorage.setItem("organization", orgres["organization"])
+        // localStorage.setItem("position", posres["token"])
         setshowFeatures(true)
     }
 
+    const navigate = useNavigate();
+
     useEffect(() => {
+        if(!loggedIn){
+            navigate("/")
+        }
         const checkClockinStatus = async () => {
             let response = await post(API_URL + "/checkClockInStatus", {token: localStorage.getItem("token")})
             if (response.clock_in === true) {
