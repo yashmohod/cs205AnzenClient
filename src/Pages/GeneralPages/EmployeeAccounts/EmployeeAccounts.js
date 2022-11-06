@@ -99,13 +99,13 @@ async function registerHandler() {
 
 
     const columnDefs = [
-        {field: 'position', headerName: 'Position' ,cellStyle: { 'text-align': 'center' }},
-        {field: 'status', headerName: 'Status' ,cellStyle: { 'text-align': 'center' }},
-        {field: 'lastName', headerName: 'Last Name' ,cellStyle: { 'text-align': 'center' }},
-        {field: 'firstName', headerName: 'First Name' ,cellStyle: { 'text-align': 'center' }},
-        {field: 'dob', headerName: ' DOB' ,cellStyle: { 'text-align': 'center' }},
-        {field: 'collegeId', headerName: 'IC ID' ,cellStyle: { 'text-align': 'center' }},
-        {field: 'email', headerName: 'Email' ,cellStyle: { 'text-align': 'center' }},
+        {field: 'position', headerName: 'Position' ,cellStyle: { 'textAlign': 'center' }},
+        {field: 'status', headerName: 'Status' ,cellStyle: { 'textAlign': 'center' }},
+        {field: 'lastName', headerName: 'Last Name' ,cellStyle: { 'textAlign': 'center' }},
+        {field: 'firstName', headerName: 'First Name' ,cellStyle: { 'textAlign': 'center' }},
+        {field: 'dob', headerName: ' DOB' ,cellStyle: { 'textAlign': 'center' }},
+        {field: 'collegeId', headerName: 'IC ID' ,cellStyle: { 'textAlign': 'center' }},
+        {field: 'email', headerName: 'Email' ,cellStyle: { 'textAlign': 'center' }},
         {field: 'id', 
         headerName: '' ,
         cellRenderer: EditButton,
@@ -230,8 +230,8 @@ async function registerHandler() {
 
     async function getAccounts() {
         let response = await get(API_URL + "/getAllAccounts?token=" +  localStorage.getItem("token"))
-        response = JSON.parse(response.accounts)
-
+        response = response.accounts
+        
         for(let x =0; x< response.length; x++){
           if(response[x].status === true){
             response[x].status = "Active"

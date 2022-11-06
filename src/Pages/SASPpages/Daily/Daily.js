@@ -187,7 +187,7 @@ function removeReferals(){
     <div>
         <ToastContainer />
         <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
-        <h1>Register Account</h1>
+        <h1>Daily</h1>
         <div className="container-fluid">
             <div className="row">
               <div className="col-0 col-md-2"></div>
