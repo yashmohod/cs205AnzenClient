@@ -76,7 +76,7 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
               keyboard={false}
             >
               <Modal.Header closeButton>
-                <Modal.Title>Add TimeCard</Modal.Title>
+                <Modal.Title>Add Time Card</Modal.Title>
               </Modal.Header>
               <Modal.Body>
 
