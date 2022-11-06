@@ -42,12 +42,12 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
             note:timeCardData.notes,
             })
 
-            if(response.status ==200){
-                toast.success(response.message)
-                handleClose()
-            }else{
-                toast.warning(response.message)
-            }
+        if(response.status === 200){
+            toast.success(response.message)
+            handleClose()
+        }else{
+            toast.warning(response.message)
+        }
     }
 
     useEffect(() => {
@@ -95,7 +95,7 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
                 <TimePicker24H inputChangeHandler={ inputChangeHandlerTimeCardData} name = {"endTime"}/>
                 </div>
                 <div className="row" id="margin">
-                <Form.Label className=" d-flex justify-content-start">Notes </Form.Label>
+                <Form.Label className=" d-flex justify-content-start"><strong>Notes:</strong></Form.Label>
                 <Form.Control as="textarea" rows={3} onChange={(e)=>inputChangeHandlerTimeCardData(e)} name = {"notes"}/>
                 </div>
 
