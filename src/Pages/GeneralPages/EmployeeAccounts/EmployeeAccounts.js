@@ -230,7 +230,7 @@ async function registerHandler() {
 
     async function getAccounts() {
         let response = await get(API_URL + "/getAllAccounts?token=" +  localStorage.getItem("token"))
-        response = JSON.parse(response.accounts)
+        response = response.accounts
         
         for(let x =0; x< response.length; x++){
           if(response[x].status === true){
