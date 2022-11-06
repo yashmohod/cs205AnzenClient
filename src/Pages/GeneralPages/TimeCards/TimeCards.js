@@ -62,7 +62,7 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
              <ToastContainer />
             <h1>Time Cards</h1>
             <Form className="incident-form">
-                <Button variant="outline-dark" onClick={() => handleShow()}>Add TimeCard</Button>
+                <Button variant="outline-dark" onClick={() => handleShow()}>Add Time Card</Button>
                 {/* <Button variant="primary" onClick={handleShow}>
                   Launch static backdrop modal
                 </Button> */}
