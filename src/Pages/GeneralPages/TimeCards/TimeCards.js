@@ -13,7 +13,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 import Modal from 'react-bootstrap/Modal';
-
+import EmployeeTimeCards from '../../../Components/TimeCardsFeatures/EmployeeTimeCards';
 
 export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
    
@@ -68,6 +68,10 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
                 </Button> */}
                 
             </Form>
+            
+
+            <EmployeeTimeCards/>
+            
 
             <Modal
               show={show}
