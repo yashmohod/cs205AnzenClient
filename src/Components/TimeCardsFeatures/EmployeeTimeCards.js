@@ -6,15 +6,30 @@ import { ToastContainer, toast } from 'react-toastify';
 import { API_URL, post,get } from "../../Utils/API";
 import CommonButton from '../Buttons/CommonButton'
 import {AgGridReact} from 'ag-grid-react';
-
+import Accordion from 'react-bootstrap/Accordion';
+import MobileTableCards from "./MobileTableCards";
 export default function EmployeeTimeCard(props) {
    
    const[empTimeCards,setEmpTimeCard]=useState([]);
 
    async function getTimeCards(){
       let response = await get(API_URL + "/getTimeCards?token=" +  localStorage.getItem("token"))
-      console.log(response.TimeCards)
-      setEmpTimeCard(response.TimeCards)
+      console.log(response.status)
+      if(response.status == 200) {
+        var data = response.TimeCards.map((tc)=>{
+          if(tc.approval){
+            tc.approval ="Approved"
+          }else{
+            tc.approval ="Pending"
+          }
+          return(
+            tc
+          )
+        })
+        console.log(data)
+        setEmpTimeCard(data)
+      gridRef.current.api.sizeColumnsToFit();
+      }
    }
 
    function editTimeCard(timeCardID){
@@ -59,18 +74,21 @@ export default function EmployeeTimeCard(props) {
       }},
       
       ]
-   
    useEffect(() => {
       getTimeCards()
-      // gridRef.current.api.sizeColumnsToFit();
+  
 
         
     }, [])
+
+
+
    
    
    
    return(<>
-      
+   {/* desktop view */}
+    <div className="d-none d-xxl-block" >
       <div className="ag-theme-alpine incident-grid">
         
               <AgGridReact
@@ -82,6 +100,26 @@ export default function EmployeeTimeCard(props) {
               </AgGridReact>
 
 
-			      </div>
+      </div>
+    </div>
+
+    {/* Mobile View */}
+    <div className="d-block d-xxl-none" >
+      <div className="ag-theme-alpine incident-grid">
+        
+      <Accordion defaultActiveKey="0">
+      {
+        empTimeCards.map(element => {
+          return(
+          <MobileTableCards keyNum ={empTimeCards.indexOf(element)}  data={element} />
+         ) })
+      }
+
+    </Accordion>
+
+      </div>
+    </div>
+
+
 
 </>)}

@@ -14,6 +14,8 @@ import { useNavigate } from "react-router-dom";
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 import Modal from 'react-bootstrap/Modal';
 import EmployeeTimeCards from '../../../Components/TimeCardsFeatures/EmployeeTimeCards';
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
 
 export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
    
@@ -56,8 +58,10 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
         
     }, [])
 
+    const[resize,setresize]= useState(true)
+
     return (
-        <div className="incident-page">
+        <div className="incident-page" >
              <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
              <ToastContainer />
             <h1>Time Cards</h1>
@@ -70,7 +74,18 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
             </Form>
             
 
-            <EmployeeTimeCards/>
+            <Tabs
+            defaultActiveKey="My Time Cards"
+            id="uncontrolled-tab-example"
+            className="mb-3"
+            >
+            <Tab eventKey="My Time Cards" title="My Time Cards">
+                <EmployeeTimeCards />
+            </Tab>
+            <Tab eventKey="All Time Cards" title="All Time Cards">
+                
+            </Tab>
+            </Tabs>
             
 
             <Modal
