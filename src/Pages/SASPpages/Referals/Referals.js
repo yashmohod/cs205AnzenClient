@@ -232,15 +232,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
     }
 
     function SaveAsCSV(){
-        let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "Incident,Date,ReceivedTime,EnrouteTime,ArivedTime,ClearTime,Location,LocationDetail,Summary,"  + "\r\n";
-        rowData.forEach(function(rowArray) {
-            let row = rowArray.incident+","+rowArray.date+","+rowArray.receivedTime+","+rowArray.enrouteTime+","+rowArray.arivedTime+","+rowArray.clearTime+","+rowArray.location+","+","+rowArray.locationDetail+","+","+rowArray.summary
-            
-            csvContent += row + "\r\n";
-        });
-    var encodedUri = encodeURI(csvContent);
-    window.open(encodedUri);
+        gridRef.current.api.exportDataAsCsv()
     }
 
    
@@ -518,9 +510,9 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
                                             Export File
                                         </Dropdown.Toggle>
 
-                                        <Dropdown.Menu>
-                                            <Dropdown.Item onClick={()=>SaveAsCSV()}>CSV </Dropdown.Item>
-                                            <Dropdown.Item >PDF</Dropdown.Item>
+                                        <Dropdown.Menu className="text-center">
+                                            <Dropdown.Item onClick={()=>SaveAsCSV()}>CSV <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="CSV" className="csv-logo"/></Dropdown.Item>
+                                            <Dropdown.Item >PDF <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" className="pdf-logo" alt=""/></Dropdown.Item>
                                         </Dropdown.Menu>
                                     </Dropdown> 
                                 : null}
