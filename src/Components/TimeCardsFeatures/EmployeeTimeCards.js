@@ -8,13 +8,46 @@ import CommonButton from '../Buttons/CommonButton'
 import {AgGridReact} from 'ag-grid-react';
 import Accordion from 'react-bootstrap/Accordion';
 import MobileTableCards from "./MobileTableCards";
+import TimePicker24H from "../TimePicker24H/TimePicker24H"
+import {Button} from 'react-bootstrap'
+import Modal from 'react-bootstrap/Modal';
+
 export default function EmployeeTimeCard(props) {
    
    const[empTimeCards,setEmpTimeCard]=useState([]);
+   const [showEdit, setShowEdit] = useState(false);
+   const handleCloseEdit = () => setShowEdit(false);
+   const handleShowEdit = () => setShowEdit(true);
+
+   const [timeCardData,setTimeCardData] = useState({
+    startDate:"",
+    startTime:"00:00",
+    endDate:"",
+    endTime:"00:00",
+    note:"",
+  });
+  function inputChangeHandlerTimeCardData(e){
+    setTimeCardData({...timeCardData,  [e.target.name] : e.target.value})
+}
+async function timeCardSubmit(){
+  console.log(timeCardData)
+  let response = await post(API_URL + "/addTimeCard", {
+      token: localStorage.getItem("token"),
+      start:timeCardData.startDate+" "+timeCardData.startTime+":00",
+      end:timeCardData.endDate+" "+timeCardData.endTime+":00",
+      note:timeCardData.note,
+      })
+
+  if(response.status === 200){
+      toast.success(response.message)
+      handleCloseEdit()
+  }else{
+      toast.warning(response.message)
+  }
+}
 
    async function getTimeCards(){
       let response = await get(API_URL + "/getTimeCards?token=" +  localStorage.getItem("token"))
-      console.log(response.status)
       if(response.status == 200) {
         var data = response.TimeCards.map((tc)=>{
           if(tc.approval){
@@ -26,7 +59,6 @@ export default function EmployeeTimeCard(props) {
             tc
           )
         })
-        console.log(data)
         setEmpTimeCard(data)
       gridRef.current.api.sizeColumnsToFit();
       }
@@ -39,14 +71,15 @@ export default function EmployeeTimeCard(props) {
         data=empTimeCards[x]
       }
     }
-    props.setTimeCardData({
-      startDate:data.startDate,
-        startTime:data.startTime,
-        endDate:data.startEnd,
-        endTime:data.EndTime,
-        notes:data.note,
+    setTimeCardData({
+      startDate:data.start.split("/")[0].replaceAll(' ', ''),
+      startTime:data.start.split("/")[1].replaceAll(' ', ''),
+      note:data.note,
+      endDate:data.end.split("/")[0].replaceAll(' ', ''),
+      endTime:data.end.split("/")[1].replaceAll(' ', '')
     })
-    props.handleShowEdit()
+
+    handleShowEdit()
 
    }
 
@@ -101,6 +134,7 @@ export default function EmployeeTimeCard(props) {
    
    
    return(<>
+   
    {/* desktop view */}
     <div className="d-none d-xxl-block" >
       <div className="ag-theme-alpine incident-grid">
@@ -134,6 +168,43 @@ export default function EmployeeTimeCard(props) {
       </div>
     </div>
 
+
+    {/* edit pop up */}
+    <Modal
+              show={showEdit}
+              onHide={handleCloseEdit}
+              backdrop="static"
+              keyboard={false}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Edit Time Card</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+
+                <div className="row ">
+                <div className="col ">
+                <Form.Label className=" d-flex justify-content-start">Start Time </Form.Label>
+                <Form.Control type="date"placeholder="" value={timeCardData.startDate} onChange={(e)=>inputChangeHandlerTimeCardData(e)}  name="startDate" />
+                </div>
+                <TimePicker24H time={timeCardData.startTime} inputChangeHandler={ inputChangeHandlerTimeCardData} name = {"startTime"}/>
+                </div>
+                <div className="row ">
+                <div className="col ">
+                <Form.Label className=" d-flex justify-content-start">End Time </Form.Label>
+                <Form.Control type="date"placeholder="" value={timeCardData.endDate} onChange={(e)=>inputChangeHandlerTimeCardData(e)}  name="endDate" />
+                </div>
+                <TimePicker24H time={timeCardData.endTime} inputChangeHandler={ inputChangeHandlerTimeCardData} name = {"endTime"}/>
+                </div>
+                <div className="row" id="margin">
+                <Form.Label className=" d-flex justify-content-start"><strong>Notes:</strong></Form.Label>
+                <Form.Control   as="textarea" value={timeCardData.note} rows={3} onChange={(e)=>inputChangeHandlerTimeCardData(e)} name = {"notes"}/>
+                </div>
+
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="primary" onClick={()=>timeCardSubmit()}>Submit</Button>
+            </Modal.Footer>
+            </Modal>
 
 
 </>)}
