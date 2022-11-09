@@ -17,6 +17,7 @@ import Modal from 'react-bootstrap/Modal';
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 import Dropdown from 'react-bootstrap/Dropdown';
 import Referals from "../Referals/Referals";
+import { GridApi } from "ag-grid-community";
 export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersion,reportID}) {
     
     // edit records 
@@ -188,12 +189,6 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
         dateFromChooser.current.value=""
     }
 
-
-
-
-
-
-  
     const [miniverFeatures, setminiverFeatures] = useState([
     {field: 'date',headerName:'Date'},
     {field: 'incident',headerName:'Incident'},
@@ -285,15 +280,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
     }));
 
     function SaveAsCSV(){
-        let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "Incident,Date,ReceivedTime,EnrouteTime,ArivedTime,ClearTime,Location,LocationDetail,Summary,"  + "\r\n";
-        rowData.forEach(function(rowArray) {
-            let row = rowArray.incident+","+rowArray.date+","+rowArray.receivedTime+","+rowArray.enrouteTime+","+rowArray.arivedTime+","+rowArray.clearTime+","+rowArray.location+","+","+rowArray.locationDetail+","+","+rowArray.summary
-            
-            csvContent += row + "\r\n";
-        });
-    var encodedUri = encodeURI(csvContent);
-    window.open(encodedUri);
+        gridRef.current.api.exportDataAsCsv()
     }
     // const [org,setOrg] = useState("")
     // const [pos,setPos]= useState("")
@@ -388,6 +375,8 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
                             <Form.Label className=" d-flex justify-content-start">Date To</Form.Label>
                             <Form.Control type="date" placeholder="" name="dateTo" ref={dateToChooser} onChange={(e) => searchInputHandeler(e)}/>
                             </div>
+                        
+                            
                             <div className="col" id="searchFormElement">
                                 <div className="row">
                                 <Button variant="outline-primary" type="button" onClick={() => getReps(searchData)}>Search</Button>
@@ -400,9 +389,9 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
                                             Export File
                                         </Dropdown.Toggle>
 
-                                        <Dropdown.Menu>
-                                            <Dropdown.Item onClick={()=>SaveAsCSV()}>CSV </Dropdown.Item>
-                                            <Dropdown.Item >PDF</Dropdown.Item>
+                                        <Dropdown.Menu className="text-center">
+                                            <Dropdown.Item onClick={()=>SaveAsCSV()}>CSV <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="CSV" className="csv-logo"/></Dropdown.Item>
+                                            <Dropdown.Item >PDF <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" className="pdf-logo" alt=""/></Dropdown.Item>
                                         </Dropdown.Menu>
                                     </Dropdown> 
                                 </div>
