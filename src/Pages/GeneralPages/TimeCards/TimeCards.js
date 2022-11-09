@@ -23,13 +23,18 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    const [showEdit, setShowEdit] = useState(false);
+    const handleCloseEdit = () => setShowEdit(false);
+    const handleShowEdit = () => setShowEdit(true);
+
     const [timeCardData,setTimeCardData] = useState({
-      startDate:"",
-      startTime:"00:00",
-      endDate:"",
-      endTime:"00:00",
-      notes:"",
-    });
+        id:"",
+        startDate:"",
+        startTime:"00:00",
+        endDate:"",
+        endTime:"00:00",
+        note:"",
+      });
 
     function inputChangeHandlerTimeCardData(e){
         setTimeCardData({...timeCardData,  [e.target.name] : e.target.value})
@@ -41,7 +46,7 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
             token: localStorage.getItem("token"),
             start:timeCardData.startDate+" "+timeCardData.startTime+":00",
             end:timeCardData.endDate+" "+timeCardData.endTime+":00",
-            note:timeCardData.notes,
+            note:timeCardData.note,
             })
 
         if(response.status === 200){
@@ -80,7 +85,7 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
             className="mb-3"
             >
             <Tab eventKey="My Time Cards" title="My Time Cards">
-                <EmployeeTimeCards />
+                <EmployeeTimeCards editShow={handleShowEdit} setEditData={setTimeCardData} />
             </Tab>
             <Tab eventKey="All Time Cards" title="All Time Cards">
                 
@@ -95,27 +100,27 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
               keyboard={false}
             >
               <Modal.Header closeButton>
-                <Modal.Title>Add Time Card</Modal.Title>
+                <Modal.Title>{showEdit?"Edit Time Card":"Add Time Card"}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
 
                 <div className="row ">
                 <div className="col ">
                 <Form.Label className=" d-flex justify-content-start">Start Time </Form.Label>
-                <Form.Control type="date"placeholder="" onChange={(e)=>inputChangeHandlerTimeCardData(e)}  name="startDate" />
+                <Form.Control type="date"placeholder="" value={timeCardData.startDate} onChange={(e)=>inputChangeHandlerTimeCardData(e)}  name="startDate" />
                 </div>
-                <TimePicker24H inputChangeHandler={ inputChangeHandlerTimeCardData} name = {"startTime"}/>
+                <TimePicker24H time = {timeCardData.startTime} inputChangeHandler={ inputChangeHandlerTimeCardData} name = {"startTime"}/>
                 </div>
                 <div className="row ">
                 <div className="col ">
                 <Form.Label className=" d-flex justify-content-start">End Time </Form.Label>
-                <Form.Control type="date"placeholder="" onChange={(e)=>inputChangeHandlerTimeCardData(e)}  name="endDate" />
+                <Form.Control type="date"placeholder="" value={timeCardData.startDate} onChange={(e)=>inputChangeHandlerTimeCardData(e)}  name="endDate" />
                 </div>
-                <TimePicker24H inputChangeHandler={ inputChangeHandlerTimeCardData} name = {"endTime"}/>
+                <TimePicker24H time = {timeCardData.endTime} inputChangeHandler={ inputChangeHandlerTimeCardData} name = {"endTime"}/>
                 </div>
                 <div className="row" id="margin">
                 <Form.Label className=" d-flex justify-content-start"><strong>Notes:</strong></Form.Label>
-                <Form.Control as="textarea" rows={3} onChange={(e)=>inputChangeHandlerTimeCardData(e)} name = {"notes"}/>
+                <Form.Control value={timeCardData.note}  as="textarea" rows={3} onChange={(e)=>inputChangeHandlerTimeCardData(e)} name = {"notes"}/>
                 </div>
 
             </Modal.Body>

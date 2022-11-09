@@ -33,6 +33,20 @@ export default function EmployeeTimeCard(props) {
    }
 
    function editTimeCard(timeCardID){
+    var data = {}
+    for(var x =0; x< empTimeCards.length;x++){
+      if(empTimeCards[x].id == timeCardID){
+        data=empTimeCards[x]
+      }
+    }
+    props.setTimeCardData({
+      startDate:data.startDate,
+        startTime:data.startTime,
+        endDate:data.startEnd,
+        endTime:data.EndTime,
+        notes:data.note,
+    })
+    props.handleShowEdit()
 
    }
 
