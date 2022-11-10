@@ -18,7 +18,12 @@ import Modal from 'react-bootstrap/Modal';
 import Records from "../Records/Records";
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 import SaspReferal from "../../../Components/SaspReferal/SaspReferal"
+import { jsPDF } from "jspdf";
+import autoTable from 'jspdf-autotable'
+
 export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVersion,reportID}) {
+    const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Judical Referral\t", "First Name\t", "Last Name\t", "Middle Initial\t", "ICID\t", "DoB\t", "Address\t", "Phone No\t"]
+    const keys = ["date", "incident", "location", "judicialReferal", "firstName", "lastName", "middleInitial", "ICID", "dob", "address", "phoneNo"]
 
     const [Referals, setReferals] = useState("")
     const [searchData, setSearchData] = useState({
@@ -235,7 +240,24 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
         gridRef.current.api.exportDataAsCsv()
     }
 
-   
+    function SaveAsPDF() {
+        const doc = new jsPDF({orientation: "landscape",});
+        console.log(rowData)
+        let bodyData = []
+        rowData.forEach((row) => {
+            let line = []
+            keys.map((key) => {
+                line.push(row[key])
+            })
+            bodyData.push(line)
+        })
+
+        autoTable(doc, {
+           head: [columnHeaders],
+           body: bodyData,
+        })
+        doc.save("referrals-export.pdf");
+    }
 
     function searchInputHandeler(e){
         setSearchData({...searchData,  [e.target.name] : e.target.value})
@@ -512,7 +534,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
 
                                         <Dropdown.Menu className="text-center">
                                             <Dropdown.Item onClick={()=>SaveAsCSV()}>CSV <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="CSV" className="csv-logo"/></Dropdown.Item>
-                                            <Dropdown.Item >PDF <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" className="pdf-logo" alt=""/></Dropdown.Item>
+                                            <Dropdown.Item onClick={() => SaveAsPDF()}>PDF <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" className="pdf-logo" alt=""/></Dropdown.Item>
                                         </Dropdown.Menu>
                                     </Dropdown> 
                                 : null}
