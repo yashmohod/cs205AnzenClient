@@ -25,14 +25,16 @@ export default function EmployeeTimeCard(props) {
     endDate:"",
     endTime:"00:00",
     note:"",
+    id:""
   });
   function inputChangeHandlerTimeCardData(e){
     setTimeCardData({...timeCardData,  [e.target.name] : e.target.value})
 }
 async function timeCardSubmit(){
   console.log(timeCardData)
-  let response = await post(API_URL + "/addTimeCard", {
+  let response = await post(API_URL + "/editTimeCard", {
       token: localStorage.getItem("token"),
+      idTimecardID:timeCardData.id,
       start:timeCardData.startDate+" "+timeCardData.startTime+":00",
       end:timeCardData.endDate+" "+timeCardData.endTime+":00",
       note:timeCardData.note,
@@ -44,6 +46,7 @@ async function timeCardSubmit(){
   }else{
       toast.warning(response.message)
   }
+  getTimeCards()
 }
 
    async function getTimeCards(){
@@ -71,12 +74,14 @@ async function timeCardSubmit(){
         data=empTimeCards[x]
       }
     }
+
     setTimeCardData({
       startDate:data.start.split("/")[0].replaceAll(' ', ''),
       startTime:data.start.split("/")[1].replaceAll(' ', ''),
       note:data.note,
       endDate:data.end.split("/")[0].replaceAll(' ', ''),
-      endTime:data.end.split("/")[1].replaceAll(' ', '')
+      endTime:data.end.split("/")[1].replaceAll(' ', ''),
+      id:timeCardID,
     })
 
     handleShowEdit()
@@ -84,6 +89,14 @@ async function timeCardSubmit(){
    }
 
    async function deleteTimeCard(timeCardID){
+
+    let response = await post(API_URL + "/clearTimeCard", {token: localStorage.getItem("token"),TimecardID: timeCardID})
+    if(response.status === 200){
+      toast.success(response.message)
+    }else{
+      toast.warning(response.message)
+    }
+    getTimeCards()
 
    }
 
@@ -197,7 +210,7 @@ async function timeCardSubmit(){
                 </div>
                 <div className="row" id="margin">
                 <Form.Label className=" d-flex justify-content-start"><strong>Notes:</strong></Form.Label>
-                <Form.Control   as="textarea" value={timeCardData.note} rows={3} onChange={(e)=>inputChangeHandlerTimeCardData(e)} name = {"notes"}/>
+                <Form.Control   as="textarea" value={timeCardData.note} rows={3} onChange={(e)=>inputChangeHandlerTimeCardData(e)} name = {"note"}/>
                 </div>
 
             </Modal.Body>
