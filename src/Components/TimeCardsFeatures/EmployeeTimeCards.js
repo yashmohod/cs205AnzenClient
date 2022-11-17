@@ -52,7 +52,7 @@ async function timeCardSubmit(){
    async function getTimeCards(){
       let response = await get(API_URL + "/getTimeCards?token=" +  localStorage.getItem("token"))
       if(response.status == 200) {
-        var data = response.TimeCards.map((tc)=>{
+        var data = response.UserTimeCards.map((tc)=>{
           if(tc.approval){
             tc.approval ="Approved"
           }else{
@@ -64,6 +64,8 @@ async function timeCardSubmit(){
         })
         setEmpTimeCard(data)
       gridRef.current.api.sizeColumnsToFit();
+      console.log(gridRef.current.api)
+      gridRef.current.columnApi.applyColumnState({state: [{ colId: 'approval', sort: 'desc' }],defaultState: { sort: null },})
       }
    }
 
@@ -101,39 +103,68 @@ async function timeCardSubmit(){
    }
 
 
+
    const gridRef = useRef(null);
    const defaultColDef= { resizable: true}
    const columnDefs = [
-      {field: 'submitedDate', headerName: 'Submited Date' ,cellStyle: { 'textAlign': 'center' }},
-      {field: 'start', headerName: 'Start' ,cellStyle: { 'textAlign': 'center' }},
-      {field: 'end', headerName: 'End' ,cellStyle: { 'textAlign': 'center' }},
-      {field: 'duration', headerName: ' Duration' ,cellStyle: { 'textAlign': 'center' }},
-      {field: 'approval', headerName: 'Status' ,cellStyle: { 'textAlign': 'center' }},
-      {field: 'note', headerName: 'Note' ,cellStyle: { 'textAlign': 'center' }},
+      {field: 'submitedDate', headerName: 'Submited Date' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
+      {field: 'start', headerName: 'Start' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
+      {field: 'end', headerName: 'End' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
+      {field: 'duration', headerName: ' Duration' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
+      {field: 'approval', headerName: 'Status' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
+      {field: 'note', headerName: 'Note' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
       {field: 'id',
       headerName: '' ,
-      cellRenderer: CommonButton, 
+      cellRenderer: (params)=>{
+        if(params.data.approval =="Pending"){
+          return (<CommonButton buttonText={"Edit"} variant={"outline-success"}/>)
+        }
+      }, 
       cellStyle: { 'textAlign': 'center' },
       cellRendererParams: {
         clicked: function(field) {
          editTimeCard(field)
         },
-        buttonText: "Edit",
-        variant:"outline-success",
       }},
       {field: 'id',
       headerName: '' ,
-      cellRenderer: CommonButton, 
+      cellRenderer:(params)=>{
+        if(params.data.approval =="Pending"){
+          return (<CommonButton buttonText={"Delete"} variant={"outline-danger"}/>)
+        }
+      }, 
       cellStyle: { 'textAlign': 'center' },
       cellRendererParams: {
         clicked: function(field) {
          deleteTimeCard(field)
         },
-        buttonText: "Delete",
-        variant:"outline-danger",
       }},
       
       ]
+
+
+    function showMobileViewTimeCards(){
+      let sortedfTC = []
+      for(let x = 0; x< empTimeCards.length; x++){
+        if(empTimeCards[x].approval =="Pending" ){
+          sortedfTC.push(empTimeCards[x])
+        }
+      }
+      for(let x = 0; x< empTimeCards.length; x++){
+        if(empTimeCards[x].approval =="Approved" ){
+          sortedfTC.push(empTimeCards[x])
+        }
+      }
+
+      return(
+        sortedfTC.map(element => {
+        return(
+        <MobileTableCards keyNum ={empTimeCards.indexOf(element)}  data={element} editTimeCard={editTimeCard} deleteTimeCard={deleteTimeCard} />
+       ) }))
+    }
+
+
+
    useEffect(() => {
       getTimeCards()
   
@@ -169,12 +200,7 @@ async function timeCardSubmit(){
       <div className="ag-theme-alpine incident-grid">
         
       <Accordion defaultActiveKey="0">
-      {
-        empTimeCards.map(element => {
-          return(
-          <MobileTableCards keyNum ={empTimeCards.indexOf(element)}  data={element} />
-         ) })
-      }
+      {showMobileViewTimeCards()}
 
     </Accordion>
 

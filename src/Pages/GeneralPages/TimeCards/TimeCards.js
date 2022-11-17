@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 import Modal from 'react-bootstrap/Modal';
 import EmployeeTimeCards from '../../../Components/TimeCardsFeatures/EmployeeTimeCards';
+import AdminTimeCards from '../../../Components/TimeCardsFeatures/AdminTimeCards';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 
@@ -53,10 +54,18 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
             toast.warning(response.message)
         }
     }
+    const [org,setOrg] = useState("")
+    const [pos,setPos]= useState("")
+    async function setORGnPOS(){
+        const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
+        const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
+        setOrg(orgres["organization"])
+        setPos(posres["position"])
+    }
 
     useEffect(() => {
         autoLogin()
-
+        setORGnPOS()
         
     }, [])
 
@@ -69,9 +78,6 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
             <h1>Time Cards</h1>
             <Form className="incident-form">
                 <Button variant="outline-dark" onClick={() => handleShow()}>Add Time Card</Button>
-                {/* <Button variant="primary" onClick={handleShow}>
-                  Launch static backdrop modal
-                </Button> */}
                 
             </Form>
             
@@ -84,9 +90,11 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
             <Tab eventKey="My Time Cards" title="My Time Cards">
                 <EmployeeTimeCards />
             </Tab>
-            <Tab eventKey="All Time Cards" title="All Time Cards">
-                
-            </Tab>
+            {pos == "admin"?
+                <Tab eventKey="All Time Cards" title="All Time Cards">
+                <AdminTimeCards />
+                </Tab>
+            :null}
             </Tabs>
             
 

@@ -30,10 +30,10 @@ export default function MobileTableCards(props) {
         <Form.Label className=" d-flex justify-content-start">Note: {props.data.note} </Form.Label>
         {props.data.approval==="Pending"?<div className="row">
             <div className="col-6">
-                <Button variant={"outline-success"} onClick={()=>{console.log(props.data.id)}} className="p-1">Edit</Button>
+                <Button variant={"outline-success"} onClick={()=>{props.editTimeCard(props.data.id)}} className="p-1">Edit</Button>
             </div>
             <div className="col-6">
-                <Button variant={"outline-danger"} onClick={()=>{console.log(props.data.id)}}className="p-1">Delete</Button>
+                <Button variant={"outline-danger"} onClick={()=>{props.deleteTimeCard(props.data.id)}}className="p-1">Delete</Button>
             </div>
         </div>: null}
         </Accordion.Body>

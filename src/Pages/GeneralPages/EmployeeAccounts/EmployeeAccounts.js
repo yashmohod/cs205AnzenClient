@@ -56,7 +56,6 @@ async function registerHandler() {
     collegeId: formData.collegeId,
     dob: formData.dob,
     })
-  // console.log(response)
   if(response.status === 200){
     toast.success(response.message)
     getAccounts()
@@ -214,7 +213,7 @@ async function registerHandler() {
 
     async function commonApiRequest(endpoint,accountId){
       let response = await post(API_URL + endpoint,  {userID: accountId,token: localStorage.getItem("token")});
-      console.log(response.status);
+
       if(response.status === 200){
         toast.success(response.message);
       }else{
@@ -230,7 +229,8 @@ async function registerHandler() {
 
     async function getAccounts() {
         let response = await get(API_URL + "/getAllAccounts?token=" +  localStorage.getItem("token"))
-        response = JSON.parse(response.accounts)
+        if(response.status==200){
+          response = response.accounts
         
         for(let x =0; x< response.length; x++){
           if(response[x].status === true){
@@ -239,10 +239,14 @@ async function registerHandler() {
             response[x].status = "Deactive"
           }
         }
+        }
+        else{
+          toast.warning(response.message)
+        }
+
 
         setRowData(response)
         setAccounts(response)
-        console.log(gridRef)
         gridRef.current.api.sizeColumnsToFit();
         return response
     }
