@@ -63,7 +63,7 @@ async function timeCardSubmit(){
          )
         })
         setEmpTimeCard(data)
-        console.log(data)
+        // console.log(data)
       gridRef.current.api.sizeColumnsToFit();
       gridRef.current.columnApi.applyColumnState({state: [{ colId: 'approval', sort: 'desc' }],defaultState: { sort: null },})
       }
@@ -102,6 +102,17 @@ async function timeCardSubmit(){
 
    }
 
+   async function approveTimeCard(timeCardID){
+    let response = await post(API_URL + "/approveTimeCard", {token: localStorage.getItem("token"),TimecardID: timeCardID})
+    if(response.status === 200){
+      toast.success(response.message)
+    }else{
+      toast.warning(response.message)
+    }
+    getTimeCards()
+
+   }
+
 
 
    const gridRef = useRef(null);
@@ -116,34 +127,41 @@ async function timeCardSubmit(){
       {field: 'note', headerName: 'Note' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
       {field: 'id',
       headerName: '' ,
-      cellRenderer: (params)=>{
-        if(params.data.approval =="Pending"){
-          return (<CommonButton buttonText={"Edit"} variant={"outline-success"}/>)
-        }
-      }, 
+      cellRenderer: CommonButton, 
       cellStyle: { 'textAlign': 'center' },
       cellRendererParams: {
         clicked: function(field) {
          editTimeCard(field)
         },
+        buttonText:"Edit",
+        variant:"outline-success",
       }},
       {field: 'id',
       headerName: '' ,
-      cellRenderer:(params)=>{
-        if(params.data.approval =="Pending"){
-          return (<CommonButton buttonText={"Delete"} variant={"outline-danger"}/>)
-        }
-      }, 
+      cellRenderer: CommonButton, 
       cellStyle: { 'textAlign': 'center' },
       cellRendererParams: {
         clicked: function(field) {
          deleteTimeCard(field)
         },
+        buttonText:"Delete",
+        variant:"outline-danger"
+      }},
+      {field: 'id',
+      headerName: '' ,
+      cellRenderer: CommonButton, 
+      cellStyle: { 'textAlign': 'center' },
+      cellRendererParams: {
+        clicked: function(field) {
+         approveTimeCard(field)
+        },
+        buttonText:"Approve",
+        variant:"outline-primary"
       }},
       
       ]
 
-
+    const mobileView  = useRef(null);
     function showMobileViewTimeCards(){
       let sortedfTC = []
       for(let x = 0; x< empTimeCards.length; x++){
@@ -157,19 +175,30 @@ async function timeCardSubmit(){
         }
       }
 
-      return(
-        sortedfTC.map(element => {
+      const tcs = sortedfTC.map(element => {
         return(
         <MobileTableCards keyNum ={empTimeCards.indexOf(element)}  data={element} editTimeCard={editTimeCard} deleteTimeCard={deleteTimeCard} />
-       ) }))
+       ) })
+
+      for(let x = 0; x<tcs.length; x++){
+        console.log(tcs[x])
+        mobileView.current.appendChild(tcs[x])
+      }
+
+
+      // return(
+      //   sortedfTC.map(element => {
+      //   return(
+      //   <MobileTableCards keyNum ={empTimeCards.indexOf(element)}  data={element} editTimeCard={editTimeCard} deleteTimeCard={deleteTimeCard} />
+      //  ) }))
     }
 
 
 
    useEffect(() => {
+    console.log(mobileView)
       getTimeCards()
-  
-
+      showMobileViewTimeCards()
         
     }, [])
 
@@ -200,9 +229,7 @@ async function timeCardSubmit(){
     <div className="d-block d-xxl-none" >
       <div className="ag-theme-alpine incident-grid">
         
-      <Accordion defaultActiveKey="0">
-      {showMobileViewTimeCards()}
-
+      <Accordion defaultActiveKey="0" ref={mobileView}>
     </Accordion>
 
       </div>

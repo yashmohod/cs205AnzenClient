@@ -64,7 +64,7 @@ async function timeCardSubmit(){
         })
         setEmpTimeCard(data)
       gridRef.current.api.sizeColumnsToFit();
-      console.log(gridRef.current.api)
+      // console.log(gridRef.current.api)
       gridRef.current.columnApi.applyColumnState({state: [{ colId: 'approval', sort: 'desc' }],defaultState: { sort: null },})
       }
    }

@@ -10,7 +10,7 @@ export default function MobileTableCards(props) {
     const cardRef = useRef(null);
     useEffect(() => {
     
-        console.log(cardRef)
+        // console.log(cardRef)
         if(props.data.approval==="Pending"){
             cardRef.current.firstChild.style.backgroundColor="#fcfcb6"
         }else{
