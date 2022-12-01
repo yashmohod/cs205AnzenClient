@@ -14,10 +14,11 @@ import { useNavigate } from "react-router-dom";
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 import Modal from 'react-bootstrap/Modal';
 import MobileTableCards from '../../../Components/TimeCardsFeatures/MobileTableCards';
-
+import EmployeeList from "../../../Components/EmployeeList/EmployeeList"
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import Accordion from 'react-bootstrap/Accordion';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
    
@@ -77,16 +78,45 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
         const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
         setOrg(orgres["organization"])
         setPos(posres["position"])
-        getAlltc(posres["position"])
+        if(posres["position"] == "admin"){
+          getAlltc(pos,myTCpreviousSearchData)
+          getAlltc(pos,allTCpreviousSearchData)
+        }else{
+          getAlltc(pos,myTCpreviousSearchData)
+        }
     }
     const[myTC,setMYtc]=useState([])
     const[allTC,setALLtc]=useState([])
 
-    async function getAlltc(position){
-    let responseALL = await get(API_URL + "/getTimeCards?token=" +  localStorage.getItem("token"))
+    async function getAlltc(position,searchDATA){
+      let responseALL = null
+      if(position == "admin"){
+        if(ISadminTCsearch){
+          responseALL = await get(API_URL + "/getTimeCards?token=" +  localStorage.getItem("token")+
+          "&admin_emp="+searchDATA.employeeId+
+          "&admin_dateFrom="+searchDATA.dateFrom+
+          "&admin_dateTo="+searchDATA.dateTo+
+          "&admin_status="+searchDATA.approval)
+          // console.log("2")
+        }else{
+          responseALL = await get(API_URL + "/getTimeCards?token=" +  localStorage.getItem("token")+
+          "&dateFrom="+searchDATA.dateFrom+
+          "&dateTo="+searchDATA.dateTo+
+          "&status="+searchDATA.approval)
+          // console.log("2")
+        }
+      }else{
+        responseALL = await get(API_URL + "/getTimeCards?token=" +  localStorage.getItem("token")+
+          "&dateFrom="+searchDATA.dateFrom+
+          "&dateTo="+searchDATA.dateTo+
+          "&status="+searchDATA.approval)
+          // console.log("3")
+      }
+
       
       if(responseALL.status == 200) {
-        var data = responseALL.UserTimeCards.map((tc)=>{
+        var data = 0;
+        data = responseALL.UserTimeCards.map((tc)=>{
           if(tc.approval){
             tc.approval ="Approved"
           }else{
@@ -96,12 +126,16 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
             tc
           )
         })
-        setMYtc(data)
+        if(data!=0){
+          // console.log(data)
+          setMYtc(data)
+        }
     }
   
     if(position == "admin"){
       if(responseALL.status == 200) {
-        var data = responseALL.AlltimeCards.map( (tc)=>{
+        var data = "0";
+         data = responseALL.AlltimeCards.map( (tc)=>{
          if(tc.approval){
             tc.approval ="Approved"
          }else{
@@ -111,7 +145,10 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
            tc
          )
         })
-        setALLtc(data)
+        // console.log(data!="0")
+        if(data!="0"){
+          setALLtc(data)
+        }
       }
     }
 }
@@ -139,7 +176,7 @@ function editTimeCard(timeCardID){
  }
 
  async function editedtimeCardSubmit(){
-  console.log(timeCardData)
+  // console.log(timeCardData)
   let response = await post(API_URL + "/editTimeCard", {
       token: localStorage.getItem("token"),
       idTimecardID:timeCardData.id,
@@ -154,7 +191,12 @@ function editTimeCard(timeCardID){
   }else{
       toast.warning(response.message)
   }
-  getAlltc(pos)
+  if(pos == "admin"){
+    getAlltc(pos,myTCpreviousSearchData)
+    getAlltc(pos,allTCpreviousSearchData)
+  }else{
+    getAlltc(pos,myTCpreviousSearchData)
+  }
   setTimeCardData({
     startDate:"",
     startTime:"00:00",
@@ -173,7 +215,8 @@ function editTimeCard(timeCardID){
   }else{
     toast.warning(response.message)
   }
-  getAlltc(pos)
+  getAlltc(pos,myTCpreviousSearchData)
+  getAlltc(pos,allTCpreviousSearchData)
  }
 
 
@@ -187,7 +230,7 @@ function editTimeCard(timeCardID){
     {field: 'duration', headerName: ' Duration' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
     {field: 'approval', headerName: 'Status' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
     {field: 'note', headerName: 'Note' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
-    {field: 'id',
+    {field: '',
     headerName: '' ,
     cellStyle: { 'textAlign': 'center' },
     cellRenderer: (params) => {
@@ -197,7 +240,7 @@ function editTimeCard(timeCardID){
         return null
       }
     }},
-    {field: 'id',
+    {field: '',
     headerName: '' ,
     cellStyle: { 'textAlign': 'center' },
     cellRenderer: (params) => {
@@ -239,8 +282,8 @@ function editTimeCard(timeCardID){
     }else{
       toast.warning(response.message)
     }
-    console.log(pos)
-    getAlltc(pos)
+    // console.log(pos)
+    getAlltc(pos,allTCpreviousSearchData)
 
    }
 
@@ -256,39 +299,29 @@ function editTimeCard(timeCardID){
       {field: 'duration', headerName: ' Duration' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
       {field: 'approval', headerName: 'Status' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
       {field: 'note', headerName: 'Note' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
-      {field: 'id',
-      headerName: '' ,
-      cellRenderer: CommonButton, 
-      cellStyle: { 'textAlign': 'center' },
-      cellRendererParams: {
-        clicked: function(field) {
-         editTimeCard(field)
-        },
-        buttonText:"Edit",
-        variant:"outline-success",
-      }},
-      {field: 'id',
-      headerName: '' ,
-      cellRenderer: CommonButton, 
-      cellStyle: { 'textAlign': 'center' },
-      cellRendererParams: {
-        clicked: function(field) {
-         deleteTimeCard(field)
-        },
-        buttonText:"Delete",
-        variant:"outline-danger"
-      }},
-      {field: 'id',
-      headerName: '' ,
-      cellRenderer: CommonButton, 
-      cellStyle: { 'textAlign': 'center' },
-      cellRendererParams: {
-        clicked: function(field) {
-         approveTimeCard(field)
-        },
-        buttonText:"Approve",
-        variant:"outline-primary"
-      }},
+      {field: '',
+    headerName: '' ,
+    cellStyle: { 'textAlign': 'center' },
+    cellRenderer: (params) => {
+      return( <CommonButton buttonText={"Edit"} variant={"outline-success"} clicked={()=>{editTimeCard(params.data.id)}} />)
+    }},
+    {field: '',
+    headerName: '' ,
+    cellStyle: { 'textAlign': 'center' },
+    cellRenderer: (params) => {
+      return( <CommonButton buttonText={"Delete"} variant={"outline-danger"} clicked={()=>{deleteTimeCard(params.data.id)}} />)
+    }},
+    {field: '',
+    headerName: '' ,
+    cellStyle: { 'textAlign': 'center' },
+    cellRenderer: (params) => {
+      if(params.data.approval == "Pending"){
+        return( <CommonButton buttonText={"Approve"} variant={"outline-primary"} clicked={()=>{approveTimeCard(params.data.id)}} />)
+        }else{
+          return null
+        }
+    }},
+  
       
       ]
 
@@ -315,13 +348,98 @@ function editTimeCard(timeCardID){
     }
 
 
+    const [ISadminTCsearch,setISadminTCsearch]= useState(false)
+    
+    
+    function tabChange(e){
+      if(e == 1){
+        setISadminTCsearch(false)
+      }
+      if(e == 2){
+        setISadminTCsearch(true)
+      }
+
+    }
+
+  const [myTCsearchData, myTCsetSearchData] = useState({
+    "approval":"",
+    "dateFrom":"",
+    "dateTo":"",
+})
+const [myTCpreviousSearchData, myTCsetPreviousSearchData] = useState({
+  "approval":"",
+  "dateFrom":"",
+  "dateTo":"",
+})
+
+function searchInputHandeler(e){
+  if(ISadminTCsearch){
+    allTCsetSearchData({...allTCsearchData,  [e.target.name] : e.target.value})
+  }
+  else{
+    myTCsetSearchData({...myTCsearchData,  [e.target.name] : e.target.value})
+  }   
+
+}
+const [allTCsearchData, allTCsetSearchData] = useState({
+  "employeeId":"",
+  "approval":"",
+  "dateFrom":"",
+  "dateTo":"",
+})
+const [allTCpreviousSearchData, allTCsetPreviousSearchData] = useState({
+"employeeId":"",
+"approval":"",
+"dateFrom":"",
+"dateTo":"",
+})
+
+function search(){
+  // clearSearchFields()
+  if(ISadminTCsearch){
+    // console.log("all tc")
+    // console.log(allTCsearchData)
+    allTCsetPreviousSearchData(allTCsearchData)
+    getAlltc(pos,allTCsearchData)
+
+  }
+  else{
+    // console.log("my tc")
+    // console.log(myTCsearchData)
+    myTCsetPreviousSearchData(myTCsearchData)
+    getAlltc(pos,myTCsearchData)
+  }
+}
+
+  const EmployeeDropdown = useRef(null)
+  const dateToChooser = useRef(null)
+  const dateFromChooser = useRef(null)
+  const status = useRef(null)
+
+
+  function clearSearchFields(){
+    // console.log(EmployeeDropdown)
+    EmployeeDropdown.current.selectedIndex=0
+    status.current.selectedIndex=0
+    dateToChooser.current.value=""
+    dateFromChooser.current.value=""
+
+}
+
+function SaveAsCSV(){
+  if(ISadminTCsearch){
+    allTCgridRef.current.api.exportDataAsCsv()
+  }else{
+    myTCgridRef.current.api.exportDataAsCsv()
+  }
+}
 
     useEffect(() => {
         autoLogin()
         setORGnPOS()
 
         
-    }, [ ])
+    }, [])
 
     function showAndClear(){
       handleShow()
@@ -346,13 +464,77 @@ function editTimeCard(timeCardID){
                 
             </Form>
             
+          {/* search */}
+          <div className="container">
+                <div className="row">
+                    <div className="col">
+                        <div className="row" id = "location-form">
+                        {ISadminTCsearch?
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">Employee</Form.Label>
+                            <Form.Select aria-label="Default select example" ref={EmployeeDropdown}  name="employeeId" onChange={(e) => searchInputHandeler(e)}>
+                            <EmployeeList  />
+                            </Form.Select>
+                            </div>: null}
+
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">Date From</Form.Label>
+                            <Form.Control type="date" placeholder=""  ref={dateFromChooser} name="dateFrom" onChange={(e) => searchInputHandeler(e)}/>
+                            </div>
+
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">Date To</Form.Label>
+                            <Form.Control type="date" placeholder="" name="dateTo" ref={dateToChooser} onChange={(e) => searchInputHandeler(e)}/>
+                            </div>
+
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">Status</Form.Label>
+                            <Form.Select aria-label="Default select example"  ref={status} name="approval" onChange={(e) => searchInputHandeler(e)}>
+                            <option value =''></option>
+                              <option value ='Pending'>Pending</option>
+                              <option value ='Approved'>Approved</option>
+                            </Form.Select>
+                            </div>
+                        
+                            
+                            <div className="col" id="searchFormElement">
+                                <div className="row">
+                                <Button variant="outline-primary" type="button" onClick={() => search()}>Search</Button>
+                                {/* <Button variant="outline-info" type="button" onClick={() => getAllReports()}>Search All</Button> */}
+                                </div>
+                                {(allTC.length > 0)? 
+                                <div className="row">
+                                    <Dropdown>
+                                        <Dropdown.Toggle variant="outline-black" id="dropdown-basic">
+                                            Export File
+                                        </Dropdown.Toggle>
+
+                                        <Dropdown.Menu className="text-center">
+                                            <Dropdown.Item onClick={()=>SaveAsCSV()}>CSV <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="CSV" className="csv-logo"/></Dropdown.Item>
+                                            <Dropdown.Item >PDF <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" className="pdf-logo" alt=""/></Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown> 
+                                </div>
+                                : null}
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  
+
+
+
 
             <Tabs
-            defaultActiveKey="My Time Cards"
+            defaultActiveKey="1"
             id="uncontrolled-tab-example"
             className="mb-3"
+            onSelect={(e) =>tabChange(e)}
             >
-            <Tab eventKey="My Time Cards" title="My Time Cards">
+            <Tab eventKey="1" title="My Time Cards" >
+
                 {/* desktop view */}
                 <div className="d-none d-xxl-block" >
                   <div className="ag-theme-alpine incident-grid">
@@ -382,7 +564,7 @@ function editTimeCard(timeCardID){
                 </div>
             </Tab>
             {pos == "admin"? 
-                <Tab eventKey="All Time Cards" title="All Time Cards">
+                <Tab eventKey="2" title="All Time Cards" onClick={()=>clearSearchFields()}>
                    {/* desktop view */}
                   <div className="d-none d-xxl-block" >
                     <div className="ag-theme-alpine incident-grid">

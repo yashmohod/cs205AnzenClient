@@ -8,7 +8,7 @@ export default function EmployeeList() {
 
     async function getNsetInceidents(){
       let response = await get(API_URL + "/getAllAccounts?token=" +  localStorage.getItem("token"))
-      response = JSON.parse(response.accounts)
+      response = response.accounts
         response.unshift( {"id":"","firstName":"","lastName":""} );
         setemployeeList(response)
 
