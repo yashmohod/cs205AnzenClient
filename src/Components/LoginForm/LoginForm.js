@@ -45,7 +45,7 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setL
         setLoggedIn(false)
         setLoggedInUser(null)
         setLoading(false)
-        toast.error(<h5>Verified. Logging you in!</h5>, {style: {fontWeight: "bold"}})
+        toast.error(<h5>Wrong Credentials!</h5>, {style: {fontWeight: "bold"}})
       }
    }
 
