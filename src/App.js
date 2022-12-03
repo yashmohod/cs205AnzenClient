@@ -1,8 +1,6 @@
 import logo from './logo.svg';
 import {useEffect, useState} from 'react';
-import './App.css';
 import Login from './Pages/GeneralPages/Login/Login';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Dashboard from './Pages/GeneralPages/Dashboard/Dashboard';
 import Location from './Pages/SASPpages/Location/Location';
 import Daily from "./Pages/SASPpages/Daily/Daily"
@@ -17,6 +15,11 @@ import ChangePassword from './Pages/GeneralPages/ChangePassword/ChangePassword';
 import EmployeeAccounts from './Pages/GeneralPages/EmployeeAccounts/EmployeeAccounts';
 import TimeCards from './Pages/GeneralPages/TimeCards/TimeCards';
 import { useNavigate } from "react-router-dom";
+import 'rsuite/styles/index.less';
+import 'rsuite/dist/rsuite.min.css'
+import 'react-toastify/dist/ReactToastify.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
 
 function App() {
   const navigate = useNavigate();
@@ -32,11 +35,13 @@ function App() {
       if (tokenVerification.message === "verified") {
         setLoggedIn(true)
         setLoggedInUser(tokenVerification.user)
+        return true
       }
       else{
         localStorage.setItem("message", "Login Session expired!")
         setLoggedIn(false)
         navigate("/")
+        return false
       }
     }
   }
@@ -51,7 +56,7 @@ function App() {
     <div className="App">
         <Routes>
           {/* general routes */}
-          
+ 
           <Route path="/" element={loggedIn ? <Dashboard loggedIn={loggedIn} setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/> :  <Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} setLoggedInUser={setLoggedInUser} autoLogin={() => autoLogin()}/> } />
           <Route path="/register-accounts" element={<Register setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/change-passwords" element={<ChangePassword setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>

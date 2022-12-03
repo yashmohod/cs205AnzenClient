@@ -14,3 +14,7 @@
     width: 50%;
     height: 100%;
 }
+
+.toast {
+    font-weight: bold;
+}
