@@ -12,11 +12,13 @@ import { API_URL, get, post } from "../../../Utils/API";
 import EditButton from '../../../Components/Buttons/EditButton'
 import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import { ToastContainer, toast } from 'react-toastify';
+import LoadingButton from "../../../Components/Buttons/LoadingButton";
 
 export default function Incidents({setLoggedIn, loggedInUser, autoLogin}) {
     const [incident, setIncident] = useState("")
     const gridRef = useRef();
     const [rowData, setRowData] = useState();
+    const [loading, setLoading] = useState(false)
 
     const columnDefs = [
         {field: 'incidentName'},
@@ -66,20 +68,26 @@ export default function Incidents({setLoggedIn, loggedInUser, autoLogin}) {
     }
 
     async function addIncidentHandler() {
-        if( incident != ""){
-            let response = await post(API_URL + "/enterIncident", {incident : incident, token: localStorage.getItem("token")}) 
-            if (response.status==200){
-                document.getElementById("locationInput").value = "";
-                setIncident("")
-                getIncidents();
-                toast.success(String(response["message"])+" : "+incident);
-                getIncidents()
+        setLoading(true)
+        try {
+            if( incident != ""){
+                let response = await post(API_URL + "/enterIncident", {incident : incident, token: localStorage.getItem("token")}) 
+                if (response.status==200){
+                    document.getElementById("locationInput").value = "";
+                    setIncident("")
+                    getIncidents();
+                    toast.success(String(response["message"])+" : "+incident);
+                    getIncidents()
+                }else{
+                    toast.warning(response["message"] )
+                }
             }else{
-                toast.warning(response["message"] )
+                toast.warning("Empty incident was entered!")
             }
-        }else{
-            toast.warning("Empty incident was entered!")
+        } catch {
+            setLoading(false)
         }
+        setLoading(false)
     }
 
     async function getIncidents() {
@@ -117,7 +125,7 @@ export default function Incidents({setLoggedIn, loggedInUser, autoLogin}) {
                     <div className="col-12">
                         <Form className="location-form">
                             <Form.Control type="text" placeholder="Enter new incident" onChange={(e) => incidentChangeHandler(e)}  id="locationInput"/>
-                            <Button onClick={() => addIncidentHandler()}>Add</Button>
+                            <div onClick={() => addIncidentHandler()}><LoadingButton text={"Add"} loading={loading}/></div>
                         </Form>
                     </div>
                 </div>
