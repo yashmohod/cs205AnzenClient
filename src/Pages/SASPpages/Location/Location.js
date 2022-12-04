@@ -9,9 +9,10 @@ import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import EditButton from '../../../Components/Buttons/EditButton'
 import { Button, Form } from "react-bootstrap";
 import { ToastContainer, toast } from 'react-toastify';
+import LoadingButton from "../../../Components/Buttons/LoadingButton";
 
 export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
-
+    const [loading, setLoading] = useState(false)
     const [Location, setLocation] = useState("")
     let tempLocation
     function locationChangeHandler(e) {
@@ -19,21 +20,25 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
       }
 
     async function addLocationHandler(e){
-        let response = await post(API_URL + "/enterLocation",  {location: Location,token: localStorage.getItem("token")});
-        if(Location != ""){
-            if (response.message =="New location was successfully entered."){
-                document.getElementById("locationInput").value = "";
-                getLocations();
-                toast.success(response.message+" : "+Location);
-                setLocation("")
+        setLoading(true)
+        try {
+            let response = await post(API_URL + "/enterLocation",  {location: Location,token: localStorage.getItem("token")});
+            if(Location != ""){
+                if (response.message =="New location was successfully entered."){
+                    document.getElementById("locationInput").value = "";
+                    getLocations();
+                    toast.success(response.message+" : "+Location);
+                    setLocation("")
+                }else{
+                    toast.warning(response.message);
+                }
             }else{
-                toast.warning(response.message);
+                toast.warning("Empty incident was entered!")
             }
-        }else{
-            toast.warning("Empty incident was entered!")
+        } catch {
+            setLoading(false)
         }
-
-        
+       setLoading(false)   
     }
     async function deleteLocationHandler(locationId){
         let response = await post(API_URL + "/deleteLocation",  {id :locationId ,token: localStorage.getItem("token")});
@@ -121,7 +126,7 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
                     <div className="col-12">
                         <Form className="location-form">
                             <Form.Control type="text" placeholder="Enter new location" onChange={(e) => locationChangeHandler(e)}  id="locationInput"/>
-                            <Button onClick={() => addLocationHandler()}>Add</Button>
+                            <div onClick={() => addLocationHandler()}><LoadingButton text={"Add"} loading={loading}/></div>
                         </Form>
                     </div>
                 </div>
