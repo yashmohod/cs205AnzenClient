@@ -1,4 +1,6 @@
 .background {
+    position: absolute;
+    top: 0;
     width: 100vw;
     height: 100vh;
     background: url("https://i.pinimg.com/originals/6f/88/f3/6f88f38d50e8752429cc9f207a8ed552.jpg");
@@ -7,7 +9,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: -1;
+}
 
+.loading-screen-layer {
+    position: absolute;
+    top: 0;
+    z-index: 1000;
 }
 
 .background-image {

@@ -1,13 +1,15 @@
 import React, { Component, useEffect, useState } from 'react'
-import SimpleLoginForm from 'simple-login-form'
-import 'simple-login-form/dist/index.css'
 import { API_URL, get, post } from '../../Utils/API'
-import './LoginForm.css'
+import { Button } from 'rsuite';
 import IthacaLogo from '../../Images/logo.png'
+import './LoginForm.css'
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify';
+
 
 //'linear-gradient(#e66465, #9198e5)'
 //linear-gradient(#1f87ab, #004961 50%, #004961 90%);
-export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin}) {
+export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setLoading}) {
     const [userName, setuserName] = useState("")
     const [password, setPassword] = useState("")
 
@@ -19,21 +21,31 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin}) {
       setPassword(e.target.value)
     }
 
-    
- 
     async function loginHandler(e) {
-      autoLogin()
-      e.preventDefault()
+      setLoading(true)
+
+      if (!e) {
+        autoLogin()
+        setLoading(false)
+        return
+      }
+      
       let response = await post(API_URL + "/login",  {userName: userName, password: password})
       var tokenVerification = await post(API_URL + "/validate-token", {token: response.token})
-
+    
       if (tokenVerification.message === "verified") {
-        setLoggedIn(true)
-        setLoggedInUser(tokenVerification.user)
-        localStorage.setItem("token", response.token)
+        toast.success(<h5>Verified. Logging you in!</h5>, {style: {fontWeight: "bold"}})
+        setLoading(false)
+        setTimeout(() => {
+          localStorage.setItem("token", response.token)
+          setLoggedIn(true)
+          setLoggedInUser(tokenVerification.user)
+        }, 1500)
       } else {
         setLoggedIn(false)
         setLoggedInUser(null)
+        setLoading(false)
+        toast.error(<h5>Wrong Credentials!</h5>, {style: {fontWeight: "bold"}})
       }
    }
 
@@ -43,6 +55,7 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin}) {
  
       return (
             <div className="form p-5">
+                <ToastContainer/>
                 <div className="ithaca-logo-login-container">
                     <img src={IthacaLogo} alt="" className="ithaca-logo-login"/>
                 </div>
@@ -56,9 +69,8 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin}) {
                        <label for="exampleInputPassword1" class="form-label d-flex justify-content-start">Password</label>
                        <input type="password" class="form-control" id="exampleInputPassword1" onChange={(e) => passwordChangeHandler(e)}/>
                      </div>
-           
-                     <button type="submit" class="btn btn-primary" onClick={(e) => loginHandler(e)}>Login</button>
-                    
+
+                     <Button appearance="primary" class="btn btn-primary" onClick={(e) => loginHandler(e)} color="blue" active>Login</Button>
                 </form>
             </div>
       )
