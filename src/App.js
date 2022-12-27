@@ -47,6 +47,8 @@ function App() {
   }
 
 
+
+
 /*
 
 {loggedIn ? <Dashboard loggedIn={loggedIn} setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/> :  <Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} setLoggedInUser={setLoggedInUser}/>}          
@@ -57,8 +59,8 @@ function App() {
         <Routes>
           {/* general routes */}
  
-          <Route path="/" element={loggedIn ? <Dashboard loggedIn={loggedIn} setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/> :  <Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} setLoggedInUser={setLoggedInUser} autoLogin={() => autoLogin()}/> } />
-          <Route path="/register-accounts" element={<Register setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
+          <Route path="/" element={loggedIn ? <Dashboard loggedIn={loggedIn} setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/> :  <Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} setLoggedInUser={setLoggedInUser} autoLogin={() => autoLogin()}/> } />
+          {/* <Route path="/register-accounts" element={<Register setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/> */}
           <Route path="/change-passwords" element={<ChangePassword setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/employee-accounts" element={<EmployeeAccounts setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/time-cards" element={<TimeCards setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>

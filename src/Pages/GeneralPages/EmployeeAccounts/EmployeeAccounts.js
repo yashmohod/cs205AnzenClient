@@ -13,6 +13,8 @@ import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import CommonButton from '../../../Components/Buttons/CommonButton'
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
+import Register from "../Register/Register";
+
 // import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
@@ -102,9 +104,9 @@ async function registerHandler() {
         {field: 'status', headerName: 'Status' ,cellStyle: { 'textAlign': 'center' }},
         {field: 'lastName', headerName: 'Last Name' ,cellStyle: { 'textAlign': 'center' }},
         {field: 'firstName', headerName: 'First Name' ,cellStyle: { 'textAlign': 'center' }},
-        {field: 'dob', headerName: ' DOB' ,cellStyle: { 'textAlign': 'center' }},
-        {field: 'collegeId', headerName: 'IC ID' ,cellStyle: { 'textAlign': 'center' }},
-        {field: 'email', headerName: 'Email' ,cellStyle: { 'textAlign': 'center' }},
+        // {field: 'dob', headerName: ' DOB' ,cellStyle: { 'textAlign': 'center' }},
+        // {field: 'collegeId', headerName: 'IC ID' ,cellStyle: { 'textAlign': 'center' }},
+        // {field: 'email', headerName: 'Email' ,cellStyle: { 'textAlign': 'center' }},
         {field: 'id', 
         headerName: '' ,
         cellRenderer: EditButton,
@@ -252,6 +254,37 @@ async function registerHandler() {
     }
 
 
+
+    const [regshow, setregShow] = useState(false);
+    const handlregClose = () => {setregShow(false);setregisterBool(false);};
+    const handlregeShow = () => setregShow(true);
+    const[registerBool,setregisterBool] = useState(false);
+
+    const [email,setEmail]= useState();
+    async function register(){
+      // console.log(email!= null && emailref.current.validity.valid )
+      for(let x =0; x< accounts.length;x++){
+        if(accounts[x].email == email){
+          toast.warning("Account already exists!");
+          return
+        }
+        let response = await post(API_URL + "/checkAccount",  {email: email,token: localStorage.getItem("token")});
+        if(response.status == 200){
+          if(response.accountFound){
+            // add to organization
+            if(false){
+              toast.success("Account found in database. Added to Org");
+            }
+          }else{
+            setregisterBool(true)
+          }
+        }else{
+          toast.warning(response.message);
+        }
+      }
+      
+    }
+
     // const [dimensions, setDimensions] = React.useState({ 
     //   height: window.innerHeight,
     //   width: window.innerWidth
@@ -275,7 +308,6 @@ async function registerHandler() {
     }, [])
 
 
-    // window.addEventListener('resize', handleResize)
 
     return (
         <div className="incident-page">
@@ -283,15 +315,37 @@ async function registerHandler() {
              <ToastContainer />
             <h1>Employee Accounts</h1>
             <Form className="incident-form">
-                <Button variant="outline-dark" onClick={() => navigate("/register-accounts")}>Add Account</Button>
-                {/* <Button variant="primary" onClick={handleShow}>
-                  Launch static backdrop modal
-                </Button> */}
+                <Button variant="outline-dark" onClick={() => handlregeShow()}>Add Account</Button>
             </Form>
+            <Modal
+              show={regshow}
+              onHide={handlregClose}
+              backdrop="static"
+              keyboard={false}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Register Account</Modal.Title>
+              </Modal.Header>
+              {registerBool?
+              <Modal.Body>
+              <Register email = {email} handlregClose= {()=>handlregClose()}/>
+              </Modal.Body>
+              :
+              <>
+              <Modal.Body>
+                <Form>
+                <Form.Label className=" d-flex justify-content-start">Email</Form.Label>
+                <Form.Control type="email" placeholder="example@email.com" name="password" onChange={(e) => setEmail(e.target.value)}/>
+                </Form>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="primary" onClick={()=>register()}>Check Account</Button>
+              </Modal.Footer></>
+              }
+            </Modal>
 
-
+            {/* desktop emp account list */}
             <div className="ag-theme-alpine incident-grid">
-        
               <AgGridReact
                 ref={gridRef}
                 columnDefs={columnDefs}
@@ -299,8 +353,6 @@ async function registerHandler() {
                 rowData={rowData}
                 >
               </AgGridReact>
-
-
 			      </div>
 
 

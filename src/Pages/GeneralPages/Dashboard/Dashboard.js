@@ -8,17 +8,17 @@ import { ToastContainer, toast } from 'react-toastify';
 import {Features} from "./features"
 import { useNavigate } from "react-router-dom";
 
-export default function({loggedIn, setLoggedIn, loggedInUser}) {
+export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     const [clockin, setClockin] = useState(false)
     const [org,setOrg] = useState("")
     const [pos,setPos]= useState("")
     const [showFeatures,setshowFeatures] =useState(false)
 
     function checkMessage(){
-        // if(!(localStorage.getItem("message") === null)){
-        //     toast.success(String(localStorage.getItem("message")));
-        //     localStorage.removeItem("message");
-        // }
+        if(!(localStorage.getItem("message") === null)){
+            toast.success(String(localStorage.getItem("message")));
+            localStorage.removeItem("message");
+        }
     }
     
 
@@ -45,9 +45,7 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if(!loggedIn){
-            navigate("/")
-        }
+        autoLogin()
         const checkClockinStatus = async () => {
             let response = await post(API_URL + "/checkClockInStatus", {token: localStorage.getItem("token")})
             if (response.clock_in === true) {

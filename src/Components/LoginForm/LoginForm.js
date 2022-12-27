@@ -10,11 +10,11 @@ import { ToastContainer, toast } from 'react-toastify';
 //'linear-gradient(#e66465, #9198e5)'
 //linear-gradient(#1f87ab, #004961 50%, #004961 90%);
 export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setLoading}) {
-    const [userName, setuserName] = useState("")
+    const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
-    function userNameChangeHandler(e) {
-      setuserName(e.target.value)
+    function emailChangeHandler(e) {
+      setEmail(e.target.value)
     }
 
     function passwordChangeHandler(e) {
@@ -30,7 +30,7 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setL
         return
       }
       
-      let response = await post(API_URL + "/login",  {userName: userName, password: password})
+      let response = await post(API_URL + "/login",  {email: email, password: password})
       var tokenVerification = await post(API_URL + "/validate-token", {token: response.token})
     
       if (tokenVerification.message === "verified") {
@@ -48,8 +48,15 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setL
         toast.error(<h5>Wrong Credentials!</h5>, {style: {fontWeight: "bold"}})
       }
    }
+   function checkMessage(){
+    if(!(localStorage.getItem("message") === null)){
+        toast.success(String(localStorage.getItem("message")));
+        localStorage.removeItem("message");
+    }
+}
 
     useEffect((e) => {
+      checkMessage()
       loginHandler(e)
     }, [])
  
@@ -62,8 +69,8 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setL
                 <form className='m-5'>
                     <h1>Access Page</h1>
                      <div class="mb-3">
-                       <label for="exampleInputEmail1" class="form-label d-flex justify-content-start">Username</label>
-                       <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={(e) => userNameChangeHandler(e)}/>
+                       <label for="exampleInputEmail1" class="form-label d-flex justify-content-start">Email</label>
+                       <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={(e) => emailChangeHandler(e)}/>
                      </div>
                      <div class="mb-3">
                        <label for="exampleInputPassword1" class="form-label d-flex justify-content-start">Password</label>

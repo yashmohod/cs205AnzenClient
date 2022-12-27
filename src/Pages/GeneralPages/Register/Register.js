@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 
 
-export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
+export default function Register({email,handlregClose}) {
   const navigate = useNavigate();
   const [SASPshowPos, setSASPshowPos] = useState(false)
   const [RESLIFEshowPos, setRESLIFEshowPos] = useState(false)
@@ -31,9 +31,7 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
       dob: "",
       organization: "",
       position: "",
-      email: "",
-      userName: "",
-      userName_confirm: "",
+      email: email,
       password: "",
       password_confirm: "",
   })
@@ -84,7 +82,7 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
       let response = await post(API_URL + "/register", {
         token: localStorage.getItem("token"),
         email: formData.email,
-        userName: formData.userName,
+        // userName: formData.userName,
         password: formData.password,
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -96,7 +94,8 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
       console.log(response)
       if(response.message === "registered successfully"){
         localStorage.setItem("message", response.message);
-        navigate("/employee-accounts");
+        // navigate("/employee-accounts");
+        handlregClose();
       }else{
         toast.warning(response.message)
       }
@@ -132,12 +131,11 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
     return (
     <div>
         <ToastContainer />
-        <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
-        <h1>Register Account</h1>
-        <div className="container-fluid">
+        {/* <h1>Register Account</h1> */}
+        {/* <div className="container-fluid">
             <div className="row">
                 <div className="col-0 col-md-2"></div>
-                <div className="col-12 col-md-8">
+                <div className="col-12 col-md-8"> */}
                    
                            <Form className="register-form-container p-5">
                            <div className="register-form">
@@ -155,7 +153,7 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
               <Form.Control type="date" placeholder="" name="dob" onChange={(e) => inputChangeHandler(e)}/>
 
               <Form.Label className=" d-flex justify-content-start">Email address</Form.Label>
-              <Form.Control type="text" placeholder="" name="email" onChange={(e) => inputChangeHandler(e)}/>
+              <Form.Control type="text" placeholder="" name="email" value={email} onChange={(e) => inputChangeHandler(e)}/>
               
             <Form.Label className=" d-flex justify-content-start">Position</Form.Label>
             { SASPshowPos ? <SASPPosButton changePosition = {changePosition} formData={formData}/> : null }
@@ -164,12 +162,12 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
               
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formBasicEmail">
+            {/* <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label className=" d-flex justify-content-start">Username</Form.Label>
               <Form.Control type="text" placeholder="Enter Username" name="userName" onChange={(e) => inputChangeHandler(e)}/>
               <Form.Label className=" d-flex justify-content-start">Confirm Username</Form.Label>
               <Form.Control type="text" placeholder="Re-enter Username" name="userName_confirm" onChange={(e) => inputChangeHandler(e)}/>
-            </Form.Group>
+            </Form.Group> */}
 
             <Form.Group className="mb-3" controlId="formBasicPassword">
               <Form.Label className=" d-flex justify-content-start">Password</Form.Label>
@@ -186,11 +184,11 @@ export default function Register({setLoggedIn, loggedInUser, autoLogin}) {
 
 
                 </div>
-                <div className="col-0 col-md-2"></div>
-            </div>
-        </div>
+    //             <div className="col-0 col-md-2"></div>
+    //         </div>
+    //     </div>
         
      
-    </div>
+    // </div>
     )
 }
