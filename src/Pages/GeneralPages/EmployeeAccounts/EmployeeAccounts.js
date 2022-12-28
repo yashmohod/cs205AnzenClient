@@ -13,14 +13,17 @@ import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import CommonButton from '../../../Components/Buttons/CommonButton'
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
+import { useLocation } from 'react-router-dom'
 import Register from "../Register/Register";
-
+import Accordion from 'react-bootstrap/Accordion';
+import MobileEmpCard from '../../../Components/EmpCards/MobileEmpCard';
 // import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
+
 export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin}) {
-    const [accounts, setAccounts] = useState("")
-    const gridRef = useRef(null);
+    const [accounts, setAccounts] = useState([])
+    const gridRef = useRef();
     const [rowData, setRowData] = useState();
     const navigate = useNavigate();
 
@@ -99,30 +102,24 @@ async function registerHandler() {
   }
 
 
-    const columnDefs = [
+    const View_columnDefs = [
         {field: 'position', headerName: 'Position' ,cellStyle: { 'textAlign': 'center' }},
         {field: 'status', headerName: 'Status' ,cellStyle: { 'textAlign': 'center' }},
         {field: 'lastName', headerName: 'Last Name' ,cellStyle: { 'textAlign': 'center' }},
         {field: 'firstName', headerName: 'First Name' ,cellStyle: { 'textAlign': 'center' }},
-        // {field: 'dob', headerName: ' DOB' ,cellStyle: { 'textAlign': 'center' }},
-        // {field: 'collegeId', headerName: 'IC ID' ,cellStyle: { 'textAlign': 'center' }},
-        // {field: 'email', headerName: 'Email' ,cellStyle: { 'textAlign': 'center' }},
-        {field: 'id', 
+        {field: 'dob', headerName: ' DOB' ,cellStyle: { 'textAlign': 'center' }},
+        {field: 'collegeId', headerName: 'IC ID' ,cellStyle: { 'textAlign': 'center' }},
+        {field: 'email', headerName: 'Email' ,cellStyle: { 'textAlign': 'center' }},
+        ]
+        
+        const Edit_columnDefs = [
+          {field: 'id', 
         headerName: '' ,
         cellRenderer: EditButton,
         cellStyle: { 'textAlign': 'center' }, 
         cellRendererParams: {
           clicked: function(field) {
             editAccount(field);
-          }
-        }},
-        {field: 'id',
-        headerName: '' ,
-        cellRenderer: DeleteButton, 
-        cellStyle: { 'textAlign': 'center' },
-        cellRendererParams: {
-          clicked: function(field) {
-            deleteAccount(field)
           }
         }},
         {field: 'id',
@@ -165,13 +162,27 @@ async function registerHandler() {
         cellStyle: { 'textAlign': 'center' },
         cellRendererParams: {
           clicked: function(field) {
-            setUserID(field)
-            handleShow()
+            changePassword(field)
+
           },
           buttonText: "Change Password",
           variant:"outline-dark",
         }},
         ]
+
+        const Delete_columnDefs = [
+          {field: 'id',
+        headerName: '' ,
+        cellRenderer: DeleteButton, 
+        cellStyle: { 'textAlign': 'center' },
+        cellRendererParams: {
+          clicked: function(field) {
+            deleteAccount(field)
+          }
+        }},
+        ]
+
+
         const defaultColDef= { resizable: true}
 
 
@@ -198,6 +209,10 @@ async function registerHandler() {
       
       handlediteShow(true)
 
+    }
+    function changePassword(accountId){
+      setUserID(accountId)
+      handleShow()
     }
     async function deleteAccount(accountId) {
       commonApiRequest("/deleteAccount",accountId)
@@ -226,11 +241,11 @@ async function registerHandler() {
 
 
   
+    const [commonColDef, setCommonColDef] = useState([]);
 
-  
 
     async function getAccounts() {
-        let response = await get(API_URL + "/getAllAccounts?token=" +  localStorage.getItem("token"))
+        let response = await get(API_URL + "/getAllAccounts?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org)
         if(response.status==200){
           response = response.accounts
         
@@ -245,13 +260,30 @@ async function registerHandler() {
         else{
           toast.warning(response.message)
         }
-
-
+        let tempColDef = []
+        if(thisFeaturePerms.access){
+          tempColDef=View_columnDefs
+        }
+        if(thisFeaturePerms.edit){
+          let temp = tempColDef.concat(Edit_columnDefs)
+          tempColDef = temp
+        }
+        if(thisFeaturePerms.delete){
+          let temp = tempColDef.concat(Delete_columnDefs)
+          tempColDef = temp
+        }
+        setCommonColDef(tempColDef)
+        console.log(response)
         setRowData(response)
         setAccounts(response)
-        gridRef.current.api.sizeColumnsToFit();
+        
+        resize()
         return response
     }
+    function resize(){
+      if (gridRef !== "null"){
+        gridRef.current.columnApi.autoSizeAllColumns();
+    }}
 
 
 
@@ -284,30 +316,30 @@ async function registerHandler() {
       }
       
     }
+    const location = useLocation()
+    const { thisFeaturePerms } = location.state
 
-    // const [dimensions, setDimensions] = React.useState({ 
-    //   height: window.innerHeight,
-    //   width: window.innerWidth
-    // })
-    
-    // function handleResize() {
-    //   setDimensions({
-    //     height: window.innerHeight,
-    //     width: window.innerWidth
-    //   })
-    //   if(window.innerHeight !== dimensions.height || window.innerWidth !== dimensions.width){
-    //     gridRef.current.api.sizeColumnsToFit();
-    //   }
-    // }
+
+    function myTCshowMobileViewTimeCards(){
+  
+      return(
+        accounts.map(element => {
+        return(
+        <MobileEmpCard keyNum ={accounts.indexOf(element)}  data={element} editAccount={editAccount} deleteAccount={deleteAccount} promoteAccount={promoteAccount} demoteAccount={demoteAccount} changeAccountStatue={changeAccountStatue} changePassword={changePassword} permisions={thisFeaturePerms} />
+       ) }))
+    }
+
 
     useEffect(() => {
         autoLogin()
         getAccounts()
         checkMessage()
+
+        console.log(thisFeaturePerms)
         
-    }, [])
+    }, [gridRef.current])
 
-
+    
 
     return (
         <div className="incident-page">
@@ -315,7 +347,7 @@ async function registerHandler() {
              <ToastContainer />
             <h1>Employee Accounts</h1>
             <Form className="incident-form">
-                <Button variant="outline-dark" onClick={() => handlregeShow()}>Add Account</Button>
+              {thisFeaturePerms.create?<Button variant="outline-dark" onClick={() => handlregeShow()}>Add Account</Button>:null}
             </Form>
             <Modal
               show={regshow}
@@ -344,17 +376,29 @@ async function registerHandler() {
               }
             </Modal>
 
-            {/* desktop emp account list */}
-            <div className="ag-theme-alpine incident-grid">
-              <AgGridReact
-                ref={gridRef}
-                columnDefs={columnDefs}
-                defaultColDef={defaultColDef}
-                rowData={rowData}
-                >
-              </AgGridReact>
-			      </div>
+                {/* desktop view */}
+                <div className="d-none d-xxl-block" >
+                  <div className="ag-theme-alpine incident-grid">
+                    <AgGridReact
+                      ref={gridRef}
+                      columnDefs={commonColDef}
+                      defaultColDef={defaultColDef}
+                      rowData={rowData}
+                      >
+                    </AgGridReact>
+                  </div>
+                </div>
 
+                {/* Mobile View */}
+                <div className="d-block d-xxl-none" >
+                  <div className="ag-theme-alpine incident-grid">
+                    
+                  <Accordion defaultActiveKey="0">
+                  {myTCshowMobileViewTimeCards()}
+
+                </Accordion>
+                </div>
+                </div>
 
 
             <Modal

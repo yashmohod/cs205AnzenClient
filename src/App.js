@@ -8,7 +8,7 @@ import Records from "./Pages/SASPpages/Records/Records"
 import Referals from "./Pages/SASPpages/Referals/Referals"
 import { Routes, Route, Link, Navigate} from "react-router-dom";
 import Incidents from './Pages/SASPpages/Incidents/Incidents';
-import { post } from './Utils/API';
+import { post, get } from './Utils/API';
 import { API_URL } from './Utils/API';
 import Register from './Pages/GeneralPages/Register/Register';
 import ChangePassword from './Pages/GeneralPages/ChangePassword/ChangePassword';
@@ -46,7 +46,11 @@ function App() {
     }
   }
 
-
+  async function getORGnPOS(){
+    let response = await get(API_URL + "/getORGnPOS?token=" +  localStorage.getItem("token"));
+    console.log(response)
+    return response
+  }
 
 
 /*
@@ -59,7 +63,7 @@ function App() {
         <Routes>
           {/* general routes */}
  
-          <Route path="/" element={loggedIn ? <Dashboard loggedIn={loggedIn} setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/> :  <Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} setLoggedInUser={setLoggedInUser} autoLogin={() => autoLogin()}/> } />
+          <Route path="/" element={loggedIn ? <Dashboard loggedIn={loggedIn} setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()} getORGnPOS={()=>getORGnPOS()}/> :  <Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} setLoggedInUser={setLoggedInUser} autoLogin={() => autoLogin()} getORGnPOS={()=>getORGnPOS()}/> } />
           {/* <Route path="/register-accounts" element={<Register setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/> */}
           <Route path="/change-passwords" element={<ChangePassword setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/employee-accounts" element={<EmployeeAccounts setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>

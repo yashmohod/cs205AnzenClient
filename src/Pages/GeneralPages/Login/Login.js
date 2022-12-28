@@ -9,6 +9,7 @@ import LoadingScreen from "../../../Components/LoadingScreen/LoadingScreen";
 export default function Login({loggedIn, setLoggedIn, setLoggedInUser, autoLogin}) {
 //<img src={Background} alt="Ithaca College" className="background-image"/>
     const [loading, setLoading] = useState(false)
+    
 
     useEffect(() => {
         autoLogin()

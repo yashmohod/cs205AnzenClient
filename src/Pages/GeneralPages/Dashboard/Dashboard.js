@@ -6,13 +6,14 @@ import './Dashboard.css'
 import { API_URL, post,get } from "../../../Utils/API";
 import { ToastContainer, toast } from 'react-toastify';
 import {Features} from "./features"
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
 import { useNavigate } from "react-router-dom";
 
 export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     const [clockin, setClockin] = useState(false)
-    const [org,setOrg] = useState("")
-    const [pos,setPos]= useState("")
     const [showFeatures,setshowFeatures] =useState(false)
+    const [features,setfeatures] = useState();
 
     function checkMessage(){
         if(!(localStorage.getItem("message") === null)){
@@ -33,16 +34,61 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
         let response = await post(API_URL + "/clockOut", {token: localStorage.getItem("token")})
         setClockin(false)
     }
-    
+    const [orgs,setOrgs] = useState([]);
+    const [sortedFeatures,setSortedFeatures]=useState([]);
     async function setFeatures(){
-        const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
-        const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
-        setOrg(orgres["organization"])
-        setPos(posres["position"])
+        let temp = []
+
+        let permisions_response = await get(API_URL + "/getFeaturePermissions?token=" +  localStorage.getItem("token"));
+        const perms = permisions_response.featurePermissions
+        let temp_sortedFeatures=[]
+        for(let x =0; x<perms.length; x++){
+            console.log()
+            if(!temp.includes(perms[x].org)){
+                temp.push(perms[x].org)
+            }
+            let count =0;
+            for(let y =0; y < temp_sortedFeatures.length; y++){
+                if(perms[x].org == temp_sortedFeatures[y].org){
+                    let accessBol = perms[x].view;
+                    if(perms[x].blackListed){
+                        accessBol = false;
+                    }
+                    let curFeature = {org :perms[x].org,access:accessBol,title: perms[x].featureName, internallyManaged:perms[x].internallyManaged, internal_url: perms[x].internalUrl,external_url: perms[x].externalUrl, create:perms[x].create, edit:perms[x].edit, delete:perms[x].delete}  ;
+                    temp_sortedFeatures[y].features.push(curFeature);
+                    count++;
+                }
+                if(count>0){
+                    break
+                }
+            
+            }
+            if(count == 0){
+                temp_sortedFeatures.push({"org":perms[x].org, "features":[]})
+                let accessBol = perms[x].view;
+                for(let y =0; y < temp_sortedFeatures.length; y++){
+                    if(perms[x].org == temp_sortedFeatures[y].org){
+                        let accessBol = perms[x].view;
+                        if(perms[x].blackListed){
+                            accessBol = false;
+                        }
+                        let curFeature = {org :perms[x].org,access:accessBol,title: perms[x].featureName, internallyManaged:perms[x].internallyManaged, internal_url: perms[x].internalUrl,external_url: perms[x].externalUrl, create:perms[x].create, edit:perms[x].edit, delete:perms[x].delete}  ;
+                        temp_sortedFeatures[y].features.push(curFeature);
+                    }
+                
+                }
+            }
+
+        }
+
+        setOrgs(temp)
+        setSortedFeatures(temp_sortedFeatures)
+        console.log(temp_sortedFeatures)
+        // setfeatures(feat)
         setshowFeatures(true)
     }
 
-    const navigate = useNavigate();
+
 
     useEffect(() => {
         autoLogin()
@@ -58,21 +104,8 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
         checkMessage()
         setFeatures()
     },[])
-    const features = 
-    [{org:"SASP",accessLevel:0,title: "Daily", description:"", url: "/SASPpages/daily", },
-     {org:"SASP",accessLevel:0,title: "Records", description:"", url: "/SASPpages/Records", },
-     {org:"SASP",accessLevel:0,title: "Referrals", description:"", url: "/SASPpages/referrals", },
-     {org:"SASP",accessLevel:0,title: "Time Cards", description:"", url: "/time-cards",},
-     {org:"SASP",accessLevel:2,title: "Senior Evaluation for Probationary Members", description:"", url: "/senior-eval-for-proba-member", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSdhKZICw5BhHMp1ubDEJlFZEeVRVEOnx5iPDQieziG-fRl_vA/viewform"},
-     {org:"SASP",accessLevel:2,title: "Senior Evaluation for Junior Member", description:"", url: "/senior-eval-for-junior-member", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSc1Ihg_MKrxUjs37x1tjAtun0zCW7UznTrUbUzOpL0N25Oj_Q/viewform"},
-     {org:"SASP",accessLevel:0,title: "SASP Evaluation for a Trainee", description:"", url: "/sasp-eval-for-trainee", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSdoUWDh2nKgE8lSAvnRFQb0llbqCiYhjVBMDmkXhJQsP2d35Q/viewform"},
-     {org:"SASP",accessLevel:4,title: "Incidents", description:"", url: "/SASPpages/incidents"},
-     {org:"SASP",accessLevel:4,title: "Locations", description:"", url: "/SASPpages/locations",},
-     {org:"SASP",accessLevel:3,title: "Employee Accounts", description:"", url: "/employee-accounts",},
 
-     {org:"RESLIFE",accessLevel:0,title: "Time Cards", description:"", url: "/time-cards",},
-     {org:"RESLIFE",accessLevel:0,title: "Employee Accounts", description:"", url: "/employee-accounts",},
-    ]
+
     const Gstyle ={
         "height": "100px",
         "display": "flex",
@@ -102,19 +135,29 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
         
         <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
         <ToastContainer />
-        <div className="features container-fluid mt-5 ">
-            <div className="row">
-                <div className="col-12">
-                    {clockin ?  <div onClick={() => clockOut()}><Card title="Clock Out" description="End your work shift" style={Rstyle}/></div> : <div onClick={() => clockIn()}><Card title="Clock In" description="Start your work shift" style={Gstyle}/></div> }
-                </div>
-            </div>
-            <div className="row justify-content-center"  >
-    
-                { showFeatures ? <Features features={features} pos ={pos} org ={org}/> : null }
+        <Tabs id="uncontrolled-tab-example"className="mb-3"defaultActiveKey="0" justify>
+            {sortedFeatures.map((SF)=>{
+                return(
+                <Tab eventKey={sortedFeatures.indexOf(SF)} title={SF.org}>
+                    <div className="features container-fluid mt-5 ">
+                        <div className="row">
+                            <div className="col-12">
+                                {clockin ?  <div onClick={() => clockOut()}><Card title="Clock Out" description="End your work shift" style={Rstyle}/></div> : <div onClick={() => clockIn()}><Card title="Clock In" description="Start your work shift" style={Gstyle}/></div> }
+                            </div>
+                        </div>
+                        <div className="row justify-content-center"  >
+                
+                            { showFeatures ? <Features features={SF.features}/> : null }
 
-            </div>
-        </div>
+                        </div>
+                    </div>
 
+
+                </Tab>
+            )})}
+
+        </Tabs>
+        
     </div>
     )
 }
