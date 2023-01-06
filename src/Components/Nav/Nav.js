@@ -4,6 +4,27 @@ import { API_URL } from "../../Utils/API";
 import './Nav.css'
 import { useNavigate,useLocation } from "react-router-dom";
 import { BsHouse,BsHouseFill } from "react-icons/bs";
+
+import { ReactNode } from 'react';
+import {
+  Box,
+  Flex,
+  Avatar,
+  Link,
+  Button,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuDivider,
+  useDisclosure,
+  useColorModeValue,
+  Stack,
+  useColorMode,
+  Center,
+} from '@chakra-ui/react';
+import { MoonIcon, SunIcon } from '@chakra-ui/icons';
+
 export default function Nav({setLoggedIn, loggedInUser}) {
     const navigate = useNavigate();
     const location = useLocation();
@@ -35,7 +56,74 @@ export default function Nav({setLoggedIn, loggedInUser}) {
     }
 
 
-    return (<div className="nav">
+
+        const { colorMode, toggleColorMode } = useColorMode();
+const { isOpen, onOpen, onClose } = useDisclosure();
+return (
+  <>
+    <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4} mb={10}>
+      <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
+        <Box>  
+            <div className="ithaca-logo-container" >
+                <img src="https://www.planetforward.org/sites/default/files/styles/840-x-variable/public/154059_ithaca-college-logo-horizontal-for-ICpg.png?itok=AcYdum-L" alt="Ithaca-Logo"  className="img-fluid mx-auto d-block ithaca-logo"/>
+            </div>
+        </Box>
+
+        <Flex alignItems={'center'}>
+          <Stack direction={'row'} spacing={7}>
+            <Button onClick={toggleColorMode}>
+              {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+            </Button>
+
+            <Menu>
+              <MenuButton
+                as={Button}
+                rounded={'full'}
+                variant={'link'}
+                cursor={'pointer'}
+                minW={0}>
+                <Avatar
+                  size={'md'}
+                  src={'https://shop.line-scdn.net/themeshop/v1/products/32/6e/3a/326e3a9d-92a9-4299-b762-608ce00a577d/89/WEBSTORE/icon_198x278.png'}
+                />
+              </MenuButton>
+              <MenuList alignItems={'center'}>
+                <br />
+                <Center>
+                  <Avatar
+                    size={'2xl'}
+                    src={'https://shop.line-scdn.net/themeshop/v1/products/32/6e/3a/326e3a9d-92a9-4299-b762-608ce00a577d/89/WEBSTORE/icon_198x278.png'}
+                  />
+                </Center>
+                <br />
+                <Center>
+                  <p>Hi, {loggedInUser.firstName}</p>
+                </Center>
+                <br />
+                <MenuDivider />
+                <MenuItem onClick={() => navigate("/")}>
+                    <img src="https://img.icons8.com/dusk/512/home-page.png" alt="" width={40} height={40}/> Home
+                </MenuItem>
+
+                <MenuItem>
+                    <img src="https://img.icons8.com/plasticine/512/settings.png" alt="" width={40} height={40}/> Settings</MenuItem>
+                <MenuItem onClick={() => logoutUserHandler()}>
+                    <img src="https://img.icons8.com/plasticine/512/logout-rounded.png" alt="" width={40} height={40}/> Logout
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          </Stack>
+        </Flex>
+      </Flex>
+    </Box>
+  </>
+);
+}
+
+
+
+/*
+<div className="nav">
                     <div className="container-fluid">
                         <div className="row">
                             <div className="col-7 col-md-5 " >
@@ -71,5 +159,5 @@ export default function Nav({setLoggedIn, loggedInUser}) {
                        
                         
                        
-                </div>)
-}
+                </div>
+*/

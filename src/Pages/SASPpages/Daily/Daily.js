@@ -13,6 +13,8 @@ import SaspLocations from "../../../Components/SaspLocations/SaspLocations"
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 import SaspReferal from "../../../Components/SaspReferal/SaspReferal"
 
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
+
 export default function Daily({setLoggedIn, loggedInUser, autoLogin}) {
   <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
   const navigate = useNavigate();
@@ -187,6 +189,26 @@ function removeReferals(){
     <div>
         <ToastContainer />
         <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
+        <Tabs>
+  <TabList isFitted>
+    <Tab>One</Tab>
+    <Tab>Two</Tab>
+    <Tab>Three</Tab>
+  </TabList>
+
+  <TabPanels>
+    <TabPanel>
+      <p>one!</p>
+    </TabPanel>
+    <TabPanel>
+      <p>two!</p>
+    </TabPanel>
+    <TabPanel>
+      <p>three!</p>
+    </TabPanel>
+  </TabPanels>
+</Tabs>
+
         <h1>Daily</h1>
         <div className="container-fluid">
             <div className="row">
