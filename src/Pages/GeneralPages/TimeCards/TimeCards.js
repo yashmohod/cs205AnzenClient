@@ -19,6 +19,7 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import Accordion from 'react-bootstrap/Accordion';
 import Dropdown from 'react-bootstrap/Dropdown';
+import { useLocation } from 'react-router-dom'
 
 export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
    
@@ -44,6 +45,7 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
     async function timeCardSubmit(){
         if(timeCardData.id !=""){
           editedtimeCardSubmit()
+          
         }
         else{
         let response = await post(API_URL + "/addTimeCard", {
@@ -51,6 +53,7 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
             start:timeCardData.startDate+" "+timeCardData.startTime+":00",
             end:timeCardData.endDate+" "+timeCardData.endTime+":00",
             note:timeCardData.note,
+            org:thisFeaturePerms.org
             })
 
         if(response.status === 200){
@@ -60,7 +63,7 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
         }else{
             toast.warning(response.message)
         }
-        getAlltc(pos)
+
         setTimeCardData({
           startDate:"",
           startTime:"00:00",
@@ -70,52 +73,35 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
           id:"",
         })
       }
+      getAlltc()
     }
-    const [org,setOrg] = useState("")
-    const [pos,setPos]= useState("")
+
+    const[atcPerm, setAtcPerm] =useState(false);
     async function setORGnPOS(){
-        const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
-        const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
-        setOrg(orgres["organization"])
-        setPos(posres["position"])
-        if(posres["position"] == "admin"){
-          getAlltc(pos,myTCpreviousSearchData)
-          getAlltc(pos,allTCpreviousSearchData)
-        }else{
-          getAlltc(pos,myTCpreviousSearchData)
-        }
+        const atcPerm_response = (await get(API_URL + "/getPermision?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org+"&featureName=All Time Cards"));
+        // console.log(atcPerm_response)
+        let atc_access = atcPerm_response.permission.view && !atcPerm_response.permission.blackListed;
+        console.log(atcPerm_response.permission.view)
+        setAtcPerm(atc_access)
+        getAlltc()
     }
     const[myTC,setMYtc]=useState([])
     const[allTC,setALLtc]=useState([])
 
-    async function getAlltc(position,searchDATA){
+    async function getAlltc(){
       let responseALL = null
-      if(position == "admin"){
-        if(ISadminTCsearch){
           responseALL = await get(API_URL + "/getTimeCards?token=" +  localStorage.getItem("token")+
-          "&admin_emp="+searchDATA.employeeId+
-          "&admin_dateFrom="+searchDATA.dateFrom+
-          "&admin_dateTo="+searchDATA.dateTo+
-          "&admin_status="+searchDATA.approval)
-          // console.log("2")
-        }else{
-          responseALL = await get(API_URL + "/getTimeCards?token=" +  localStorage.getItem("token")+
-          "&dateFrom="+searchDATA.dateFrom+
-          "&dateTo="+searchDATA.dateTo+
-          "&status="+searchDATA.approval)
-          // console.log("2")
-        }
-      }else{
-        responseALL = await get(API_URL + "/getTimeCards?token=" +  localStorage.getItem("token")+
-          "&dateFrom="+searchDATA.dateFrom+
-          "&dateTo="+searchDATA.dateTo+
-          "&status="+searchDATA.approval)
-          // console.log("3")
-      }
+          "&admin_emp="+allTCpreviousSearchData.employeeId+
+          "&admin_dateFrom="+allTCpreviousSearchData.dateFrom+
+          "&admin_dateTo="+allTCpreviousSearchData.dateTo+
+          "&admin_status="+allTCpreviousSearchData.approval+
+          "&org="+thisFeaturePerms.org+
+          "&dateFrom="+myTCpreviousSearchData.dateFrom+
+          "&dateTo="+myTCpreviousSearchData.dateTo+
+          "&status="+myTCpreviousSearchData.approval)
 
-      
       if(responseALL.status == 200) {
-        var data = 0;
+        var data = "0";
         data = responseALL.UserTimeCards.map((tc)=>{
           if(tc.approval){
             tc.approval ="Approved"
@@ -126,31 +112,29 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
             tc
           )
         })
-        if(data!=0){
-          // console.log(data)
+        if(data!="0"){
           setMYtc(data)
+          tableResize()
         }
-    }
-  
-    if(position == "admin"){
-      if(responseALL.status == 200) {
-        var data = "0";
-         data = responseALL.AlltimeCards.map( (tc)=>{
-         if(tc.approval){
+
+        data = "0";
+          data = responseALL.AlltimeCards.map( (tc)=>{
+          if(tc.approval){
             tc.approval ="Approved"
-         }else{
-           tc.approval ="Pending"
-         }
-         return(
-           tc
-         )
+          }else{
+            tc.approval ="Pending"
+          }
+          return(
+            tc
+          )
         })
-        // console.log(data!="0")
         if(data!="0"){
           setALLtc(data)
+          tableResize()
         }
-      }
+      
     }
+  
 }
 
 
@@ -170,6 +154,7 @@ function editTimeCard(timeCardID){
     endTime:data.end.split("/")[1].replaceAll(' ', ''),
     id:timeCardID,
   })
+  console.log(data.end.split("/")[1].replaceAll(' ', ''))
 
   handleShow()
 
@@ -183,6 +168,7 @@ function editTimeCard(timeCardID){
       start:timeCardData.startDate+" "+timeCardData.startTime+":00",
       end:timeCardData.endDate+" "+timeCardData.endTime+":00",
       note:timeCardData.note,
+      org:thisFeaturePerms.org
       })
 
   if(response.status === 200){
@@ -191,12 +177,7 @@ function editTimeCard(timeCardID){
   }else{
       toast.warning(response.message)
   }
-  if(pos == "admin"){
-    getAlltc(pos,myTCpreviousSearchData)
-    getAlltc(pos,allTCpreviousSearchData)
-  }else{
-    getAlltc(pos,myTCpreviousSearchData)
-  }
+  getAlltc()
   setTimeCardData({
     startDate:"",
     startTime:"00:00",
@@ -209,14 +190,14 @@ function editTimeCard(timeCardID){
 
  async function deleteTimeCard(timeCardID){
 
-  let response = await post(API_URL + "/clearTimeCard", {token: localStorage.getItem("token"),TimecardID: timeCardID})
+  let response = await post(API_URL + "/clearTimeCard", {token: localStorage.getItem("token"),TimecardID: timeCardID,
+  org:thisFeaturePerms.org})
   if(response.status === 200){
     toast.success(response.message)
   }else{
     toast.warning(response.message)
   }
-  getAlltc(pos,myTCpreviousSearchData)
-  getAlltc(pos,allTCpreviousSearchData)
+  getAlltc()
  }
 
 
@@ -276,14 +257,15 @@ function editTimeCard(timeCardID){
 
   // AdminTimeCards
   async function approveTimeCard(timeCardID){
-    let response = await post(API_URL + "/approveTimeCard", {token: localStorage.getItem("token"),TimecardID: timeCardID})
+    let response = await post(API_URL + "/approveTimeCard", {token: localStorage.getItem("token"),TimecardID: timeCardID,
+    org:thisFeaturePerms.org})
     if(response.status === 200){
       toast.success(response.message)
     }else{
       toast.warning(response.message)
     }
     // console.log(pos)
-    getAlltc(pos,allTCpreviousSearchData)
+    getAlltc(atcPerm,allTCpreviousSearchData)
 
    }
 
@@ -354,26 +336,35 @@ function editTimeCard(timeCardID){
     function tabChange(e){
       if(e == 1){
         setISadminTCsearch(false)
+        getAlltc(atcPerm,myTCpreviousSearchData)
       }
       if(e == 2){
         setISadminTCsearch(true)
+        getAlltc(atcPerm,allTCpreviousSearchData)
       }
+      console.log(myTCpreviousSearchData)
+      console.log(allTCsearchData)
+      tableResize()
 
+    }
+    function tableResize(){
+      myTCgridRef.current.api.sizeColumnsToFit();
+      allTCgridRef.current.api.sizeColumnsToFit();
     }
 
   const [myTCsearchData, myTCsetSearchData] = useState({
-    "approval":"",
+    "approval":"Pending",
     "dateFrom":"",
     "dateTo":"",
 })
 const [myTCpreviousSearchData, myTCsetPreviousSearchData] = useState({
-  "approval":"",
+  "approval":"Pending",
   "dateFrom":"",
   "dateTo":"",
 })
 
 function searchInputHandeler(e){
-  if(ISadminTCsearch){
+  if( ISadminTCsearch){
     allTCsetSearchData({...allTCsearchData,  [e.target.name] : e.target.value})
   }
   else{
@@ -383,13 +374,13 @@ function searchInputHandeler(e){
 }
 const [allTCsearchData, allTCsetSearchData] = useState({
   "employeeId":"",
-  "approval":"",
+  "approval":"Pending",
   "dateFrom":"",
   "dateTo":"",
 })
 const [allTCpreviousSearchData, allTCsetPreviousSearchData] = useState({
 "employeeId":"",
-"approval":"",
+"approval":"Pending",
 "dateFrom":"",
 "dateTo":"",
 })
@@ -397,17 +388,13 @@ const [allTCpreviousSearchData, allTCsetPreviousSearchData] = useState({
 function search(){
   // clearSearchFields()
   if(ISadminTCsearch){
-    // console.log("all tc")
-    // console.log(allTCsearchData)
     allTCsetPreviousSearchData(allTCsearchData)
-    getAlltc(pos,allTCsearchData)
+    getAlltc()
 
   }
   else{
-    // console.log("my tc")
-    // console.log(myTCsearchData)
     myTCsetPreviousSearchData(myTCsearchData)
-    getAlltc(pos,myTCsearchData)
+    getAlltc()
   }
 }
 
@@ -418,7 +405,6 @@ function search(){
 
 
   function clearSearchFields(){
-    // console.log(EmployeeDropdown)
     EmployeeDropdown.current.selectedIndex=0
     status.current.selectedIndex=0
     dateToChooser.current.value=""
@@ -434,12 +420,14 @@ function SaveAsCSV(){
   }
 }
 
-    useEffect(() => {
-        autoLogin()
-        setORGnPOS()
+  const location = useLocation()
+  const { thisFeaturePerms } = location.state
 
-        
-    }, [])
+  useEffect(() => {
+    autoLogin()
+    setORGnPOS()
+      
+  }, [myTCgridRef,allTCgridRef])
 
     function showAndClear(){
       handleShow()
@@ -563,7 +551,7 @@ function SaveAsCSV(){
                   </div>
                 </div>
             </Tab>
-            {pos == "admin"? 
+            {atcPerm? 
                 <Tab eventKey="2" title="All Time Cards" onClick={()=>clearSearchFields()}>
                    {/* desktop view */}
                   <div className="d-none d-xxl-block" >
@@ -604,7 +592,7 @@ function SaveAsCSV(){
               keyboard={false}
             >
               <Modal.Header closeButton>
-                <Modal.Title>Edit Time Card</Modal.Title>
+                <Modal.Title>Time Card</Modal.Title>
               </Modal.Header>
               <Modal.Body>
 

@@ -18,8 +18,10 @@ import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 import Dropdown from 'react-bootstrap/Dropdown';
 import Referals from "../Referals/Referals";
 import { GridApi } from "ag-grid-community";
+import { useLocation } from 'react-router-dom'
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable'
+
 
 export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersion,reportID}) {
     const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Loc. Details\t", "Received Time\t", "Enroute Time\t", "Arrived Time\t", "Clear Time\t", "Reported By\t", "Summary\t"]
@@ -220,7 +222,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
     }},
     ])
 
-    const [morecolumns, setmoreColumns] = useState([
+    const [Edit_column, setEdit_columns] = useState(
     {field: 'id', 
     headerName: '' ,
     cellRenderer: EditButton, 
@@ -229,14 +231,16 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
         reportEdit(field)
       }
     }},
-    {field: 'id',
-    headerName: '' ,
-    cellRenderer: DeleteButton, 
-    cellRendererParams: {
-      clicked: function(field) {
-        reportDelete(field)
-      }
-    }}]);
+    );
+    const [Delete_column, setDelete_columns] = useState(
+        {field: 'id',
+        headerName: '' ,
+        cellRenderer: DeleteButton, 
+        cellRendererParams: {
+          clicked: function(field) {
+            reportDelete(field)
+          }
+        }});
 
     async function reportDelete(reportId){
         let response = await post(API_URL + "/deleteSaspReports", {reportID:reportId,token: localStorage.getItem("token")})
@@ -308,37 +312,31 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
     // const [org,setOrg] = useState("")
     // const [pos,setPos]= useState("")
 
+    const location = useLocation()
+    const { thisFeaturePerms } = location.state
 
+    async function setThisFeature(){
 
-    async function getOrgNPos(){
-        const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
-        const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
-        let locOrg = orgres["organization"]
-        let locPos = posres["position"]
-        // setOrg(locOrg)
-        // setPos(locPos)
-
-        //set mini version features
-        setColumnDefs( miniverFeatures);
+        //set mini version feature
+        let cols = miniverFeatures
         //set full version features
         if(fullVersion){
-            let cols = miniverFeatures
             for(let i=0; i<fullverFeatures.length; i++){
                 cols.push(fullverFeatures[i])
             }
-            setColumnDefs(cols);
+
 
         }
-        //set admin version features
-        if(locPos== "admin"){
-            let cols = miniverFeatures
-            for(let i=0; i<morecolumns.length; i++){
-                cols.push(morecolumns[i])
-            }
-            setColumnDefs(cols);
+        if(thisFeaturePerms.edit){
+            cols.push(Edit_column);
+        } 
+        if(thisFeaturePerms.delete){
+            cols.push(Delete_column);
+        } 
 
-        }
 
+
+        setColumnDefs(cols);
         gridRef.current.api.sizeColumnsToFit();
 
     }
@@ -347,13 +345,8 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
 
     useEffect(() => {
         autoLogin();
-        getOrgNPos();
-        // if(!fullVersion){getRep(reportID)}
+        setThisFeature();
     }, [])
-
-    useEffect(() => {
-        console.log(JSON.stringify(rowData))
-    })
 
     return (
         <div className="location-page">

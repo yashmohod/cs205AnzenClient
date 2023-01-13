@@ -20,6 +20,8 @@ import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 import SaspReferal from "../../../Components/SaspReferal/SaspReferal"
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable'
+import { useLocation } from 'react-router-dom'
+import { isDisabled } from "@testing-library/user-event/dist/utils";
 
 export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVersion,reportID}) {
     const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Judical Referral\t", "First Name\t", "Last Name\t", "Middle Initial\t", "ICID\t", "DoB\t", "Address\t", "Phone No\t"]
@@ -267,7 +269,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
 
 
 
-    const gridRef = useRef(null); // Optional - for accessing Grid's API
+    const gridRef = useRef(); // Optional - for accessing Grid's API
     const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
 
     // Each Column Definition results in one Column.
@@ -298,16 +300,17 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
       variant:"outline-dark",
     }},
     ])
-
-    const [adminverFeatures, setadminverFeatures] = useState([
-    {field: 'id', 
-    headerName: '' ,
-    cellRenderer: EditButton, 
-    cellRendererParams: {
-      clicked: function(field) {
-        referalEdit(field)
-      }
-    }},
+    const [editFeature, seteditFeature] = useState(
+        {field: 'id', 
+        headerName: '' ,
+        cellRenderer: EditButton, 
+        cellRendererParams: {
+          clicked: function(field) {
+            referalEdit(field)
+          }
+        }},
+    )
+    const [deleteFeature, setdeleteFeature] = useState(
     {field: 'id',
     headerName: '' ,
     cellRenderer: DeleteButton, 
@@ -315,7 +318,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
       clicked: function(field) {
         referalDelete(field)
       }
-    }}]);
+    }});
 
 
     async function referalDelete(refID){
@@ -400,37 +403,36 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
         sortable: true
     }));
 
-    const [org,setOrg] = useState("")
-    const [pos,setPos]= useState("")
+
+    const location = useLocation()
+    const { thisFeaturePerms } = location.state
 
     async function getOrgNPos(){
-        const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
-        const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
-        let locOrg = orgres["organization"]
-        let locPos = posres["position"]
-        setOrg(locOrg)
-        setPos(locPos)
 
         //set mini version features
-        setColumnDefs( miniverFeatures);
+        let temp = miniverFeatures;
+
         //set full version features
         if(fullVersion){
-            let cols = miniverFeatures
             for(let i=0; i<fullverFeatures.length; i++){
-                cols.push(fullverFeatures[i])
+                temp.push(fullverFeatures[i]);
             }
-            setColumnDefs(cols);
 
+        }else{
+            getRefsOFrep(reportID);
         }
-        //set admin version features
-        if(locPos== "admin"){
-            let cols = miniverFeatures
-            for(let i=0; i<adminverFeatures.length; i++){
-                cols.push(adminverFeatures[i])
-            }
-            setColumnDefs(cols);
 
+        // edit permision
+        if(thisFeaturePerms.edit){
+            temp.push(editFeature);
         }
+
+        // delete permision
+        if(thisFeaturePerms.delete){
+            temp.push(deleteFeature);
+        }
+        setColumnDefs(temp);
+        gridRef.current.api.sizeColumnsToFit();
     }
 
 
@@ -466,9 +468,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
     useEffect(() => {
         autoLogin();
         getOrgNPos();
-        if(reportID!==""){
-            getRefsOFrep(reportID)
-        }
+
     }, [])
 
 
@@ -600,8 +600,8 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
                 <div className="register-form">
                   
                   <Form.Label className=" d-flex justify-content-start">Incident</Form.Label>
-                  <Form.Select aria-label="Default select example"  name="incident" onChange={(e) => reportInputChangeHandler(e)}>
-                  <SaspIncidents selected = {formData.incident}  />
+                  <Form.Select aria-label="Default select example"  name="incident" onChange={(e) => reportInputChangeHandler(e)}   >
+                  <SaspIncidents selected = {formData.incident} />
                   </Form.Select>
               
                   <Form.Label className=" d-flex justify-content-start">Date </Form.Label>
@@ -632,12 +632,14 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
                   </div>
                 </Form>
               </Modal.Body>
-              {pos=="admin"?
               <Modal.Footer>
+              {thisFeaturePerms.edit?
+              <>
                 <Button variant="primary" onClick={()=>reportChangeSubmit()}>Submit</Button>
-                <Button variant="primary" onClick={()=>reportDelete()}>Delete</Button>
-              </Modal.Footer>
+                {thisFeaturePerms.delete?
+                <Button variant="primary" onClick={()=>reportDelete()}>Delete</Button>:null}</>
               :null}
+              </Modal.Footer>
             </Modal>
            
         </div>

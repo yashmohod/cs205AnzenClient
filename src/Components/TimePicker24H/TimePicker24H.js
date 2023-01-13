@@ -35,10 +35,11 @@ export default function TimePicker24H(props) {
         settimeM(m)
         setTime()
     }
-    useEffect(() => 
-    {   setTime();
+    useEffect(() =>{   
+        // setTime();
         setHoursNminutes();
-
+        console.log(props.name)
+        console.log(props.time)
     },[timeH,timeM])
 
     return ( 
@@ -46,18 +47,17 @@ export default function TimePicker24H(props) {
         <InputGroup className="col justify-content-center " onChange={(e) =>setTime()}>
             <div>
             <Form.Label className=" d-flex justify-content-start">Hours</Form.Label>
-            <Form.Select aria-label="Default select example" name="Hours" onChange={(e) =>setTimeH(e.target.value)}>
+            <Form.Select  name="Hours" onChange={(e) =>setTimeH(e.target.value)}>
                 {
                     hours.map((item) => {
-                        let hr = String(props.time).split(":")[0]
-                        if (item == hr){
+                        if(item == String(props.time).split(":")[0]){
                             return (
-                                <option key={item} selected  >{item}</option>
+                                <option key={item} selected={true}   >{item}</option>
                                 )
                         }
                         else{
                             return (
-                                <option key={item}  >{item}</option>
+                                <option key={item}   >{item}</option>
                                 )
                         }
                         
@@ -67,18 +67,18 @@ export default function TimePicker24H(props) {
             </div>
             <div>
             <Form.Label className=" d-flex justify-content-start">Min</Form.Label>
-            <Form.Select aria-label="Default select example" name="Min" onChange={(e) =>setTimeM(e.target.value)}>
+            <Form.Select  name="Min"  onChange={(e) =>setTimeM(e.target.value)}>
                 {
                     minutes.map((item) => {
-                        let min = String(props.time).split(":")[1]
-                        if (item == min){
+
+                        if(item == String(props.time).split(":")[1]){
                             return (
-                                <option key={item} selected  >{item}</option>
+                                <option key={item} selected={true}   >{item}</option>
                                 )
                         }
                         else{
                             return (
-                                <option key={item}  >{item}</option>
+                                <option key={item}   >{item}</option>
                                 )
                         }
                         
