@@ -1,5 +1,5 @@
 /* eslint-disable import/no-anonymous-default-export */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Card from "../../../Components/Card/Card";
 import Nav from "../../../Components/Nav/Nav";
 import './Dashboard.css'
@@ -23,16 +23,34 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     }
     
 
-
+    function tabChange(e){
+        console.log(sortedFeatures[e].org)
+        set_curOrgClock(sortedFeatures[e].org)
+        checkClockinStatus(sortedFeatures[e].org)
+    }
+    const [curOrgClock, set_curOrgClock] = useState()
 
     async function clockIn() {
-        let response = await post(API_URL + "/clockIn", {token: localStorage.getItem("token")})
-        setClockin(true) 
+
+        let response = await post(API_URL + "/clockIn", {token: localStorage.getItem("token"), org:curOrgClock})
+        if(response.status == 400){
+            toast.warning(response.message)
+        }
+        if(response.status == 200){
+            toast.success(response.message)
+            setClockin(true) 
+        }
     }
 
     async function clockOut() {
-        let response = await post(API_URL + "/clockOut", {token: localStorage.getItem("token")})
-        setClockin(false)
+        let response = await post(API_URL + "/clockOut", {token: localStorage.getItem("token"), org:curOrgClock})
+        if(response.status == 400){
+            toast.warning(response.message)
+        }
+        if(response.status == 200){
+            toast.success(response.message)
+            setClockin(false) 
+        }
     }
     const [orgs,setOrgs] = useState([]);
     const [sortedFeatures,setSortedFeatures]=useState([]);
@@ -40,10 +58,10 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
         let temp = []
 
         let permisions_response = await get(API_URL + "/getFeaturePermissions?token=" +  localStorage.getItem("token"));
+        console.log(permisions_response)
         const perms = permisions_response.featurePermissions
         let temp_sortedFeatures=[]
         for(let x =0; x<perms.length; x++){
-            console.log()
             if(!temp.includes(perms[x].org)){
                 temp.push(perms[x].org)
             }
@@ -54,7 +72,18 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
                     if(perms[x].blackListed){
                         accessBol = false;
                     }
-                    let curFeature = {org :perms[x].org,access:accessBol,title: perms[x].featureName, internallyManaged:perms[x].internallyManaged, internal_url: perms[x].internalUrl,external_url: perms[x].externalUrl, create:perms[x].create, edit:perms[x].edit, delete:perms[x].delete}  ;
+                    let curFeature = {
+                        org :perms[x].org,
+                        access:accessBol,
+                        title: perms[x].featureName, 
+                        internallyManaged:perms[x].internallyManaged, 
+                        internal_url: perms[x].internalUrl,
+                        external_url: perms[x].externalUrl, 
+                        create:perms[x].create, 
+                        edit:perms[x].edit, 
+                        delete:perms[x].delete,
+                        dashboardFeature: perms[x].dashboardFeature,
+                    };
                     temp_sortedFeatures[y].features.push(curFeature);
                     count++;
                 }
@@ -72,7 +101,18 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
                         if(perms[x].blackListed){
                             accessBol = false;
                         }
-                        let curFeature = {org :perms[x].org,access:accessBol,title: perms[x].featureName, internallyManaged:perms[x].internallyManaged, internal_url: perms[x].internalUrl,external_url: perms[x].externalUrl, create:perms[x].create, edit:perms[x].edit, delete:perms[x].delete}  ;
+                        let curFeature = {
+                            org :perms[x].org,
+                            access:accessBol,
+                            title: perms[x].featureName, 
+                            internallyManaged:perms[x].internallyManaged, 
+                            internal_url: perms[x].internalUrl,
+                            external_url: perms[x].externalUrl, 
+                            create:perms[x].create, 
+                            edit:perms[x].edit, 
+                            delete:perms[x].delete,
+                            dashboardFeature: perms[x].dashboardFeature,
+                        }  ;
                         temp_sortedFeatures[y].features.push(curFeature);
                     }
                 
@@ -83,25 +123,23 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
 
         setOrgs(temp)
         setSortedFeatures(temp_sortedFeatures)
-        console.log(temp_sortedFeatures)
-        // setfeatures(feat)
+        set_curOrgClock(temp_sortedFeatures[0].org)
+        checkClockinStatus(temp_sortedFeatures[0].org)
         setshowFeatures(true)
     }
 
-
+    const checkClockinStatus = async (Org) => {
+        let response = await post(API_URL + "/checkClockInStatus", {token: localStorage.getItem("token"),org:Org})
+        if (response.clock_in === true) {
+            setClockin(true)
+        } else {
+            setClockin(false)
+        }
+    }
 
     useEffect(() => {
         autoLogin()
-        const checkClockinStatus = async () => {
-            let response = await post(API_URL + "/checkClockInStatus", {token: localStorage.getItem("token")})
-            if (response.clock_in === true) {
-                setClockin(true)
-            } else {
-                setClockin(false)
-            }
-        }
-        checkClockinStatus()
-        checkMessage()
+        // checkMessage()
         setFeatures()
     },[])
 
@@ -135,7 +173,7 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
         
         <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
         <ToastContainer />
-        <Tabs id="uncontrolled-tab-example"className="mb-3"defaultActiveKey="0" justify>
+        <Tabs id="uncontrolled-tab-example"className="mb-3"defaultActiveKey="0" justify onSelect={(e) =>tabChange(e)} >
             {sortedFeatures.map((SF)=>{
                 return(
                 <Tab eventKey={sortedFeatures.indexOf(SF)} title={SF.org}>

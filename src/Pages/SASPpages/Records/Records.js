@@ -22,6 +22,7 @@ import { useLocation } from 'react-router-dom'
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable'
 
+
 export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersion,reportID}) {
     const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Loc. Details\t", "Received Time\t", "Enroute Time\t", "Arrived Time\t", "Clear Time\t", "Reported By\t", "Summary\t"]
     const keys = ["date", "incident", "location", "locationDetail", "receivedTime", "enrouteTime", "arivedTime", "clearTime", "reportedByName", "summary"]
@@ -314,7 +315,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
     const location = useLocation()
     const { thisFeaturePerms } = location.state
 
-    async function getOrgNPos(){
+    async function setThisFeature(){
 
         //set mini version feature
         let cols = miniverFeatures
@@ -327,11 +328,12 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
 
         }
         if(thisFeaturePerms.edit){
-            cols.push(Edit_column)
+            cols.push(Edit_column);
         } 
         if(thisFeaturePerms.delete){
-            cols.push(Delete_column)
+            cols.push(Delete_column);
         } 
+
 
 
         setColumnDefs(cols);
@@ -343,12 +345,8 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
 
     useEffect(() => {
         autoLogin();
-        getOrgNPos();
+        setThisFeature();
     }, [])
-
-    useEffect(() => {
-        console.log(JSON.stringify(rowData))
-    })
 
     return (
         <div className="location-page">

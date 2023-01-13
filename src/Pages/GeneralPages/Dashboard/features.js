@@ -6,8 +6,6 @@ import Card from "../../../Components/Card/Card";
 
 export function Features(props) {
 
-    // let accessLevel= null
-    let accessLevel= null
     const style ={
         "height": "100px",
         "display": "flex",
@@ -31,7 +29,9 @@ export function Features(props) {
     return (
         <>
         {props.features.map((item) => {
-                    if(item.access){
+            console.log(item.title)
+            console.log(item.dashboardFeature)
+                    if(item.access && item.dashboardFeature){
                         return (
                             <div className="col-lg-6 col-md-6 col-sm-12">
                                 {!item.internallyManaged ?    

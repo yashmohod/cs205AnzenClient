@@ -14,9 +14,10 @@ import CommonButton from '../../../Components/Buttons/CommonButton'
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 import { useLocation } from 'react-router-dom'
-import Register from "../Register/Register";
+import AccountInfoHandeler from "../../../Components/AccountInfoHandeler/AccountInfoHandeler";
 import Accordion from 'react-bootstrap/Accordion';
 import MobileEmpCard from '../../../Components/EmpCards/MobileEmpCard';
+import UserProfile from "../../../Components/UserProfile/UserProfile";
 // import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
@@ -31,9 +32,9 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    const [editshow, seteditShow] = useState(false);
-    const handleditClose = () => seteditShow(false);
-    const handlediteShow = () => seteditShow(true);
+    const [adshow, setadShow] = useState(false);
+    const handleadClose = () => setadShow(false);
+    const handleadShow = () => setadShow(true);
 
     const [formData, setFormData] = useState({
       userID: "",
@@ -49,50 +50,10 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
     setFormData({...formData,  [e.target.name] : e.target.value})
     // console.log(e.target.name)
 }
-async function registerHandler() {
 
-  let response = await post(API_URL + "/editAccountDetails", {
-    token: localStorage.getItem("token"),
-    userID: formData.userID,
-    email: formData.email,
-    userName: formData.userName,
-    firstName: formData.firstName,
-    lastName: formData.lastName,
-    collegeId: formData.collegeId,
-    dob: formData.dob,
-    })
-  if(response.status === 200){
-    toast.success(response.message)
-    getAccounts()
-    handleditClose()
-  }else{
-    toast.warning(response.message)
-  }
-
-}
 
     const [userID, setUserID] = useState('')
-    const [passwords, setPassword] = useState({
-      password:'',
-      password_confirm:''
-    })
-    async function passwordChangeSubmit(){
-      if(passwords.password === passwords.password_confirm){
-        let response = await post(API_URL + "/editAccountPassword",  {userID: userID,password:passwords.password,token: localStorage.getItem("token")});
-        if(response.status === 200){
-          toast.success(response.message);
-          handleClose()
-        }else{
-          toast.warning(response.message);
-        }
-      }else{
-        toast.warning("Passwords do not match!")
-      }
-    }
 
-    function inputChangeHandler(e){
-      setPassword({...passwords,  [e.target.name] : e.target.value})
-    }
 
     function checkMessage(){
       if(!(localStorage.getItem("message") === null)){
@@ -110,134 +71,30 @@ async function registerHandler() {
         {field: 'dob', headerName: ' DOB' ,cellStyle: { 'textAlign': 'center' }},
         {field: 'collegeId', headerName: 'IC ID' ,cellStyle: { 'textAlign': 'center' }},
         {field: 'email', headerName: 'Email' ,cellStyle: { 'textAlign': 'center' }},
-        ]
-        
-        const Edit_columnDefs = [
-          {field: 'id', 
-        headerName: '' ,
-        cellRenderer: EditButton,
-        cellStyle: { 'textAlign': 'center' }, 
-        cellRendererParams: {
-          clicked: function(field) {
-            editAccount(field);
-          }
-        }},
         {field: 'id',
         headerName: '' ,
         cellRenderer: CommonButton, 
         cellStyle: { 'textAlign': 'center' },
         cellRendererParams: {
           clicked: function(field) {
-            promoteAccount(field)
+            showUserProfile(field)
           },
-          buttonText: "Promote",
-          variant:"outline-success",
-        }},
-        {field: 'id',
-        headerName: '' ,
-        cellRenderer: CommonButton, 
-        cellStyle: { 'textAlign': 'center' },
-        cellRendererParams: {
-          clicked: function(field) {
-            demoteAccount(field)
-          },
-          buttonText: "Demote",
-          variant:"outline-danger",
-        }},
-        {field: 'id',
-        headerName: '' ,
-        cellRenderer: CommonButton, 
-        cellStyle: { 'textAlign': 'center' },
-        cellRendererParams: {
-          clicked: function(field) {
-            changeAccountStatue(field)
-          },
-          buttonText: "Change Status",
+          buttonText: "View Profile",
           variant:"outline-info",
-
-        }},
-        {field: 'id',
-        headerName: '' ,
-        cellRenderer: CommonButton, 
-        cellStyle: { 'textAlign': 'center' },
-        cellRendererParams: {
-          clicked: function(field) {
-            changePassword(field)
-
-          },
-          buttonText: "Change Password",
-          variant:"outline-dark",
         }},
         ]
-
-        const Delete_columnDefs = [
-          {field: 'id',
-        headerName: '' ,
-        cellRenderer: DeleteButton, 
-        cellStyle: { 'textAlign': 'center' },
-        cellRendererParams: {
-          clicked: function(field) {
-            deleteAccount(field)
-          }
-        }},
-        ]
-
+        const [userAcc,setUserAcc] = useState({})
 
         const defaultColDef= { resizable: true}
-
-
-    async function editAccount(accountId) {
-      let curAccount = {}
-      accounts.map((acc)=>{
-        if (accountId == acc.id){
-          curAccount= acc
+        function showUserProfile(userID){
+          setUserAcc(userID)
+          handleadShow()
         }
-      })
 
-      // console.log(curAccount)
-      const oldData = {
-        userID:accountId,
-        firstName: curAccount.firstName,
-        lastName: curAccount.lastName,
-        collegeId: curAccount.collegeId,
-        dob: curAccount.dob,
-        email: curAccount.email,
-        userName: curAccount.userName,
-  
-    }
-    setFormData(oldData)
-      
-      handlediteShow(true)
 
-    }
-    function changePassword(accountId){
-      setUserID(accountId)
-      handleShow()
-    }
-    async function deleteAccount(accountId) {
-      commonApiRequest("/deleteAccount",accountId)
-    }
-    async function promoteAccount(accountId) {
-      commonApiRequest("/promoteAccount",accountId)
-    }
-    async function demoteAccount(accountId) {
-      commonApiRequest("/demoteAccount",accountId)
-    }
-    async function changeAccountStatue(accountId) {
-      commonApiRequest("/changeAccountStatus",accountId)
-    }
- 
 
-    async function commonApiRequest(endpoint,accountId){
-      let response = await post(API_URL + endpoint,  {userID: accountId,token: localStorage.getItem("token")});
 
-      if(response.status === 200){
-        toast.success(response.message);
-      }else{
-        toast.warning(response.message);
-      }
-      getAccounts()
-    }
+
 
 
   
@@ -245,7 +102,13 @@ async function registerHandler() {
 
 
     async function getAccounts() {
-        let response = await get(API_URL + "/getAllAccounts?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org)
+        let response = await get(API_URL + "/getAccounts?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org
+        +"&email="+empSearchData.email
+        +"&firstName="+empSearchData.firstName
+        +"&lastName="+empSearchData.lastName
+        +"&ICID="+empSearchData.ICID
+        +"&status="+empSearchData.status
+        )
         if(response.status==200){
           response = response.accounts
         
@@ -253,7 +116,7 @@ async function registerHandler() {
           if(response[x].status === true){
             response[x].status = "Active"
           }else{
-            response[x].status = "Deactive"
+            response[x].status = "Deactivated"
           }
         }
         }
@@ -264,25 +127,15 @@ async function registerHandler() {
         if(thisFeaturePerms.access){
           tempColDef=View_columnDefs
         }
-        if(thisFeaturePerms.edit){
-          let temp = tempColDef.concat(Edit_columnDefs)
-          tempColDef = temp
-        }
-        if(thisFeaturePerms.delete){
-          let temp = tempColDef.concat(Delete_columnDefs)
-          tempColDef = temp
-        }
         setCommonColDef(tempColDef)
-        console.log(response)
         setRowData(response)
         setAccounts(response)
-        
         resize()
         return response
     }
     function resize(){
       if (gridRef !== "null"){
-        gridRef.current.columnApi.autoSizeAllColumns();
+        gridRef.current.api.sizeColumnsToFit();
     }}
 
 
@@ -291,6 +144,14 @@ async function registerHandler() {
     const handlregClose = () => {setregShow(false);setregisterBool(false);};
     const handlregeShow = () => setregShow(true);
     const[registerBool,setregisterBool] = useState(false);
+    const[addToOrg,setAddToOrg] = useState(false);
+    const[accountFoundData,setAccountFoundData] =useState({
+      firstName: "",
+      lastName: "",
+      collegeId: "",
+      dob: "",
+ 
+  })
 
     const [email,setEmail]= useState();
     async function register(){
@@ -304,9 +165,9 @@ async function registerHandler() {
         if(response.status == 200){
           if(response.accountFound){
             // add to organization
-            if(false){
-              toast.success("Account found in database. Added to Org");
-            }
+            setAccountFoundData(response.UserAcc)
+            setAddToOrg(true)
+            setregisterBool(true)
           }else{
             setregisterBool(true)
           }
@@ -320,13 +181,28 @@ async function registerHandler() {
     const { thisFeaturePerms } = location.state
 
 
-    function myTCshowMobileViewTimeCards(){
+    function showMobileViewEmpCards(){
   
       return(
         accounts.map(element => {
         return(
-        <MobileEmpCard keyNum ={accounts.indexOf(element)}  data={element} editAccount={editAccount} deleteAccount={deleteAccount} promoteAccount={promoteAccount} demoteAccount={demoteAccount} changeAccountStatue={changeAccountStatue} changePassword={changePassword} permisions={thisFeaturePerms} />
+        <MobileEmpCard keyNum ={accounts.indexOf(element)}  data={element} showUserProfile={showUserProfile} permisions={thisFeaturePerms} />
        ) }))
+    }
+
+    function searchInputHandeler(e){
+      setEmpSearchData({...empSearchData,  [e.target.name] : e.target.value})
+    }
+    const [empSearchData, setEmpSearchData] = useState({
+      email : "",
+      firstName: "",
+      lastName: "",
+      ICID:"",
+      status: "",
+    })
+    function search(){
+      console.log(empSearchData)
+      getAccounts()
     }
 
 
@@ -337,7 +213,7 @@ async function registerHandler() {
 
         console.log(thisFeaturePerms)
         
-    }, [gridRef.current])
+    }, [])
 
     
 
@@ -347,7 +223,7 @@ async function registerHandler() {
              <ToastContainer />
             <h1>Employee Accounts</h1>
             <Form className="incident-form">
-              {thisFeaturePerms.create?<Button variant="outline-dark" onClick={() => handlregeShow()}>Add Account</Button>:null}
+              {thisFeaturePerms.create?<Button variant="outline-success" onClick={() => handlregeShow()}>Add Account</Button>:null}
             </Form>
             <Modal
               show={regshow}
@@ -360,7 +236,7 @@ async function registerHandler() {
               </Modal.Header>
               {registerBool?
               <Modal.Body>
-              <Register email = {email} handlregClose= {()=>handlregClose()}/>
+              <AccountInfoHandeler email = {email} handlregClose= {()=>handlregClose()} mode={"register"} thisFeaturePerms={thisFeaturePerms} getAccounts={getAccounts} accountFoundData={accountFoundData} addToOrg={addToOrg}/>
               </Modal.Body>
               :
               <>
@@ -375,6 +251,73 @@ async function registerHandler() {
               </Modal.Footer></>
               }
             </Modal>
+
+
+              
+
+
+
+              {/* search */}
+          <div className="container">
+                <div className="row">
+                    <div className="col">
+                        <div className="row" id = "location-form">
+                          
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">Email</Form.Label>
+                            <Form.Control type="email" placeholder="" name="email" onChange={(e) => searchInputHandeler(e)} />
+                            </div>
+
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">First name</Form.Label>
+                            <Form.Control type="text" placeholder="" name="firstName" onChange={(e) => searchInputHandeler(e)} />
+                            </div>
+                            
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">Last name</Form.Label>
+                            <Form.Control type="text" placeholder="" name="lastName" onChange={(e) => searchInputHandeler(e)} />
+                            </div>
+
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">ICID</Form.Label>
+                            <Form.Control type="number" placeholder="" name="ICID" onChange={(e) => searchInputHandeler(e)} />
+                            </div>
+
+                            <div className="col" id="searchFormElement">
+                            <Form.Label className=" d-flex justify-content-start">Status</Form.Label>
+                            <Form.Select aria-label="Default select example" name="status" onChange={(e) => searchInputHandeler(e)}>
+                            <option value =''></option>
+                              <option value ='Active'>Active</option>
+                              <option value ='Deactivated'>Deactivated</option>
+                            </Form.Select>
+                            </div>
+                        
+                            
+                            <div className="col" id="searchFormElement">
+                                <div className="row ">
+                                <Button variant="outline-primary" type="button" onClick={() => search()}>Search</Button>
+
+                                </div>
+                                {/* {(allTC.length > 0)? 
+                                <div className="row">
+                                    <Dropdown>
+                                        <Dropdown.Toggle variant="outline-black" id="dropdown-basic">
+                                            Export File
+                                        </Dropdown.Toggle>
+
+                                        <Dropdown.Menu className="text-center">
+                                            <Dropdown.Item onClick={()=>SaveAsCSV()}>CSV <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="CSV" className="csv-logo"/></Dropdown.Item>
+                                            <Dropdown.Item >PDF <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" className="pdf-logo" alt=""/></Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown> 
+                                </div>
+                                : null} */}
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
 
                 {/* desktop view */}
                 <div className="d-none d-xxl-block" >
@@ -394,73 +337,29 @@ async function registerHandler() {
                   <div className="ag-theme-alpine incident-grid">
                     
                   <Accordion defaultActiveKey="0">
-                  {myTCshowMobileViewTimeCards()}
+                  {showMobileViewEmpCards()}
 
                 </Accordion>
                 </div>
                 </div>
 
 
-            <Modal
-              show={show}
-              onHide={handleClose}
-              backdrop="static"
-              keyboard={false}
-            >
-              <Modal.Header closeButton>
-                <Modal.Title>New Password</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <Form>
-                <Form.Label className=" d-flex justify-content-start">Password</Form.Label>
-                <Form.Control type="password" placeholder="Password" name="password" onChange={(e) => inputChangeHandler(e)}/>
-                <Form.Label className=" d-flex justify-content-start">Confirm Password</Form.Label>
-                <Form.Control type="password" placeholder="Re-enter Password" name="password_confirm" onChange={(e) => inputChangeHandler(e)}/>
-                </Form>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="primary" onClick={()=>passwordChangeSubmit()}>Submit</Button>
-              </Modal.Footer>
-            </Modal>
+
 
 
             <Modal
-              show={editshow}
-              onHide={handleditClose}
+              show={adshow}
+              onHide={handleadClose}
               backdrop="static"
               keyboard={false}
+              fullscreen={true}
             >
               <Modal.Header closeButton>
-                <Modal.Title>Edit Account Details</Modal.Title>
+                <Modal.Title>Account Details</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label className=" d-flex justify-content-start">First Name</Form.Label>
-              <Form.Control type="text" placeholder="" value={formData.firstName}  name="firstName" onChange={(e) => inputChangeHandleracc(e)} />
-
-              <Form.Label className=" d-flex justify-content-start">Last Name</Form.Label>
-              <Form.Control type="text" placeholder="" value={formData.lastName}  name="lastName" onChange={(e) => inputChangeHandleracc(e)}/>
-
-              <Form.Label className=" d-flex justify-content-start">Student ID</Form.Label>
-              <Form.Control type="text" placeholder="" value={formData.collegeId}  name="collegeId" onChange={(e) => inputChangeHandleracc(e)}/>
-
-              <Form.Label className=" d-flex justify-content-start">Date of Birth </Form.Label>
-              <Form.Control type="date" placeholder="" value={formData.dob}   name="dob" onChange={(e) => inputChangeHandleracc(e)}/>
-
-              <Form.Label className=" d-flex justify-content-start">Email address</Form.Label>
-              <Form.Control type="text" placeholder="" value={formData.email}   name="email" onChange={(e) => inputChangeHandleracc(e)}/>
-                        
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label className=" d-flex justify-content-start">Username</Form.Label>
-              <Form.Control type="text" placeholder="Enter Username" value={formData.userName}   name="userName" onChange={(e) => inputChangeHandleracc(e)}/>
-            </Form.Group>
-
+                <UserProfile thisFeaturePerms={thisFeaturePerms} getAccounts={getAccounts} handleadClose={handleadClose} userAcc={userAcc} personalProfileAccess={false} />
               </Modal.Body>
-              <Modal.Footer>
-                <Button variant="primary" onClick={()=>registerHandler()}>Submit</Button>
-              </Modal.Footer>
             </Modal>
 
         </div>
