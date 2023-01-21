@@ -37,10 +37,13 @@ export default function Nav({setLoggedIn, loggedInUser}) {
 
     function logoutUserHandler() {
         localStorage.removeItem("token")
+        localStorage.removeItem("firstName")
         document.location.replace("/")
         setLoggedIn(false)
     }
     useEffect(() => {
+
+
         if(location.pathname != "/"){
             setshowmore(true)
         }
@@ -59,6 +62,7 @@ export default function Nav({setLoggedIn, loggedInUser}) {
 
         const { colorMode, toggleColorMode } = useColorMode();
 const { isOpen, onOpen, onClose } = useDisclosure();
+
 return (
   <>
     <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4} mb={10}>
@@ -97,16 +101,18 @@ return (
                 </Center>
                 <br />
                 <Center>
-                  <p>Hi, {loggedInUser.firstName}</p>
+                  <p>Hi, {localStorage.getItem("firstName")}</p>
                 </Center>
                 <br />
                 <MenuDivider />
                 <MenuItem onClick={() => navigate("/")}>
-                    <img src="https://img.icons8.com/dusk/512/home-page.png" alt="" width={40} height={40}/> Home
+                 <img src="https://img.icons8.com/dusk/512/home-page.png" alt="" width={40} height={40}/> Home
                 </MenuItem>
 
-                <MenuItem>
-                    <img src="https://img.icons8.com/plasticine/512/settings.png" alt="" width={40} height={40}/> Settings</MenuItem>
+                <MenuItem onClick={() => navigate("/UserPersonalProfile")}>
+                  <img src="https://img.icons8.com/plasticine/512/settings.png" alt="" width={40} height={40}/> Settings
+                </MenuItem>
+                
                 <MenuItem onClick={() => logoutUserHandler()}>
                     <img src="https://img.icons8.com/plasticine/512/logout-rounded.png" alt="" width={40} height={40}/> Logout
                 </MenuItem>

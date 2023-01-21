@@ -43,6 +43,7 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setL
           localStorage.setItem("token", response.token)
           setLoggedIn(true)
           setLoggedInUser(tokenVerification.user)
+          localStorage.setItem("firstName", tokenVerification.user.firstName)
         }, 1500)
       } else {
         setLoggedIn(false)
@@ -72,7 +73,7 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setL
                 <form className='m-5'>
                       <Text fontSize='4xl' color="black" mb={10}>Access Page</Text>
                      <div class="mb-3">
-                       <label for="exampleInputEmail1" class="form-label d-flex justify-content-start" style={{color: "black"}}>Username</label>
+                       <label for="exampleInputEmail1" class="form-label d-flex justify-content-start" style={{color: "black"}}>Email</label>
                        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={(e) => emailChangeHandler(e)} style={{color: "black"}}/>
                      </div>
                      <div class="mb-3">

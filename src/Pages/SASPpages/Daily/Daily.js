@@ -118,7 +118,7 @@ useEffect(() =>
     return (
     <div>
         <ToastContainer />
-        <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
+        <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
 
         <Tabs>
   <TabList isFitted>

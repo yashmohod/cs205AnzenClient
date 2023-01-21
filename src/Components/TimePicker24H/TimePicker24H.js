@@ -21,30 +21,30 @@ export default function TimePicker24H(props) {
         setHours(Thours)
         setMinutes(Tminutes)
     }
-    function setTime(){
-        let value = timeH+":"+timeM;
+    function setTime(h,m){
+        
+        let value = h+":"+m;
+        console.log(value)
         let target={"value":value,"name":props.name}
         let e = {"target":target}
         props.inputChangeHandler(e)
     }
     function setTimeH(h){
         settimeH(h)
-        setTime()
+        setTime(h,timeM)
     }
     function setTimeM(m){
         settimeM(m)
-        setTime()
+        setTime(timeH,m)
     }
     useEffect(() =>{   
         // setTime();
         setHoursNminutes();
-        console.log(props.name)
-        console.log(props.time)
     },[timeH,timeM])
 
     return ( 
 
-        <InputGroup className="col justify-content-center " onChange={(e) =>setTime()}>
+        <InputGroup className="col justify-content-center ">
             <div>
             <Form.Label className=" d-flex justify-content-start">Hours</Form.Label>
             <Form.Select  name="Hours" onChange={(e) =>setTimeH(e.target.value)}>

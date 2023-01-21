@@ -352,7 +352,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
         <div className="location-page">
             {fullVersion?
             <>
-            <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
+            <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
              <ToastContainer />
              </>
              :null}

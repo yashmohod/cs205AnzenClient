@@ -209,7 +209,7 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
     useEffect(() => {
         autoLogin()
         getAccounts()
-        checkMessage()
+
 
         console.log(thisFeaturePerms)
         
@@ -219,7 +219,7 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
 
     return (
         <div className="incident-page">
-             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
+             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
              <ToastContainer />
             <h1>Employee Accounts</h1>
             <Form className="incident-form">

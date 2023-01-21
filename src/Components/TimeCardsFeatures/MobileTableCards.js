@@ -32,6 +32,7 @@ export default function MobileTableCards(props) {
         <Form.Label className=" d-flex justify-content-start">End: {props.data.end} </Form.Label>
         <Form.Label className=" d-flex justify-content-start">Duration: {props.data.duration} </Form.Label>
         <Form.Label className=" d-flex justify-content-start">Status: {props.data.approval} </Form.Label>
+        <Form.Label className=" d-flex justify-content-start">Shift Type: {props.data.shiftName} </Form.Label>
         <Form.Label className=" d-flex justify-content-start">Note: {props.data.note} </Form.Label>
         {props.data.approval==="Pending" && !adminOptions?<div className="row">
             <div className="col-6">
