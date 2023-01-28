@@ -16,7 +16,7 @@ export default function MobileTableCards(props) {
     
         // console.log(cardRef)
         setAdminOptions(props.admin)
-        if(props.data.approval==="Pending"){
+        if(props.data.approval=="Pending"){
             cardRef.current.firstChild.style.backgroundColor="#fcfcb6"
         }else{
             cardRef.current.firstChild.style.backgroundColor="#a6f7bb"
