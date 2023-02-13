@@ -108,7 +108,7 @@ export default function Incidents({setLoggedIn, loggedInUser, autoLogin}) {
 
     return (
         <div className="incident-page">
-             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
+             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
              <ToastContainer />
             <h1>Incidents</h1>
             

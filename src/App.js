@@ -13,6 +13,7 @@ import { API_URL } from './Utils/API';
 import ChangePassword from './Pages/GeneralPages/ChangePassword/ChangePassword';
 import EmployeeAccounts from './Pages/GeneralPages/EmployeeAccounts/EmployeeAccounts';
 import TimeCards from './Pages/GeneralPages/TimeCards/TimeCards';
+import UserPersonalProfile from './Pages/GeneralPages/UserPersonalProfile/UserPersonalProfile'
 import { useNavigate } from "react-router-dom";
 import 'rsuite/styles/index.less';
 import 'rsuite/dist/rsuite.min.css'
@@ -34,6 +35,7 @@ function App() {
       if (tokenVerification.message === "verified") {
         setLoggedIn(true)
         setLoggedInUser(tokenVerification.user)
+        localStorage.setItem("firstName", tokenVerification.user.firstName)
         return true
       }
       else{
@@ -45,11 +47,6 @@ function App() {
     }
   }
 
-  async function getORGnPOS(){
-    let response = await get(API_URL + "/getORGnPOS?token=" +  localStorage.getItem("token"));
-    console.log(response)
-    return response
-  }
 
 
 /*
@@ -62,10 +59,11 @@ function App() {
         <Routes>
           {/* general routes */}
  
-          <Route path="/" element={loggedIn ? <Dashboard loggedIn={loggedIn} setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()} getORGnPOS={()=>getORGnPOS()}/> :  <Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} setLoggedInUser={setLoggedInUser} autoLogin={() => autoLogin()} getORGnPOS={()=>getORGnPOS()}/> } />
+          <Route path="/" element={loggedIn ? <Dashboard loggedIn={loggedIn} setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()} /> :  <Login loggedIn={loggedIn} setLoggedIn={setLoggedIn} setLoggedInUser={setLoggedInUser} autoLogin={() => autoLogin()}/> } />
           <Route path="/change-passwords" element={<ChangePassword setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/employee-accounts" element={<EmployeeAccounts setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/time-cards" element={<TimeCards setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
+          <Route path="/UserPersonalProfile" element={<UserPersonalProfile setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
 
           {/* sasp routes */}
           <Route path="/SASPpages/daily" element={<Daily setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>

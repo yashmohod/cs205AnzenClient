@@ -475,7 +475,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
     return (
         <div className="location-page">
             {fullVersion?
-             <><Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} /><ToastContainer /></>: null }
+             <><Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/><ToastContainer /></>: null }
             <h1>Referrals</h1>
             {fullVersion?
             <div className="container">

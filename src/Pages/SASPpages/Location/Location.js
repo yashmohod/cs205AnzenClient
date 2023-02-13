@@ -113,7 +113,7 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
 
     return (
         <div className="location-page">
-             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
+            <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
              <ToastContainer />
             <h1>Locations</h1>
             <div className="container-fluid m-5">

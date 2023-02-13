@@ -43,6 +43,7 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setL
           localStorage.setItem("token", response.token)
           setLoggedIn(true)
           setLoggedInUser(tokenVerification.user)
+          localStorage.setItem("firstName", tokenVerification.user.firstName)
         }, 1500)
       } else {
         setLoggedIn(false)

@@ -36,6 +36,7 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
         endTime:"00:00",
         note:"",
         id:"",
+        shiftType:"",
       });
 
     function inputChangeHandlerTimeCardData(e){
@@ -43,6 +44,7 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
     }
 
     async function timeCardSubmit(){
+      console.log(timeCardData)
         if(timeCardData.id !=""){
           editedtimeCardSubmit()
           
@@ -53,7 +55,8 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
             start:timeCardData.startDate+" "+timeCardData.startTime+":00",
             end:timeCardData.endDate+" "+timeCardData.endTime+":00",
             note:timeCardData.note,
-            org:thisFeaturePerms.org
+            org:thisFeaturePerms.org,
+            shiftName: timeCardData.shiftType,
             })
 
         if(response.status === 200){
@@ -71,6 +74,7 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
           endTime:"00:00",
           note:"",
           id:"",
+          shiftType:'',
         })
       }
       getAlltc()
@@ -99,7 +103,7 @@ export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
           "&dateFrom="+myTCpreviousSearchData.dateFrom+
           "&dateTo="+myTCpreviousSearchData.dateTo+
           "&status="+myTCpreviousSearchData.approval)
-
+      console.log(responseALL)
       if(responseALL.status == 200) {
         var data = "0";
         data = responseALL.UserTimeCards.map((tc)=>{
@@ -153,6 +157,7 @@ function editTimeCard(timeCardID){
     endDate:data.end.split("/")[0].replaceAll(' ', ''),
     endTime:data.end.split("/")[1].replaceAll(' ', ''),
     id:timeCardID,
+    shiftType:data.shiftName,
   })
   console.log(data.end.split("/")[1].replaceAll(' ', ''))
 
@@ -168,7 +173,8 @@ function editTimeCard(timeCardID){
       start:timeCardData.startDate+" "+timeCardData.startTime+":00",
       end:timeCardData.endDate+" "+timeCardData.endTime+":00",
       note:timeCardData.note,
-      org:thisFeaturePerms.org
+      org:thisFeaturePerms.org,
+      shiftName: timeCardData.shiftType,
       })
 
   if(response.status === 200){
@@ -199,7 +205,15 @@ function editTimeCard(timeCardID){
   }
   getAlltc()
  }
-
+ const reportColumnDef = [
+  {field: 'submitedDate', headerName: 'Submited Date' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
+  {field: 'start', headerName: 'Start' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
+  {field: 'end', headerName: 'End' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
+  {field: 'duration', headerName: ' Duration' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
+  {field: 'approval', headerName: 'Status' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
+  {field: 'note', headerName: 'Note' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
+  {field: 'shiftName', headerName: 'Shift Type' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
+ ]
 
 
  const myTCgridRef = useRef(null);
@@ -211,6 +225,7 @@ function editTimeCard(timeCardID){
     {field: 'duration', headerName: ' Duration' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
     {field: 'approval', headerName: 'Status' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
     {field: 'note', headerName: 'Note' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
+    {field: 'shiftName', headerName: 'Shift Type' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
     {field: '',
     headerName: '' ,
     cellStyle: { 'textAlign': 'center' },
@@ -281,6 +296,7 @@ function editTimeCard(timeCardID){
       {field: 'duration', headerName: ' Duration' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
       {field: 'approval', headerName: 'Status' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
       {field: 'note', headerName: 'Note' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
+      {field: 'shiftName', headerName: 'Shift Type' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
       {field: '',
     headerName: '' ,
     cellStyle: { 'textAlign': 'center' },
@@ -331,25 +347,40 @@ function editTimeCard(timeCardID){
 
 
     const [ISadminTCsearch,setISadminTCsearch]= useState(false)
+    const [reportView, setReportView]= useState(false)
     
     
     function tabChange(e){
+      setReportView(false)
       if(e == 1){
         setISadminTCsearch(false)
-        getAlltc(atcPerm,myTCpreviousSearchData)
+        getAlltc(myTCpreviousSearchData)
       }
       if(e == 2){
         setISadminTCsearch(true)
-        getAlltc(atcPerm,allTCpreviousSearchData)
+        getAlltc(allTCpreviousSearchData)
       }
-      console.log(myTCpreviousSearchData)
-      console.log(allTCsearchData)
+      if(e==3){
+        setReportView(true)
+        getReport()
+        setReportSearchData(previousReportSearchData)
+      }
       tableResize()
 
     }
     function tableResize(){
-      myTCgridRef.current.api.sizeColumnsToFit();
-      allTCgridRef.current.api.sizeColumnsToFit();
+      if(!reportView){
+        if(ISadminTCsearch){
+          if(allTCgridRef.current!= null){
+            allTCgridRef.current.api.sizeColumnsToFit();
+          }
+        }else{
+          if(myTCgridRef.current != null){
+            myTCgridRef.current.api.sizeColumnsToFit();
+          }
+        }
+      }
+      
     }
 
   const [myTCsearchData, myTCsetSearchData] = useState({
@@ -364,12 +395,17 @@ const [myTCpreviousSearchData, myTCsetPreviousSearchData] = useState({
 })
 
 function searchInputHandeler(e){
-  if( ISadminTCsearch){
-    allTCsetSearchData({...allTCsearchData,  [e.target.name] : e.target.value})
+  if(reportView){
+    setReportSearchData({...reportSearchData,  [e.target.name] : e.target.value})
   }
   else{
-    myTCsetSearchData({...myTCsearchData,  [e.target.name] : e.target.value})
-  }   
+    if( ISadminTCsearch){
+      allTCsetSearchData({...allTCsearchData,  [e.target.name] : e.target.value})
+    }
+    else{
+      myTCsetSearchData({...myTCsearchData,  [e.target.name] : e.target.value})
+    }  
+  } 
 
 }
 const [allTCsearchData, allTCsetSearchData] = useState({
@@ -387,26 +423,41 @@ const [allTCpreviousSearchData, allTCsetPreviousSearchData] = useState({
 
 function search(){
   // clearSearchFields()
-  if(ISadminTCsearch){
-    allTCsetPreviousSearchData(allTCsearchData)
-    getAlltc()
-
+  if(reportView){
+    console.log(reportSearchData)
+    setPreviousReportSearchData(reportSearchData)
+    getReport()
   }
   else{
-    myTCsetPreviousSearchData(myTCsearchData)
-    getAlltc()
+    if(ISadminTCsearch){
+      allTCsetPreviousSearchData(allTCsearchData)
+      getAlltc()
+  
+    }
+    else{
+      myTCsetPreviousSearchData(myTCsearchData)
+      getAlltc()
+    }
   }
+  
 }
 
   const EmployeeDropdown = useRef(null)
   const dateToChooser = useRef(null)
   const dateFromChooser = useRef(null)
   const status = useRef(null)
+  const shiftSelect = useRef(null)
 
 
   function clearSearchFields(){
-    EmployeeDropdown.current.selectedIndex=0
-    status.current.selectedIndex=0
+    if(ISadminTCsearch){
+      EmployeeDropdown.current.selectedIndex=0
+    }
+    if(reportView){
+      shiftSelect.current.selectedIndex=0
+    }else{
+      status.current.selectedIndex=0
+    }
     dateToChooser.current.value=""
     dateFromChooser.current.value=""
 
@@ -420,14 +471,6 @@ function SaveAsCSV(){
   }
 }
 
-  const location = useLocation()
-  const { thisFeaturePerms } = location.state
-
-  useEffect(() => {
-    autoLogin()
-    setORGnPOS()
-      
-  }, [myTCgridRef,allTCgridRef])
 
     function showAndClear(){
       handleShow()
@@ -438,13 +481,88 @@ function SaveAsCSV(){
         endTime:"00:00",
         note:"",
         id:"",
+        shiftType:"",
       })
     }
+    const [shifts, setShifts] = useState([]);
+
+
+    async function getShifts(){
+      let response = await get(API_URL + "/getShifts?token=" +  localStorage.getItem("token"))
+      setShifts(response.shifts)
+  }
+
+  const [reportData, setReportData]=useState([])
+
+  const [reportSearchData, setReportSearchData] = useState({
+    "employeeId":"",
+    "dateFrom":"",
+    "dateTo":"",
+    "shiftName":"",
+  })
+  const [previousReportSearchData, setPreviousReportSearchData] = useState({
+  "employeeId":"",
+  "dateFrom":"",
+  "dateTo":"",
+  "shiftName":"",
+  })
+  
+
+
+  async function getReport(){
+    console.log(previousReportSearchData)
+    let response =  await get(API_URL + "/getTimeCardReport?token=" +  localStorage.getItem("token")+
+          "&emp="+reportSearchData.employeeId+
+          "&dateFrom="+reportSearchData.dateFrom+
+          "&dateTo="+reportSearchData.dateTo+
+          "&org="+thisFeaturePerms.org+
+          "&shift="+reportSearchData.shiftName)
+    if(response.status == 200){
+      console.log(response.report)
+      setReportData(response.report.reports)
+    }else{
+      toast.warning(response.message)
+    }
+
+  }
+  function reportMobileViewTimeCards(tcs){
+    let sortedfTC = []
+    for(let x = 0; x< tcs.length; x++){
+      if(tcs[x].approval =="Pending" ){
+        sortedfTC.push(tcs[x])
+      }
+    }
+    for(let x = 0; x< tcs.length; x++){
+      if(tcs[x].approval =="Approved" ){
+        sortedfTC.push(tcs[x])
+      }
+    }
+
+
+    return(
+      sortedfTC.map(element => {
+      return(
+      <MobileTableCards keyNum ={tcs.indexOf(element)}  data={element} editTimeCard={editTimeCard} deleteTimeCard={deleteTimeCard} approveTimeCard={approveTimeCard}  admin={true}/>
+     ) }))
+  }
+
+
+
+
+  const location = useLocation()
+  const { thisFeaturePerms } = location.state
+
+  useEffect(() => {
+    autoLogin()
+    getShifts()
+    setORGnPOS()
+      
+  }, [myTCgridRef,allTCgridRef])
 
 
     return (
         <div className="incident-page" >
-             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
+             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
              <ToastContainer />
             <h1>Time Cards</h1>
             <Form className="incident-form">
@@ -457,11 +575,11 @@ function SaveAsCSV(){
                 <div className="row">
                     <div className="col">
                         <div className="row" id = "location-form">
-                        {ISadminTCsearch?
+                        {ISadminTCsearch || reportView?
                             <div className="col" id="searchFormElement">
                             <Form.Label className=" d-flex justify-content-start">Employee</Form.Label>
                             <Form.Select aria-label="Default select example" ref={EmployeeDropdown}  name="employeeId" onChange={(e) => searchInputHandeler(e)}>
-                            <EmployeeList  />
+                            <EmployeeList org ={thisFeaturePerms.org}  />
                             </Form.Select>
                             </div>: null}
 
@@ -474,7 +592,23 @@ function SaveAsCSV(){
                             <Form.Label className=" d-flex justify-content-start">Date To</Form.Label>
                             <Form.Control type="date" placeholder="" name="dateTo" ref={dateToChooser} onChange={(e) => searchInputHandeler(e)}/>
                             </div>
-
+                          {reportView?
+                          <div className="col" id="searchFormElement">
+                          <Form.Label className=" d-flex justify-content-start">Shift</Form.Label>
+                          <Form.Select aria-label="Default select example"  ref={shiftSelect} name="shiftName" onChange={(e) => searchInputHandeler(e)}>
+                          <option value =''></option>
+                          {
+                            shifts.map((item) => {
+                              if(item.orgName ==thisFeaturePerms.org ){
+                                    return (<option key={item.shiftName }   >{item.shiftName}</option>)
+                                }
+                              }
+                            )
+                          }
+                            
+                          </Form.Select>
+                          </div>
+                          :
                             <div className="col" id="searchFormElement">
                             <Form.Label className=" d-flex justify-content-start">Status</Form.Label>
                             <Form.Select aria-label="Default select example"  ref={status} name="approval" onChange={(e) => searchInputHandeler(e)}>
@@ -482,12 +616,12 @@ function SaveAsCSV(){
                               <option value ='Pending'>Pending</option>
                               <option value ='Approved'>Approved</option>
                             </Form.Select>
-                            </div>
+                            </div>}
                         
                             
                             <div className="col" id="searchFormElement">
                                 <div className="row">
-                                <Button variant="outline-primary" type="button" onClick={() => search()}>Search</Button>
+                                <Button variant="outline-primary" type="button" onClick={() =>search()}>Search</Button>
                                 {/* <Button variant="outline-info" type="button" onClick={() => getAllReports()}>Search All</Button> */}
                                 </div>
                                 {(allTC.length > 0)? 
@@ -581,6 +715,82 @@ function SaveAsCSV(){
                   </div>
                 </Tab>
             :null}
+            {atcPerm? 
+                <Tab eventKey="3" title="Time Card Report" onClick={()=>clearSearchFields()}>
+                   {/* desktop view */}
+                  <div className="" >
+                    <div className="ag-theme-alpine incident-grid">
+
+
+                      <Accordion defaultActiveKey="0" >
+                        {reportData.map((report)=>{
+                          report.timeCards = report.timeCards.map((tc)=>{
+                            if(tc.approval){
+                              tc.approval ="Approved"
+                            }else{
+                              tc.approval ="Pending"
+                            }
+                            return tc
+                          })
+                          return (
+                            <Accordion.Item keyNum ={reportData.indexOf(report)}  >
+                              <Accordion.Header >{report.who}</Accordion.Header>
+                              <Accordion.Body>
+                                {
+                                  report.hourReport.map((hourR)=>{
+                                    return(
+                                      <Form.Label className=" d-flex justify-content-start">{hourR.shiftName +": "+hourR.hour} </Form.Label>
+                                    )
+                                  })
+                                }
+                                <div className="d-none d-xxl-block" >
+                                  <div className="ag-theme-alpine incident-grid">
+                                    
+                                          <AgGridReact
+                                            // ref={allTCgridRef}
+                                            columnDefs={allTCcolumnDefs}
+                                            defaultColDef={allTCdefaultColDef}
+                                            rowData={report.timeCards}
+                                            >
+                                          </AgGridReact>
+
+
+                                  </div>
+                                </div>
+                                {/* Mobile View */}
+                              <div className="d-block d-xxl-none" >
+                                                                
+                                <Accordion defaultActiveKey="0" >
+                                  {reportMobileViewTimeCards(report.timeCards)}
+                              </Accordion>
+
+                              </div>
+                              
+                              </Accordion.Body>
+                            </Accordion.Item>
+                          )
+                        })
+                          
+                        }
+                      </Accordion>
+                      
+
+
+                    </div>
+                  </div>
+
+                  {/* Mobile View */}
+                  <div className="d-block d-xxl-none" >
+                    <div className="ag-theme-alpine incident-grid">
+                      
+                    {/* <Accordion defaultActiveKey="0" >
+                      {allTCshowMobileViewTimeCards()}
+                  </Accordion> */}
+
+                    </div>
+                  </div>
+                </Tab>
+            :null}
             </Tabs>
             
 
@@ -613,6 +823,30 @@ function SaveAsCSV(){
                 <div className="row" id="margin">
                 <Form.Label className=" d-flex justify-content-start"><strong>Notes:</strong></Form.Label>
                 <Form.Control   as="textarea" value={timeCardData.note} rows={3} onChange={(e)=>inputChangeHandlerTimeCardData(e)} name = {"note"}/>
+                </div>
+                <div className="row" id="margin">
+                <Form.Label className=" d-flex justify-content-start"><strong>Shift Type:</strong></Form.Label>
+                {/* <Form.Control   as="textarea" value={timeCardData.shiftType} rows={3} onChange={(e)=>inputChangeHandlerTimeCardData(e)} name = {"shiftType"}/> */}
+                <Form.Select  name="shiftType" onChange={(e)=>inputChangeHandlerTimeCardData(e)}>
+			<option key=""></option>
+                  {
+                      shifts.map((item) => {
+                        if(item.orgName ==thisFeaturePerms.org ){
+                          if(item.shiftName ==timeCardData.shiftType ){
+                              return (
+                                  <option key={item.shiftName} selected={true}   >{item.shiftName}</option>
+                                  )
+                          }
+                          else{
+                              return (
+                                  <option key={item.shiftName }   >{item.shiftName}</option>
+                                  )
+                          }
+                          
+                          }})
+                        
+                  }
+              </Form.Select>
                 </div>
 
             </Modal.Body>

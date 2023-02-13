@@ -9,6 +9,8 @@ import {Features} from "./features"
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { useNavigate } from "react-router-dom";
+import Modal from 'react-bootstrap/Modal';
+import {Form, Button} from 'react-bootstrap'
 
 export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     const [clockin, setClockin] = useState(false)
@@ -30,6 +32,19 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     }
     const [curOrgClock, set_curOrgClock] = useState()
 
+
+    const [adshow, setadShow] = useState(false);
+    const handleadClose = () => setadShow(false);
+    const handleadShow = () => setadShow(true);
+    const [shifts, setShifts] = useState([]);
+    const [addNote,setAddNote]= useState(false);
+    const [note,setNote] = useState("");
+
+    async function getShifts(){
+        let response = await get(API_URL + "/getShifts?token=" +  localStorage.getItem("token"))
+        setShifts(response.shifts)
+    }
+
     async function clockIn() {
 
         let response = await post(API_URL + "/clockIn", {token: localStorage.getItem("token"), org:curOrgClock})
@@ -41,9 +56,14 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
             setClockin(true) 
         }
     }
+    
+    function clockOutButtonHandler(){
+        handleadShow()
+    }
 
-    async function clockOut() {
-        let response = await post(API_URL + "/clockOut", {token: localStorage.getItem("token"), org:curOrgClock})
+    async function clockOut(shiftType) {
+        handleadClose()
+        let response = await post(API_URL + "/clockOut", {token: localStorage.getItem("token"), org:curOrgClock, note:note, shiftName: shiftType})
         if(response.status == 400){
             toast.warning(response.message)
         }
@@ -52,6 +72,10 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
             setClockin(false) 
         }
     }
+
+
+
+
     const [orgs,setOrgs] = useState([]);
     const [sortedFeatures,setSortedFeatures]=useState([]);
     async function setFeatures(){
@@ -140,6 +164,7 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     useEffect(() => {
         autoLogin()
         // checkMessage()
+        getShifts()
         setFeatures()
     },[])
 
@@ -171,8 +196,43 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
         
         <div>
         
-        <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
+        <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
         <ToastContainer />
+        <Modal
+              show={adshow}
+              onHide={handleadClose}
+              backdrop="static"
+              keyboard={false}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Clock Out</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Form>
+                    {addNote?
+                    <>
+                        <Form.Control as="textarea" placeholder="Note..." name="note" onChange={(e) => setNote(e.target.value)}/>
+                        <Button variant="danger" style={{marginTop:"10px"}} onClick={()=>{setAddNote(false);setNote("")}}>Cancel</Button>
+                    </>
+                    :
+                    <>
+                    <Button variant="primary" onClick={()=>setAddNote(true)}>Add Note</Button>
+                    </>}
+                </Form>
+              </Modal.Body>
+              <Modal.Footer>
+              <Form>
+                <Form.Label className=" d-flex justify-content-start">Select a shift type!</Form.Label>
+                {shifts.map((shift)=>{
+                    return (<Button variant="success" style={{marginRight:"5px"}} onClick={()=>clockOut(shift.shiftName)}>{shift.shiftName}</Button>)
+                })}
+                </Form>
+              </Modal.Footer>
+              
+            </Modal>
+
+
+
         <Tabs id="uncontrolled-tab-example"className="mb-3"defaultActiveKey="0" justify onSelect={(e) =>tabChange(e)} >
             {sortedFeatures.map((SF)=>{
                 return(
@@ -180,7 +240,7 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
                     <div className="features container-fluid mt-5 ">
                         <div className="row">
                             <div className="col-12">
-                                {clockin ?  <div onClick={() => clockOut()}><Card title="Clock Out" description="End your work shift" style={Rstyle}/></div> : <div onClick={() => clockIn()}><Card title="Clock In" description="Start your work shift" style={Gstyle}/></div> }
+                                {clockin ?  <div onClick={() => clockOutButtonHandler()}><Card title="Clock Out" description="End your work shift" style={Rstyle}/></div> : <div onClick={() => clockIn()}><Card title="Clock In" description="Start your work shift" style={Gstyle}/></div> }
                             </div>
                         </div>
                         <div className="row justify-content-center"  >
