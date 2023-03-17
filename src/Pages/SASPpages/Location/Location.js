@@ -10,7 +10,7 @@ import EditButton from '../../../Components/Buttons/EditButton'
 import { Button, Form } from "react-bootstrap";
 import { ToastContainer, toast } from 'react-toastify';
 
-export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
+export default function Location({autoLogin}) {
 
     const [Location, setLocation] = useState("")
     let tempLocation
@@ -113,7 +113,6 @@ export default function Location({setLoggedIn, loggedInUser, autoLogin}) {
 
     return (
         <div className="location-page">
-            <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
              <ToastContainer />
             <h1>Locations</h1>
             <div className="container-fluid m-5">

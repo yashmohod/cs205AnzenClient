@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useRef, useState,useMemo } from "react";
-import Nav from "../../../Components/Nav/Nav";
 import './Records.css'
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
@@ -23,7 +22,7 @@ import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable'
 
 
-export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersion,reportID}) {
+export default function Records({autoLogin,fullVersion,reportID}) {
     const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Loc. Details\t", "Received Time\t", "Enroute Time\t", "Arrived Time\t", "Clear Time\t", "Reported By\t", "Summary\t"]
     const keys = ["date", "incident", "location", "locationDetail", "receivedTime", "enrouteTime", "arivedTime", "clearTime", "reportedByName", "summary"]
     // edit records 
@@ -352,7 +351,6 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
         <div className="location-page">
             {fullVersion?
             <>
-            <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
              <ToastContainer />
              </>
              :null}
@@ -499,7 +497,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
               </Modal.Header>
               <Modal.Body>
 
-            <Referals setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()} fullVersion={false} reportID={reportIdForRef}/>
+            <Referals autoLogin={() => autoLogin()} fullVersion={false} reportID={reportIdForRef}/>
 
 
             </Modal.Body>

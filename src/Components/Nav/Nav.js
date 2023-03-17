@@ -30,6 +30,7 @@ export default function Nav({setLoggedIn, loggedInUser}) {
     const location = useLocation();
     const [showmore,setshowmore] = useState(false)
     const [darkHome,setDarkHome] = useState(false)
+    
     function home() {
         navigate("/")
         console.log(location.pathname)
@@ -68,7 +69,7 @@ return (
     <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4} mb={10}>
       <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
         <Box>  
-            <div className="ithaca-logo-container" >
+            <div className="ithaca-logo-container" onClick={() => home()}>
                 <img src="https://www.planetforward.org/sites/default/files/styles/840-x-variable/public/154059_ithaca-college-logo-horizontal-for-ICpg.png?itok=AcYdum-L" alt="Ithaca-Logo"  className="img-fluid mx-auto d-block ithaca-logo"/>
             </div>
         </Box>

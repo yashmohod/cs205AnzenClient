@@ -23,7 +23,7 @@ import autoTable from 'jspdf-autotable'
 import { useLocation } from 'react-router-dom'
 import { isDisabled } from "@testing-library/user-event/dist/utils";
 
-export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVersion,reportID}) {
+export default function Referals({autoLogin, fullVersion,reportID}) {
     const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Judical Referral\t", "First Name\t", "Last Name\t", "Middle Initial\t", "ICID\t", "DoB\t", "Address\t", "Phone No\t"]
     const keys = ["date", "incident", "location", "judicialReferal", "firstName", "lastName", "middleInitial", "ICID", "dob", "address", "phoneNo"]
 
@@ -475,7 +475,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
     return (
         <div className="location-page">
             {fullVersion?
-             <><Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/><ToastContainer /></>: null }
+             <><ToastContainer /></>: null }
             <h1>Referrals</h1>
             {fullVersion?
             <div className="container">
