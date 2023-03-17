@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import Modal from 'react-bootstrap/Modal';
 import {Form, Button} from 'react-bootstrap'
 
-export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
+export default function({autoLogin}) {
     const [clockin, setClockin] = useState(false)
     const [showFeatures,setshowFeatures] =useState(false)
     const [features,setfeatures] = useState();
@@ -195,8 +195,6 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     return (
         
         <div>
-        
-        <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
         <ToastContainer />
         <Modal
               show={adshow}

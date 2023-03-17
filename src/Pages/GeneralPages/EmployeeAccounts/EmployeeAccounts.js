@@ -22,7 +22,7 @@ import UserProfile from "../../../Components/UserProfile/UserProfile";
 import Modal from 'react-bootstrap/Modal';
 
 
-export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin}) {
+export default function EmployeeAccounts({autoLogin}) {
     const [accounts, setAccounts] = useState([])
     const gridRef = useRef();
     const [rowData, setRowData] = useState();
@@ -219,7 +219,6 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
 
     return (
         <div className="incident-page">
-             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
              <ToastContainer />
             <h1>Employee Accounts</h1>
             <Form className="incident-form">

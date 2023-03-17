@@ -13,7 +13,7 @@ import EditButton from '../../../Components/Buttons/EditButton'
 import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import { ToastContainer, toast } from 'react-toastify';
 
-export default function Incidents({setLoggedIn, loggedInUser, autoLogin}) {
+export default function Incidents({autoLogin}) {
     const [incident, setIncident] = useState("")
     const gridRef = useRef();
     const [rowData, setRowData] = useState();
@@ -108,7 +108,6 @@ export default function Incidents({setLoggedIn, loggedInUser, autoLogin}) {
 
     return (
         <div className="incident-page">
-             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
              <ToastContainer />
             <h1>Incidents</h1>
             

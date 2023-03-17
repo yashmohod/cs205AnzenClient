@@ -8,13 +8,16 @@ import './LoginForm.css'
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import { Text } from '@chakra-ui/react'
-
+import { useDispatch, useSelector } from 'react-redux';
+import { userActions } from '../../redux/slices/user';
 
 //'linear-gradient(#e66465, #9198e5)'
 //linear-gradient(#1f87ab, #004961 50%, #004961 90%);
-export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setLoading}) {
+export default function LoginForm({autoLogin, setLoading}) {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const dispatch = useDispatch()
+    const user = useSelector((state) => state.user)
 
     function emailChangeHandler(e) {
       setEmail(e.target.value)
@@ -41,13 +44,13 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setL
         setLoading(false)
         setTimeout(() => {
           localStorage.setItem("token", response.token)
-          setLoggedIn(true)
-          setLoggedInUser(tokenVerification.user)
+          dispatch(userActions.updateLoggedIn(true))
+          dispatch(userActions.updateUserMetadata(tokenVerification.user))
           localStorage.setItem("firstName", tokenVerification.user.firstName)
         }, 1500)
       } else {
-        setLoggedIn(false)
-        setLoggedInUser(null)
+        dispatch(userActions.updateLoggedIn(false))
+        dispatch(userActions.updateUserMetadata(null))
         setLoading(false)
         toast.error(<h5>Wrong Credentials!</h5>, {style: {fontWeight: "bold"}})
       }
@@ -65,7 +68,7 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setL
     }, [])
  
       return (
-            <div className="form p-5">
+            <div className="form m-2 p-2">
                 <ToastContainer/>
                 <div className="ithaca-logo-login-container" style={{color: "black"}}>
                     <img src={IthacaLogo} alt="" className="ithaca-logo-login"/>

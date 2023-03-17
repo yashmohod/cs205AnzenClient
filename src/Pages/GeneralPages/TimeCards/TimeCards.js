@@ -21,7 +21,7 @@ import Accordion from 'react-bootstrap/Accordion';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useLocation } from 'react-router-dom'
 
-export default function TimeCards({setLoggedIn, loggedInUser, autoLogin}) {
+export default function TimeCards({autoLogin}) {
    
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -562,7 +562,6 @@ function SaveAsCSV(){
 
     return (
         <div className="incident-page" >
-             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
              <ToastContainer />
             <h1>Time Cards</h1>
             <Form className="incident-form">
