@@ -8,13 +8,72 @@ import './LoginForm.css'
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import { Text } from '@chakra-ui/react'
-
+import { useMsal } from "@azure/msal-react";
+import { loginRequest } from "../../sso/authConfig";
+import { useIsAuthenticated } from "@azure/msal-react";
+import { callMsGraph } from "./../../sso/graph";
 
 //'linear-gradient(#e66465, #9198e5)'
 //linear-gradient(#1f87ab, #004961 50%, #004961 90%);
 export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setLoading}) {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+
+    const [user, setUser] = useState();
+    const [error, setError] = useState();
+    const [isAuthenticated, setIsAuthenticated]= useState(false);
+    
+
+  //   const { instance, accounts } = useMsal();
+
+  //   function login (){
+  //     instance.loginPopup(loginRequest).catch(e => {
+  //         console.log(e);
+  //         // setIsAuthenticated(false);
+  //       });
+  //       setIsAuthenticated(true);
+  //   }
+
+  // function logout (){
+  //         instance.logoutPopup({
+  //             postLogoutRedirectUri: "/",
+  //             mainWindowRedirectUri: "/" // redirects the top level app after logout
+  //         });
+  //         setIsAuthenticated(false);
+  // }
+
+
+
+  //   const [graphData, setGraphData] = useState(null);
+
+  //   const name = accounts[0] && accounts[0].name;
+
+  //   function RequestProfileData() {
+  //       const request = {
+  //           ...loginRequest,
+  //           account: accounts[0]
+  //       };
+
+  //       // Silently acquires an access token which is then attached to a request for Microsoft Graph data
+  //       instance.acquireTokenSilent(request).then((response) => {
+  //           callMsGraph(response.accessToken).then(response => setGraphData(response));
+  //       }).catch((e) => {
+  //           instance.acquireTokenPopup(request).then((response) => {
+  //               callMsGraph(response.accessToken).then(response => setGraphData(response));
+  //           });
+  //       });
+
+  //       console.log(graphData);
+  //       console.log(accounts);
+  //   }
+
+
+
+
+
+
+
+
 
     function emailChangeHandler(e) {
       setEmail(e.target.value)
@@ -60,8 +119,9 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setL
 }
 
     useEffect((e) => {
-      checkMessage()
+      // checkMessage()
       loginHandler(e)
+      
     }, [])
  
       return (
@@ -82,6 +142,14 @@ export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setL
                      </div>
 
                      <Button appearance="primary" class="btn btn-primary" onClick={(e) => loginHandler(e)} color="blue" active>Login</Button>
+                     {/* {useIsAuthenticated()?
+                     <>
+                     <Button variant="secondary" onClick={RequestProfileData}>Request Access Token</Button>
+                     <Button appearance="primary" className="btn btn-primary" onClick={() => logout()} color="blue" active>Log out</Button>
+                     </>
+                     :
+                     <Button appearance="primary" className="btn btn-primary" onClick={()=>login()} color="blue" active>Login</Button>
+                     } */}
                 </form>
             </div>
       )

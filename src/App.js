@@ -14,6 +14,7 @@ import ChangePassword from './Pages/GeneralPages/ChangePassword/ChangePassword';
 import EmployeeAccounts from './Pages/GeneralPages/EmployeeAccounts/EmployeeAccounts';
 import TimeCards from './Pages/GeneralPages/TimeCards/TimeCards';
 import UserPersonalProfile from './Pages/GeneralPages/UserPersonalProfile/UserPersonalProfile'
+import Positions from './Pages/GeneralPages/Positions/Positions'
 import { useNavigate } from "react-router-dom";
 import 'rsuite/styles/index.less';
 import 'rsuite/dist/rsuite.min.css'
@@ -64,6 +65,7 @@ function App() {
           <Route path="/employee-accounts" element={<EmployeeAccounts setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/time-cards" element={<TimeCards setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
           <Route path="/UserPersonalProfile" element={<UserPersonalProfile setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
+          <Route path="/Positions" element={<Positions setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>
 
           {/* sasp routes */}
           <Route path="/SASPpages/daily" element={<Daily setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()}/>}/>

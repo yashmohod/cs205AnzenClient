@@ -82,7 +82,6 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
         let temp = []
 
         let permisions_response = await get(API_URL + "/getFeaturePermissions?token=" +  localStorage.getItem("token"));
-        console.log(permisions_response)
         const perms = permisions_response.featurePermissions
         let temp_sortedFeatures=[]
         for(let x =0; x<perms.length; x++){
