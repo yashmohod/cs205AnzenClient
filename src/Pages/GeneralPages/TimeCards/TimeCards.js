@@ -526,21 +526,21 @@ function SaveAsCSV(){
 
   }
   function reportMobileViewTimeCards(tcs){
-    let sortedfTC = []
-    for(let x = 0; x< tcs.length; x++){
-      if(tcs[x].approval =="Pending" ){
-        sortedfTC.push(tcs[x])
-      }
-    }
-    for(let x = 0; x< tcs.length; x++){
-      if(tcs[x].approval =="Approved" ){
-        sortedfTC.push(tcs[x])
-      }
-    }
+    // let sortedfTC = []
+    // for(let x = 0; x< tcs.length; x++){
+    //   if(tcs[x].approval =="Pending" ){
+    //     sortedfTC.push(tcs[x])
+    //   }
+    // }
+    // for(let x = 0; x< tcs.length; x++){
+    //   if(tcs[x].approval =="Approved" ){
+    //     sortedfTC.push(tcs[x])
+    //   }
+    // }
 
 
     return(
-      sortedfTC.map(element => {
+      tcs.map(element => {
       return(
       <MobileTableCards keyNum ={tcs.indexOf(element)}  data={element} editTimeCard={editTimeCard} deleteTimeCard={deleteTimeCard} approveTimeCard={approveTimeCard}  admin={true}/>
      ) }))
@@ -733,7 +733,7 @@ function SaveAsCSV(){
                             return tc
                           })
                           return (
-                            <Accordion.Item keyNum ={reportData.indexOf(report)}  >
+                            <Accordion.Item eventKey ={reportData.indexOf(report)}  >
                               <Accordion.Header >{report.who}</Accordion.Header>
                               <Accordion.Body>
                                 {

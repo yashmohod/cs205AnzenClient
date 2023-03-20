@@ -12,7 +12,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import {AgGridReact} from 'ag-grid-react';
 import CheckButton from '../Buttons/CheckButton';
-
+import Modal from 'react-bootstrap/Modal';
 
 export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,userAcc,personalProfileAccess }) {
     const navigate = useNavigate();
@@ -33,15 +33,70 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
         email: "",
     })
 
+    const [pNdShow, setpNdShow] = useState(false);
+    const handleadClose_pnd = () => setpNdShow(false);
+    const handleadShow_pnd = () => setpNdShow(true);
+    const [pnd,setPnd] = useState();
+    const [isPromotion, setIsPromotion] = useState(false);
+    async function getPromotionsNdemotions(){
+        console.log(userAcc)
+        let response = await get(API_URL + "/getPromotionsNdemotions?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org+"&user_id="+userAcc)
+        console.log( response.demoteTo)
+        console.log( response.promoteTo)
+        const promoteTo_titles = response.promoteTo;
+        const demoteTo_titles = response.demoteTo;
+        let promote_positions =[]
+        let demote_positions =[]
+        for(let i=0; i<promoteTo_titles.length; i++){
+            if(!promote_positions.includes(promoteTo_titles[i].PosName)){
+                promote_positions.push(promoteTo_titles[i].PosName);
+            }
+        }
+        for(let i=0; i<demoteTo_titles.length; i++){
+            if(!demote_positions.includes(demoteTo_titles[i].PosName)){
+                demote_positions.push(demoteTo_titles[i].PosName);
+            }
+        }
+        const temp = {
+            "promoteTo_titles":promoteTo_titles,
+            "demoteTo_titles":demoteTo_titles,
+            "promote_positions":promote_positions,
+            "demote_positions":demote_positions,
+        }
+        console.log(temp)
+        setPnd(temp)
+    }
 
     async function deleteAccount() {
         commonApiRequest("/deleteAccount",userAcc,true)
       }
       async function promoteAccount() {
-        commonApiRequest("/promoteAccount",userAcc,false)
+        setIsPromotion(true)
+        handleadShow_pnd()
+        // commonApiRequest("/promoteAccount",userAcc,false)
       }
       async function demoteAccount() {
-        commonApiRequest("/demoteAccount",userAcc,false)
+        setIsPromotion(false)
+        handleadShow_pnd()
+        // commonApiRequest("/demoteAccount",userAcc,false)
+      }
+      async function promotionNdemotionRequest(posName, posTitle, isPromo){
+        let response = await post(API_URL + "/promoteNdemote", {
+            userID: userAcc,
+            token: localStorage.getItem("token"),
+            org:thisFeaturePerms.org,
+            PosName:posName,
+            title:posTitle,
+            isPomotion:isPromo,
+        });
+        console.log(response)
+        if(response.status ==200){
+            toast.success(response.message);
+        }
+        handleadClose_pnd();
+        getAccountDetails();
+        getUserAccPermissions();
+        getPromotionsNdemotions();
       }
       async function changeAccountStatue() {
         commonApiRequest("/changeAccountStatus",userAcc,false)
@@ -286,9 +341,9 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
 
   useEffect(() => {
     // console.log(thisFeaturePerms)
-    getAccountDetails()
-    getUserAccPermissions()
-
+    getAccountDetails();
+    getUserAccPermissions();
+    getPromotionsNdemotions();
   },[])
 
 
@@ -397,7 +452,14 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
                             <Form.Group className="mb-3" controlId="formBasicFirstName">
                                 <Form.Label className=" d-flex justify-content-start">Organizations and Positions</Form.Label>
                                 {oNp.map((item)=>{
-                                    return <Form.Label className=" d-flex justify-content-start" style={{marginLeft:"10%"}}>{item.org} : {item.pos}</Form.Label>
+                                    let pos = item.pos
+                                    let title = item.title
+                                    console.log(item)
+                                    if(pos == title){
+                                        return <Form.Label className=" d-flex justify-content-start" style={{marginLeft:"10%"}}>{item.org} : {pos}</Form.Label>
+                                    }else{
+                                        return <Form.Label className=" d-flex justify-content-start" style={{marginLeft:"10%"}}>{item.org} : {pos+","+title}</Form.Label>
+                                    }
                                 })}
                                
                             </Form.Group>
@@ -465,7 +527,86 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
                 </>:null}
             </div>
         </div>
+{/* 
+        "promoteTo_titles":promoteTo_titles,
+            "demoteTo_titles":demoteTo_titles,
+            "promote_positions":promote_positions,
+            "demote_positions":demote_positions, */}
 
-    </div>
+
+        <Modal
+            show={pNdShow}
+            onHide={handleadClose_pnd}
+            backdrop="static"
+            keyboard={false}
+        >
+            <Modal.Header closeButton>
+            <Modal.Title>{isPromotion? "Promote To":"Demote To"}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {(pnd!= undefined)?
+                    <div>
+                    {isPromotion? 
+                        <>
+                            {pnd.promoteTo_titles.length > 0 ? 
+                            <>
+                                {
+                                    pnd.promote_positions.map((position)=>{
+                                        return(<div  style={{paddingTop:"5%"}}>
+                                            <h2>{position}</h2>
+                                            <div className="col" style={{borderTop:"1px solid rgba(100,100,100,0.4)", paddingTop:"5px"}} >
+                                                {pnd.promoteTo_titles.map((title)=>{
+                                                    if(title.PosName == position){
+                                                        return(<Button onClick={()=>promotionNdemotionRequest(title.PosName,title.title,isPromotion)} style={{padding:"5px",width:"50%"}} variant="outline-success">{title.title}</Button>)
+                                                    }
+                                                })}     
+                                            </div>
+                                        </div>)
+                                    })
+                                }
+                            </>
+                        :
+                        <>
+                            <h4>No position found to promote!</h4> 
+                        </>
+                        }
+                        </>
+                    :
+                        <>
+                            {pnd.demoteTo_titles.length > 0 ? 
+                                <>
+                                    {
+                                        pnd.demote_positions.map((position)=>{
+                                            return(<div style={{paddingTop:"5%"}}>
+                                                <h2>{position}</h2>
+                                                <div className="col" style={{borderTop:"1px solid rgba(100,100,100,0.4)", paddingTop:"5px"}}>
+                                                    {pnd.demoteTo_titles.map((title)=>{
+                                                        if(title.PosName == position){
+                                                            return(<Button onClick={()=>promotionNdemotionRequest(title.PosName,title.title,isPromotion)} style={{padding:"5px",width:"50%"}} variant="outline-danger">{title.title}</Button>)
+                                                        }
+                                                    })}     
+                                                </div>
+                                            </div>)
+                                        })
+                                    }
+                                </>
+                            :
+                                <>
+                                    <h4>No position found to demote!</h4>
+                                </>
+                            }
+                        </>
+                    }
+                    </div>
+                :
+                    <>
+                    <h4>Positions Not loaded yet!</h4>
+                    <h4>Try refreshing!</h4> 
+                    </>
+                }
+                
+            </Modal.Body>
+        </Modal>
+</div>
     )
 }

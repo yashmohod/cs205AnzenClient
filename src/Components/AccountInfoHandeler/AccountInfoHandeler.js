@@ -8,6 +8,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 import InputGroup from 'react-bootstrap/InputGroup';
+import { position } from "@chakra-ui/react";
 
 
 export default function AccountInfoHandeler({email,handlregClose, mode,thisFeaturePerms,getAccounts,accountFoundData,addToOrg}) {
@@ -86,9 +87,26 @@ export default function AccountInfoHandeler({email,handlregClose, mode,thisFeatu
     }
     async function setpos(){
       let response = await get(API_URL + "/getPositions?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org)
-      setPos(response.positions)
+      // setPos(response.positions)
+      const position_titles = response.positions;
+
+      let positions =[]
+
+      for(let i=0; i<position_titles.length; i++){
+          if(!positions.includes(position_titles[i].PosName)){
+            positions.push(position_titles[i].PosName);
+          }
+      }
+      console.log(response.positions)
+      const temp = {
+          "position_titles":position_titles,
+          "positions":positions,
+
+      }
+      console.log(temp)
+      setPos(temp)
     }
-    const [pos, setPos] = useState([]);
+    const [pos, setPos] = useState();
 
 
 
@@ -139,11 +157,44 @@ export default function AccountInfoHandeler({email,handlregClose, mode,thisFeatu
             
             <Form.Group className="mb-3" controlId="formBasicLastName" required>              
             <Form.Label className=" d-flex justify-content-start">Position</Form.Label>
-            {pos.map((item) => {
+            {/* {pos.map((item) => {
               return (
                 <Form.Check required inline label={item.PosName} value ={item.id} name="orgNpos" type={"radio"} id={item.id} onChange={(e) => inputChangeHandler(e)}/>
                       )})
+              } */}
+
+              {pos!=undefined?
+                <>
+                  {pos.position_titles.length > 0 ? 
+                            <>
+                                {
+                                    pos.positions.map((position)=>{
+                                        return(<div  style={{paddingTop:"5%"}}>
+                                            <h2>{position}</h2>
+                                            <div className="col" style={{borderTop:"1px solid rgba(100,100,100,0.4)", paddingTop:"5px"}} >
+                                                {pos.position_titles.map((title)=>{
+                                                    if(title.PosName == position){
+                                                        return(<Form.Check required inline label={title.title} value ={title.id} name="orgNpos" type={"radio"} id={title.id} onChange={(e) => inputChangeHandler(e)}/>)
+                                                    }
+                                                })}     
+                                            </div>
+                                        </div>)
+                                    })
+                                }
+                            </>
+                        :
+                        <>
+                            <h4>No position found to promote!</h4> 
+                        </>
+                        }
+                </>
+              :
+                <>
+                <h3>Position not loaded!</h3>
+                <h3>Please try refreshing.</h3>
+                </>
               }
+
             </Form.Group>
               {!addToOrg?<>
             <Form.Group className="mb-3" controlId="formBasicPassword">

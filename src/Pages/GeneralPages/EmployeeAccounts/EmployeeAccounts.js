@@ -33,7 +33,11 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
     const handleShow = () => setShow(true);
 
     const [adshow, setadShow] = useState(false);
-    const handleadClose = () => setadShow(false);
+    const handleadClose = () => {
+      setadShow(false);
+      autoLogin();
+      getAccounts();
+    };
     const handleadShow = () => setadShow(true);
 
     const [formData, setFormData] = useState({
@@ -88,6 +92,7 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
         const defaultColDef= { resizable: true}
         function showUserProfile(userID){
           setUserAcc(userID)
+          // ############################
           handleadShow()
         }
 
@@ -211,7 +216,7 @@ export default function EmployeeAccounts({setLoggedIn, loggedInUser, autoLogin})
         getAccounts()
 
 
-        console.log(thisFeaturePerms)
+        // console.log(thisFeaturePerms)
         
     }, [])
 

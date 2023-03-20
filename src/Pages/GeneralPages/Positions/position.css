@@ -1,0 +1,13 @@
+.position-grid {
+    height: 1000px;
+    width: 100vw;
+}
+
+#positionnInput {
+    width: 300px;
+}
+
+.position-form {
+    display: flex;
+    justify-content: center;
+}

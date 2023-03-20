@@ -22,7 +22,7 @@ export default function MobileTableCards(props) {
             cardRef.current.firstChild.style.backgroundColor="#a6f7bb"
         }
           
-      }, [props.data.approval])
+      })
    return(<>
    
    <Accordion.Item eventKey={props.keyNum} >

@@ -5,8 +5,8 @@ import { API_URL, post,get } from "../../../Utils/API";
 import { ToastContainer, toast } from 'react-toastify';
 import {AgGridReact} from 'ag-grid-react';
 import { useLocation } from 'react-router-dom'
-import Accordion from 'react-bootstrap/Accordion';
-import PositionCard from "./PositionCard"
+import {Accordion,Button, Form} from 'react-bootstrap';
+import PositionCard from "../../../Components/PositionCard/PositionCard"
 
 export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
 
@@ -27,8 +27,8 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
 
     async function getpositions(){
         let response = await get(API_URL + "/getPositions?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org);
-        console.log(response)
-        // sortPositions(response.positions);
+        console.log(response);
+        setPositions(response.positions)
     }
 
     async function addPositions(){
@@ -42,6 +42,8 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     async function editPositions(){
 
     }
+
+    
     
     async function hierarchyMoveUp(){
 
@@ -55,26 +57,40 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
 
     }
 
-    function sortPositions(curPositions){
-        console.log(curPositions.length)
-        for(var i =0; i < curPositions.length;i++ ){
-            for(var j = i+1 ; j < curPositions.length;j++ ){
-                if(curPositions[i].Org_hierarchyLevel >curPositions[j].Org_hierarchyLevel ){
-                    const temp = curPositions[j];
-                    curPositions[j] = curPositions[i];
-                    curPositions[i] = temp;
-                }
-            }
-        }
-        console.log(curPositions)
-    }
+    async function editPermissions(data,e,org){
+        // console.log(data)
+        // console.log(e.target.checked)
+        // const value = e.target.checked
+        // const permissionName = data.colDef.field
+        // const featureName = userAccPermissions[data.rowIndex].featureName
+        // console.log(org)
+        // console.log(permissionName)
+        // console.log(featureName)
+        // let response = await post(API_URL + "/updatePermission",  {
+        //     token: localStorage.getItem("token"),
+        //     userID: "",
+        //     featureName:featureName,
+        //     permissionName:permissionName,
+        //     value:value,
+        //     org:org
+        // });
+        // if(response.status ==200){
+        //     toast.success(response.message);
+        // }else{
+        //     toast.warning(response.message);
+        // }
+    
+      }
+    
+
+
 
     function showPositionCards(){
   
         return(
         positions.map(element => {
           return(
-          <PositionCard curpos={element} />
+          <PositionCard keyNum={positions.indexOf(element)} curpos={element} editPermissions={editPermissions} />
          ) }))
       }
 
@@ -96,15 +112,27 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
         <div>
         
             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
-            <ToastContainer />
-            {/* <div className="d-block d-xxl-none" >
+             <ToastContainer />
+            <h1>Positions & Permissions</h1>
+            <div className="">
+                <div className="row">
+                    <div className="col-12">
+                        <Form className="position-form">
+                            <Button onClick={() => addPositions()}>Add</Button>
+                        </Form>
+                    </div>
+                </div>
+            </div>
+            <div className="" >
                 <div className="ag-theme-alpine incident-grid">
-                    
+
                     <Accordion defaultActiveKey="0">
                         {showPositionCards()}
                     </Accordion>
                 </div>
-            </div> */}
+            </div>
+
+       
         
         </div>
     )
