@@ -32,7 +32,8 @@ export default function({curpos,keyNum,editPermissions,edit_promotionNdemotion})
         clicked: function(field) {
         },
         editPermissions:editPermissions,
-        org:curpos.OrgName
+        org:curpos.OrgName,
+        permissionFunction:true,
       }},
       {field: 'create',
       headerName: '' ,
@@ -43,7 +44,8 @@ export default function({curpos,keyNum,editPermissions,edit_promotionNdemotion})
         clicked: function(field) {
         },
         editPermissions:editPermissions,
-        org:curpos.OrgName
+        org:curpos.OrgName,
+        permissionFunction:true,
       }},
       {field: 'edit',
       headerName: '' ,
@@ -54,7 +56,8 @@ export default function({curpos,keyNum,editPermissions,edit_promotionNdemotion})
         clicked: function(field) {
         },
         editPermissions:editPermissions,
-        org:curpos.OrgName
+        org:curpos.OrgName,
+        permissionFunction:true,
       }},
       {field: 'delete',
       headerName: '' ,
@@ -65,7 +68,8 @@ export default function({curpos,keyNum,editPermissions,edit_promotionNdemotion})
         clicked: function(field) {
         },
         editPermissions:editPermissions,
-        org:curpos.OrgName
+        org:curpos.OrgName,
+        permissionFunction:true,
       }},
       {field: 'blackList',
       headerName: '' ,
@@ -76,7 +80,8 @@ export default function({curpos,keyNum,editPermissions,edit_promotionNdemotion})
         clicked: function(field) {
         },
         editPermissions:editPermissions,
-        org:curpos.OrgName
+        org:curpos.OrgName,
+        permissionFunction:true,
       }},
       ]
 

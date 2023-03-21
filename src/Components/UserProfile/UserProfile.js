@@ -250,7 +250,8 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
       clicked: function(field) {
       },
       editPermissions:editPermissions,
-      org:thisFeaturePerms.org
+      org:thisFeaturePerms.org,
+      permissionFunction:true,
     }},
     {field: 'create',
     headerName: '' ,
@@ -261,7 +262,8 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
       clicked: function(field) {
       },
       editPermissions:editPermissions,
-      org:thisFeaturePerms.org
+      org:thisFeaturePerms.org,
+      permissionFunction:true,
     }},
     {field: 'edit',
     headerName: '' ,
@@ -272,7 +274,8 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
       clicked: function(field) {
       },
       editPermissions:editPermissions,
-      org:thisFeaturePerms.org
+      org:thisFeaturePerms.org,
+      permissionFunction:true,
     }},
     {field: 'delete',
     headerName: '' ,
@@ -283,7 +286,8 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
       clicked: function(field) {
       },
       editPermissions:editPermissions,
-      org:thisFeaturePerms.org
+      org:thisFeaturePerms.org,
+      permissionFunction:true,
     }},
     {field: 'blackList',
     headerName: '' ,
@@ -312,22 +316,23 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
     setUserAccPermissions(curOrgPerms)
 
   }
-  async function editPermissions(data,e,org){
+  async function editPermissions(prop,e,org){
     // console.log(data)
     // console.log(e.target.checked)
     const value = e
-    const permissionName = data.colDef.field
-    const featureName = userAccPermissions[data.rowIndex].featureName
+    const permissionName = prop.colDef.field
+    const featureName = prop.data.featureName
     // console.log(org)
     // console.log(permissionName)
     // console.log(featureName)
     let response = await post(API_URL + "/updatePermission",  {
         token: localStorage.getItem("token"),
-        userID: userAcc,
+        permId: prop.data.id,
         featureName:featureName,
         permissionName:permissionName,
         value:value,
-        org:org
+        org:org,
+        isPositionPermission:false,
     });
     if(response.status ==200){
         toast.success(response.message);
