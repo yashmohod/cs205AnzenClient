@@ -1,0 +1,17 @@
+#permissionsDiv{
+    max-height: 500px;
+    max-width: 100%;
+}
+
+#promotionsDiv{
+    max-height: 400px;
+    max-width: 100%;
+}
+
+#positionCardHeader button{
+
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    justify-content: center;
+}

@@ -11,3 +11,19 @@
     display: flex;
     justify-content: center;
 }
+
+#PositionCardHolder{
+
+    width: 1300px;
+    
+}
+.CardsDiv{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+    align-content: center;
+    max-width: 100%;
+}

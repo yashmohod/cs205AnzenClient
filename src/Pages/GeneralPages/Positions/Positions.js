@@ -7,11 +7,11 @@ import {AgGridReact} from 'ag-grid-react';
 import { useLocation } from 'react-router-dom'
 import {Accordion,Button, Form} from 'react-bootstrap';
 import PositionCard from "../../../Components/PositionCard/PositionCard"
-
+import "./position.css"
 export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
 
     const [positions,setPositions] = useState([]);
-    const [rowData, setRowData] = useState([]);
+    // const [promotionD, setPromotionD] = useState([]);
     const gridRef = useRef();
     const defaultColDef= { resizable: true}
 
@@ -27,39 +27,73 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
 
     async function getpositions(){
         let response = await get(API_URL + "/getPositions?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org);
-        console.log(response);
-        setPositions(response.positions)
+        cutomizePromotionDetails(response.positions);
+
+    }
+
+    function cutomizePromotionDetails(positionAll){
+        for(let position of positionAll){
+            let dataGrid =[];
+            for(let otherPositions of positionAll){
+                if(position.id != otherPositions.id){
+                    let isPromote = false;
+                for(let pormoteToPos of position.promoteTo){
+                    if(pormoteToPos.title == otherPositions.title){
+                        isPromote = true;
+                    }
+                }
+                let isDemote = false;
+                for(let demoteToPos of position.demoteTo){
+                    if(demoteToPos.title == otherPositions.title){
+                        isDemote = true;
+                    }
+                }
+                dataGrid.push({
+                    "otherPos": otherPositions,
+                    "isPromote":isPromote,
+                    "isDemote": isDemote,
+                })   
+                }
+            }
+            position.promotionD = dataGrid;
+        }   
+        console.log(positionAll);
+        setPositions(positionAll);
     }
 
     async function addPositions(){
 
     }
 
-    async function deletePositions(){
+    async function deletePositions(positionID){
 
     }
 
-    async function editPositions(){
+    async function editPositions(positionID,data){
 
     }
 
     
+    async function edit_promotionNdemotion(transitionOf, transitionTo, isPromotion, updateValue ){
+        // set_promotionsNdemotions
+        let response = await post(API_URL + "/set_promotionsNdemotions",  {
+            token: localStorage.getItem("token"),
+            org: thisFeaturePerms.org,
+            transitionOf:transitionOf.id,
+            transitionTo: transitionTo.otherPos.id,
+            isPromotion:isPromotion,
+            updateValue:updateValue,
+        });
+        if(response.status == 200){
+            toast.success(response.message);
+        }else{
+            toast.warning(response.message);
+        }
+        refresh();
+    }
     
-    async function hierarchyMoveUp(){
-
-    }
-
-    async function hierarchyMoveDown(){
-
-    }
-
-    function updateTable(){
-
-    }
 
     async function editPermissions(data,e,org){
-        // console.log(data)
-        // console.log(e.target.checked)
         // const value = e.target.checked
         // const permissionName = data.colDef.field
         // const featureName = userAccPermissions[data.rowIndex].featureName
@@ -83,14 +117,17 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
       }
     
 
-
+    function refresh(){
+        autoLogin();
+        getpositions();
+    }
 
     function showPositionCards(){
   
         return(
         positions.map(element => {
           return(
-          <PositionCard keyNum={positions.indexOf(element)} curpos={element} editPermissions={editPermissions} />
+          <PositionCard keyNum={positions.indexOf(element)} curpos={element}   edit_promotionNdemotion={edit_promotionNdemotion}/>
          ) }))
       }
 
@@ -99,8 +136,7 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     const { thisFeaturePerms } = location.state
 
     useEffect(() => {
-        autoLogin();
-        getpositions();
+        refresh();
 
     },[])
 
@@ -123,13 +159,12 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
                     </div>
                 </div>
             </div>
-            <div className="" >
-                <div className="ag-theme-alpine incident-grid">
+            <div className="CardsDiv" >
 
-                    <Accordion defaultActiveKey="0">
-                        {showPositionCards()}
-                    </Accordion>
-                </div>
+                <Accordion defaultActiveKey="0" id="PositionCardHolder" alwaysOpen>
+                    {showPositionCards()}
+                </Accordion>
+
             </div>
 
        

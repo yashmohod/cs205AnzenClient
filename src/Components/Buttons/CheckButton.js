@@ -9,7 +9,12 @@ export default class CommonButton extends Component {
     }
     btnClickedHandler(e) {
      this.props.clicked(this.props.value);
-     this.props.editPermissions(this.props,e, this.props.org);
+     if(this.props.permissionFunction){
+      this.props.editPermissions(this.props,e.target.checked, this.props.org);
+     }
+     if(this.props.promotionFunction){
+      this.props.edit_promotionNdemotion(this.props.transitionOf, this.props.data, this.props.isPromotion,e.target.checked);
+     }
     }
     render() {
       return (

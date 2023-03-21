@@ -294,7 +294,8 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
       clicked: function(field) {
       },
       editPermissions:editPermissions,
-      org:thisFeaturePerms.org
+      org:thisFeaturePerms.org,
+      permissionFunction: true,
     }},
     ]
 
@@ -314,12 +315,12 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
   async function editPermissions(data,e,org){
     // console.log(data)
     // console.log(e.target.checked)
-    const value = e.target.checked
+    const value = e
     const permissionName = data.colDef.field
     const featureName = userAccPermissions[data.rowIndex].featureName
-    console.log(org)
-    console.log(permissionName)
-    console.log(featureName)
+    // console.log(org)
+    // console.log(permissionName)
+    // console.log(featureName)
     let response = await post(API_URL + "/updatePermission",  {
         token: localStorage.getItem("token"),
         userID: userAcc,

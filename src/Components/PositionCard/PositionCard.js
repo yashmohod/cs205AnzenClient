@@ -5,20 +5,23 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom'
 import {AgGridReact} from 'ag-grid-react';
 import CheckButton from '../Buttons/CheckButton';
-
+import "./PositionCard.css"
 import { Form, Accordion} from 'react-bootstrap';
-export default function({curpos,keyNum,editPermissions}) {
+import Position from "rsuite/esm/Overlay/Position";
+export default function({curpos,keyNum,editPermissions,edit_promotionNdemotion}) {
 
     const cardRef = useRef(null);
 
     const location = useLocation()
-    const[userAccPermissions, setUserAccPermissions]=useState(curpos.permissions)
+
     const defaultColDef= { resizable: true}
     const gridRef= useRef()
+    
+
 
 
   
-    const columnDefs = [
+    const columnDefs_permissions = [
       {field: 'featureName', headerName: 'Feature' ,cellStyle: { 'textAlign': 'center' }},
       {field: 'view',
       headerName: '' ,
@@ -77,7 +80,36 @@ export default function({curpos,keyNum,editPermissions}) {
       }},
       ]
 
-
+      const columnDefs_promotionD = [
+        {field: 'otherPos.PosName', headerName: 'Position' ,cellStyle: { 'textAlign': 'center' }},
+        {field: 'otherPos.title', headerName: 'Title' ,cellStyle: { 'textAlign': 'center' }},
+        {field: 'isPromote',
+        cellRenderer: CheckButton, 
+        headerName: 'Promote To',
+        cellStyle: { 'textAlign': 'center' },
+        cellRendererParams: {
+          clicked: function(field) {
+          },
+          edit_promotionNdemotion:edit_promotionNdemotion,
+          promotionFunction: true,
+          transitionOf: curpos,
+          isPromotion: true,
+        }
+      },
+        {field: 'isDemote',
+        cellRenderer: CheckButton, 
+        headerName: 'Demote To',
+        cellStyle: { 'textAlign': 'center' },
+        cellRendererParams: {
+          clicked: function(field) {
+          },
+          edit_promotionNdemotion:edit_promotionNdemotion,
+          promotionFunction: true,
+          transitionOf: curpos,
+          isPromotion: false,
+        }
+      },
+        ]
 
     const { thisFeaturePerms } = location.state
 
@@ -85,25 +117,49 @@ export default function({curpos,keyNum,editPermissions}) {
 
     },[])
 
-
+ 
    
 
     return (
         
-        <Accordion.Item eventKey={keyNum} >
-        <Accordion.Header ref={cardRef} >{curpos.PosName} </Accordion.Header>
-        <Accordion.Body>
-          <div>
-              <div className="ag-theme-alpine incident-grid">
-                  <AgGridReact
-                  ref={gridRef}
-                  columnDefs={columnDefs}
-                  defaultColDef={defaultColDef}
-                  rowData={userAccPermissions}
-                  >
-                  </AgGridReact>
-              </div>  
-          </div>
+        <Accordion.Item eventKey={keyNum} id ="positionCard">
+        <Accordion.Header ref={cardRef} id="positionCardHeader" >{curpos.PosName} </Accordion.Header>
+        <Accordion.Body id="positionCardBody">
+          <Accordion defaultActiveKey="0">
+            <Accordion.Item eventKey={0} >
+            <Accordion.Header  >Permissions </Accordion.Header>
+            <Accordion.Body>
+              <div>
+                <div className="ag-theme-alpine incident-grid" id = "permissionsDiv" >
+                    <AgGridReact
+                    ref={gridRef}
+                    columnDefs={columnDefs_permissions}
+                    defaultColDef={defaultColDef}
+                    rowData={curpos.permissions}
+                    >
+                    </AgGridReact>
+                </div>  
+            </div>
+            </Accordion.Body>
+           </Accordion.Item>
+           <Accordion.Item eventKey={1} >
+            <Accordion.Header  >Promotion Settings</Accordion.Header>
+            <Accordion.Body>
+              <div>
+                <div className="ag-theme-alpine incident-grid" id = "promotionsDiv">
+                    <AgGridReact
+                    ref={gridRef}
+                    columnDefs={columnDefs_promotionD}
+                    defaultColDef={defaultColDef}
+                    rowData={curpos.promotionD}
+                    >
+                    </AgGridReact>
+                </div>  
+              </div>
+            </Accordion.Body>
+           </Accordion.Item>
+          </Accordion>
+
 
         </Accordion.Body>
       </Accordion.Item>
