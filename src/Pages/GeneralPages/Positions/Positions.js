@@ -22,7 +22,6 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
 
     const [positionData, setPositionData] = useState({
         "id":"",
-        "OrgName":"",
         "PosName":"",
         "title":"",
         "availableNoPos":"",
@@ -68,6 +67,27 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
 
     async function addPositions(){
         console.log(positionData);
+        let response = await post(API_URL + "/addPosition",  {
+            token: localStorage.getItem("token"),
+            org: thisFeaturePerms.org,
+            PosName:positionData.PosName,
+            title:positionData.title,
+            availableNoPos:positionData.availableNoPos,
+
+        });
+        if(response.status == 200){
+            toast.success(response.message);
+        }else{
+            toast.warning(response.message);
+        }
+        handleadClose_posModal();
+        setPositionData({
+            "id":"",
+            "PosName":"",
+            "title":"",
+            "availableNoPos":"",
+        });
+        refresh();
     }
 
     async function deletePositions(positionID){
@@ -81,6 +101,10 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     
     async function edit_promotionNdemotion(transitionOf, transitionTo, isPromotion, updateValue ){
         // set_promotionsNdemotions
+        console.log(transitionOf)
+        console.log(transitionTo)
+        console.log(isPromotion)
+        console.log(updateValue)
         let response = await post(API_URL + "/set_promotionsNdemotions",  {
             token: localStorage.getItem("token"),
             org: thisFeaturePerms.org,
@@ -125,6 +149,7 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     function refresh(){
         autoLogin();
         getpositions();
+        console.log(thisFeaturePerms)
     }
 
     function showPositionCards(){
@@ -186,18 +211,16 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
             <Modal.Title>{isAdd?"Add Position":"Edit Position"}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form className="register-form-container p-5">
-                    <div className="register-form">
-                        <Form.Group className="mb-3" controlId="formBasicFirstName">
-                        <Form.Label className=" d-flex justify-content-start">Positions Name</Form.Label>
-                        <Form.Control type="text" placeholder="" name="PosName" onChange={(e) =>inputPasswordChangeHandler(e)}/>
-                        <Form.Label className=" d-flex justify-content-start">Confirm Password</Form.Label>
-                        <Form.Control type="text" placeholder="" name="title" onChange={(e) => inputPasswordChangeHandler(e)}/>
-                        <Form.Label className=" d-flex justify-content-start">Available Positions #</Form.Label>
-                        <Form.Control type="number" placeholder="" name="availableNoPos" onChange={(e) => inputPasswordChangeHandler(e)}/>
-                        </Form.Group>
-                    </div>
-                </Form>
+                <div className="register-form">
+                    <Form.Group className="mb-3" controlId="formBasicFirstName">
+                    <Form.Label className=" d-flex justify-content-start">Positions Name</Form.Label>
+                    <Form.Control type="text" placeholder="" name="PosName" onChange={(e) =>inputPasswordChangeHandler(e)}/>
+                    <Form.Label className=" d-flex justify-content-start">Title</Form.Label>
+                    <Form.Control type="text" placeholder="" name="title" onChange={(e) => inputPasswordChangeHandler(e)}/>
+                    <Form.Label className=" d-flex justify-content-start">Available Positions #</Form.Label>
+                    <Form.Control type="number" placeholder="" name="availableNoPos" onChange={(e) => inputPasswordChangeHandler(e)}/>
+                    </Form.Group>
+                </div>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="primary" onClick={()=>addPositions()}>Submit</Button>

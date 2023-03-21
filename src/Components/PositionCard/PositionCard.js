@@ -128,7 +128,7 @@ export default function({curpos,keyNum,editPermissions,edit_promotionNdemotion})
     return (
         
         <Accordion.Item eventKey={keyNum} id ="positionCard">
-        <Accordion.Header ref={cardRef} id="positionCardHeader" >{curpos.PosName} </Accordion.Header>
+        <Accordion.Header ref={cardRef} id="positionCardHeader" >{curpos.PosName ==curpos.title?<>{curpos.PosName}</>:<>{curpos.PosName+","+curpos.title}</>} </Accordion.Header>
         <Accordion.Body id="positionCardBody">
           <Accordion defaultActiveKey="0">
             <Accordion.Item eventKey={0} >

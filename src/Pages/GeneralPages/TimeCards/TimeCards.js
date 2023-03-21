@@ -183,7 +183,8 @@ function editTimeCard(timeCardID){
   }else{
       toast.warning(response.message)
   }
-  getAlltc()
+  getAlltc(atcPerm,allTCpreviousSearchData)
+  getReport();
   setTimeCardData({
     startDate:"",
     startTime:"00:00",
@@ -192,6 +193,7 @@ function editTimeCard(timeCardID){
     note:"",
     id:"",
   })
+  
 }
 
  async function deleteTimeCard(timeCardID){
@@ -203,7 +205,8 @@ function editTimeCard(timeCardID){
   }else{
     toast.warning(response.message)
   }
-  getAlltc()
+  getAlltc(atcPerm,allTCpreviousSearchData)
+  getReport();
  }
  const reportColumnDef = [
   {field: 'submitedDate', headerName: 'Submited Date' ,cellStyle: { 'textAlign': 'center' }, sortable: true},
@@ -281,6 +284,7 @@ function editTimeCard(timeCardID){
     }
     // console.log(pos)
     getAlltc(atcPerm,allTCpreviousSearchData)
+    getReport();
 
    }
 
@@ -424,7 +428,6 @@ const [allTCpreviousSearchData, allTCsetPreviousSearchData] = useState({
 function search(){
   // clearSearchFields()
   if(reportView){
-    console.log(reportSearchData)
     setPreviousReportSearchData(reportSearchData)
     getReport()
   }

@@ -96,6 +96,7 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
                         accessBol = false;
                     }
                     let curFeature = {
+                        id:perms[x].id,
                         org :perms[x].org,
                         access:accessBol,
                         title: perms[x].featureName, 
@@ -125,6 +126,7 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
                             accessBol = false;
                         }
                         let curFeature = {
+                            id:perms[x].id,
                             org :perms[x].org,
                             access:accessBol,
                             title: perms[x].featureName, 
