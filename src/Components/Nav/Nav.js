@@ -4,6 +4,7 @@ import { API_URL } from "../../Utils/API";
 import './Nav.css'
 import { useNavigate,useLocation } from "react-router-dom";
 import { BsHouse,BsHouseFill } from "react-icons/bs";
+import Logo from './Ithaca_College_logo.svg.png'
 
 import { ReactNode } from 'react';
 import {
@@ -70,7 +71,7 @@ return (
       <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
         <Box>  
             <div className="ithaca-logo-container" onClick={() => home()}>
-                <img src="https://www.planetforward.org/sites/default/files/styles/840-x-variable/public/154059_ithaca-college-logo-horizontal-for-ICpg.png?itok=AcYdum-L" alt="Ithaca-Logo"  className="img-fluid mx-auto d-block ithaca-logo"/>
+                <img src={Logo} alt="Ithaca-Logo"  className="img-fluid mx-auto d-block ithaca-logo"/>
             </div>
         </Box>
 
