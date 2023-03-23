@@ -567,6 +567,7 @@ function SaveAsCSV(){
         <div className="incident-page" >
              <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
              <ToastContainer />
+            <h1>{thisFeaturePerms.org}</h1>
             <h1>Time Cards</h1>
             <Form className="incident-form">
                 <Button variant="outline-dark" onClick={() =>showAndClear() }>Add Time Card</Button>
