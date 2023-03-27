@@ -10,9 +10,9 @@ export default function Exporter({gridRef, rowData, columnHeaders, keys}) {
 
     function SaveAsPDF() {
         const doc = new jsPDF({orientation: "landscape",});
-        let bodyData = []
+        var bodyData = []
         rowData.forEach((row) => {
-            let line = []
+            var line = []
             keys.map((key) => {
                 line.push(row[key])
             })
