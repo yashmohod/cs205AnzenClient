@@ -14,13 +14,21 @@ import EmployeeList from "../../../Components/EmployeeList/EmployeeList"
 import CommonButton from '../../../Components/Buttons/CommonButton'
 import Modal from 'react-bootstrap/Modal';
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
-import Dropdown from 'react-bootstrap/Dropdown';
+import { Dropdown } from 'rsuite';
 import Referals from "../Referals/Referals";
 import { GridApi } from "ag-grid-community";
 import { useLocation } from 'react-router-dom'
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable'
-
+import {
+    Stat,
+    StatLabel,
+    StatNumber,
+    StatHelpText,
+    StatArrow,
+    StatGroup,
+  } from '@chakra-ui/react'
+import Exporter from "../../../Components/Exporter/Exporter";
 
 export default function Records({autoLogin,fullVersion,reportID}) {
     const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Loc. Details\t", "Received Time\t", "Enroute Time\t", "Arrived Time\t", "Clear Time\t", "Reported By\t", "Summary\t"]
@@ -292,7 +300,9 @@ export default function Records({autoLogin,fullVersion,reportID}) {
 
     function SaveAsPDF() {
         const doc = new jsPDF({orientation: "landscape",});
-
+        // var img = new Image()
+        // img.src = 'https://www.aashe.org/wp-content/uploads/2020/09/IthacaCollege-Logo-web.png'
+        // doc.addImage(img, 'png', 10, 10, 200, 200)
         let bodyData = []
         rowData.forEach((row) => {
             let line = []
@@ -306,7 +316,7 @@ export default function Records({autoLogin,fullVersion,reportID}) {
            head: [columnHeaders],
            body: bodyData,
         })
-        doc.save("records-export.pdf");
+        doc.save("export.pdf");
     }
     // const [org,setOrg] = useState("")
     // const [pos,setPos]= useState("")
@@ -355,6 +365,8 @@ export default function Records({autoLogin,fullVersion,reportID}) {
              </>
              :null}
 
+             
+
             <h1>Records</h1>
             {fullVersion?
             <div className="container">
@@ -398,20 +410,36 @@ export default function Records({autoLogin,fullVersion,reportID}) {
                                 <Button variant="outline-primary" type="button" onClick={() => getReps(searchData)}>Search</Button>
                                 {/* <Button variant="outline-info" type="button" onClick={() => getAllReports()}>Search All</Button> */}
                                 </div>
-                                {(rowData.length > 0)? 
-                                <div className="row">
-                                    <Dropdown>
+                   
+                        
+                                    {/* <Dropdown>
                                         <Dropdown.Toggle variant="outline-black" id="dropdown-basic">
                                             Export File
                                         </Dropdown.Toggle>
 
                                         <Dropdown.Menu className="text-center">
-                                            <Dropdown.Item onClick={()=>SaveAsCSV()}>CSV <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="CSV" className="csv-logo"/></Dropdown.Item>
-                                            <Dropdown.Item onClick={() => SaveAsPDF()}>PDF <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" className="pdf-logo" alt=""/></Dropdown.Item>
+                                            <Dropdown.Item onClick={()=>SaveAsCSV()} style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                                            <div>
+                                                <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="CSV" className="csv-logo" width={30} height={30}/>
+                                            </div>
+                                            <div className="ms-2">
+                                                CSV 
+                                            </div>
+                                            
+                                            </Dropdown.Item>
+                                            <Dropdown.Item onClick={() => SaveAsPDF()} style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                                            <div>
+                                                <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" className="pdf-logo" alt="" width={30} height={30}/> 
+                                            </div>
+                                            <div className="ms-2">
+                                                PDF
+                                            </div>
+                                            </Dropdown.Item>
                                         </Dropdown.Menu>
-                                    </Dropdown> 
-                                </div>
-                                : null}
+                                    </Dropdown>  */}
+               
+                                   <Exporter {...{gridRef: gridRef, columnHeaders: columnHeaders, rowData: rowData, keys: keys}}/>
+                  
                             </div>
                             
                         </div>
@@ -420,7 +448,9 @@ export default function Records({autoLogin,fullVersion,reportID}) {
             </div>:null}
 
        
-        
+            <Stat>
+                <StatLabel>Results   <StatNumber>{rowData.length}</StatNumber></StatLabel>
+            </Stat>                        
             <div className="ag-theme-alpine incident-grid">
         
               <AgGridReact

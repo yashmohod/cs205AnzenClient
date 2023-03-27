@@ -22,6 +22,7 @@ import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable'
 import { useLocation } from 'react-router-dom'
 import { isDisabled } from "@testing-library/user-event/dist/utils";
+import Exporter from "../../../Components/Exporter/Exporter";
 
 export default function Referals({autoLogin, fullVersion,reportID}) {
     const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Judical Referral\t", "First Name\t", "Last Name\t", "Middle Initial\t", "ICID\t", "DoB\t", "Address\t", "Phone No\t"]
@@ -526,18 +527,11 @@ export default function Referals({autoLogin, fullVersion,reportID}) {
                                 </div>
                                 </div>
                                 <div className="col">
-                                {(rowData.length > 0)? 
-                                    <Dropdown>
-                                        <Dropdown.Toggle variant="outline-black" id="dropdown-basic">
-                                            Export File
-                                        </Dropdown.Toggle>
-
-                                        <Dropdown.Menu className="text-center">
-                                            <Dropdown.Item onClick={()=>SaveAsCSV()}>CSV <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="CSV" className="csv-logo"/></Dropdown.Item>
-                                            <Dropdown.Item onClick={() => SaveAsPDF()}>PDF <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" className="pdf-logo" alt=""/></Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown> 
-                                : null}
+                                <Exporter {...{
+                                  gridRef: gridRef, 
+                                  columnHeaders: columnHeaders, 
+                                  rowData: rowData, 
+                                  keys: keys}}/>
                                 </div>
                             </div>
                             
@@ -630,6 +624,7 @@ export default function Referals({autoLogin, fullVersion,reportID}) {
                   <Form.Label className=" d-flex justify-content-start">Summary</Form.Label>
                   <Form.Control as="textarea" placeholder="" value={formData.summary} name="summary" onChange={(e) => reportInputChangeHandler(e)}/>
                   </div>
+                  
                 </Form>
               </Modal.Body>
               <Modal.Footer>
