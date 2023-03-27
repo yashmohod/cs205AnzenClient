@@ -126,8 +126,6 @@ export default function Location({autoLogin}) {
                 </div>
             </div>
           
-
-       
         
             <div className="ag-theme-alpine location-grid">
                 
@@ -136,7 +134,9 @@ export default function Location({autoLogin}) {
 					columnDefs={columnDefs}
 					rowData={rowData}>
 				</AgGridReact>
+        
 			</div>
+
            
         </div>
     )

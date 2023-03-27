@@ -20,6 +20,7 @@ import Tabs from 'react-bootstrap/Tabs';
 import Accordion from 'react-bootstrap/Accordion';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useLocation } from 'react-router-dom'
+import Exporter from "../../../Components/Exporter/Exporter";
 
 export default function TimeCards({autoLogin}) {
    
@@ -623,20 +624,18 @@ function SaveAsCSV(){
                                 <Button variant="outline-primary" type="button" onClick={() =>search()}>Search</Button>
                                 {/* <Button variant="outline-info" type="button" onClick={() => getAllReports()}>Search All</Button> */}
                                 </div>
-                                {(allTC.length > 0)? 
-                                <div className="row">
-                                    <Dropdown>
-                                        <Dropdown.Toggle variant="outline-black" id="dropdown-basic">
-                                            Export File
-                                        </Dropdown.Toggle>
-
-                                        <Dropdown.Menu className="text-center">
-                                            <Dropdown.Item onClick={()=>SaveAsCSV()}>CSV <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="CSV" className="csv-logo"/></Dropdown.Item>
-                                            <Dropdown.Item >PDF <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" className="pdf-logo" alt=""/></Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown> 
-                                </div>
-                                : null}
+                              {!ISadminTCsearch ?
+                                <Exporter {...{
+                                  gridRef: myTCgridRef, 
+                                  columnHeaders: ["Submitted Date\t", "Start\t", "End\t",  "Duration\t", "Status\t", "Note\t", "Shift Type\t"], 
+                                  rowData: myTC, 
+                                  keys: ["submitedDate", "start", "end", "duration", "approval", "note", "shiftName"]}}/>:
+                                <Exporter {...{
+                                  gridRef: allTCgridRef, 
+                                  columnHeaders: ["Employee\t", "Submitted Date", "Start\t", "End\t",  "Duration\t", "Status\t", "Note\t", "Shift Type\t"], 
+                                  rowData: allTC, 
+                                  keys: ["whoName", "submitedDate", "start", "end", "duration", "approval", "note", "shiftName"]}}/>
+                              }       
                             </div>
                         </div>
                       </div>

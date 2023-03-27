@@ -66,7 +66,7 @@ export default function Nav({setLoggedIn, loggedInUser}) {
 const { isOpen, onOpen, onClose } = useDisclosure();
 
 return (
-  <>
+  <div style={{position: "relative", zIndex: 9999999, width: "100vw"}}>
     <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4} mb={10}>
       <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
         <Box>  
@@ -93,7 +93,7 @@ return (
                   src={'https://shop.line-scdn.net/themeshop/v1/products/32/6e/3a/326e3a9d-92a9-4299-b762-608ce00a577d/89/WEBSTORE/icon_198x278.png'}
                 />
               </MenuButton>
-              <MenuList alignItems={'center'}>
+              <MenuList alignItems={'center'} >
                 <br />
                 <Center>
                   <Avatar
@@ -124,7 +124,7 @@ return (
         </Flex>
       </Flex>
     </Box>
-  </>
+  </div>
 );
 }
 

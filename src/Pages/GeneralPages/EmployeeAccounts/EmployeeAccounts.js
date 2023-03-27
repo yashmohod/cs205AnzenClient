@@ -20,7 +20,7 @@ import MobileEmpCard from '../../../Components/EmpCards/MobileEmpCard';
 import UserProfile from "../../../Components/UserProfile/UserProfile";
 // import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-
+import Exporter from "../../../Components/Exporter/Exporter";
 
 export default function EmployeeAccounts({autoLogin}) {
     const [accounts, setAccounts] = useState([])
@@ -297,6 +297,11 @@ export default function EmployeeAccounts({autoLogin}) {
                                 <Button variant="outline-primary" type="button" onClick={() => search()}>Search</Button>
 
                                 </div>
+                                <Exporter {...{
+                                  gridRef: gridRef, 
+                                  columnHeaders: ["Position\t", "Status\t", "Last Name\t", "First Name\t", "DOB\t", "IC ID\t", "Email\t"], 
+                                  rowData: rowData, 
+                                  keys: ["position", "status", "lastName", "firstName", "dob", "collegeId", "email"]}}/>
                                 {/* {(allTC.length > 0)? 
                                 <div className="row">
                                     <Dropdown>
