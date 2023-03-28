@@ -13,7 +13,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import {AgGridReact} from 'ag-grid-react';
 
 
-export default function UserPersonalProfile({setLoggedIn, loggedInUser, autoLogin }) {
+export default function UserPersonalProfile({autoLogin }) {
     const navigate = useNavigate();
     const [userDetails,setUserDetails] = useState(true);
     const [settings,setSettings] = useState(false);
@@ -163,7 +163,6 @@ const personalProfileAccess = true;
 
 
     return (<>
-    <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
     <ToastContainer />
     <div className="container" id="container">
 

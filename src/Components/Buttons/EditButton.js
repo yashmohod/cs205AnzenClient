@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button} from 'react-bootstrap'
+import Button from 'rsuite/Button';
 
 export default class EditButton extends Component {
    
@@ -12,7 +12,9 @@ export default class EditButton extends Component {
     }
     render() {
       return (
-        <Button variant="outline-success" onClick={this.btnClickedHandler} className="p-1">Edit</Button>
+        <Button color="green" appearance="primary" onClick={this.btnClickedHandler} className="p-1">
+          <img src="https://cdn-icons-png.flaticon.com/512/2921/2921222.png" width={30} height={30}/>
+        </Button>
       )
     }
   }
