@@ -14,7 +14,7 @@ import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import { ToastContainer, toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom'
 
-export default function Incidents({setLoggedIn, loggedInUser, autoLogin}) {
+export default function Incidents({autoLogin}) {
     const [incident, setIncident] = useState("")
     const gridRef = useRef();
     const [rowData, setRowData] = useState();
@@ -122,7 +122,6 @@ const { thisFeaturePerms } = location.state
 
     return (
         <div className="incident-page">
-             <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
              <ToastContainer />
             <h1>Incidents</h1>
             {thisFeaturePerms.create?<>

@@ -16,8 +16,7 @@ import { useLocation } from 'react-router-dom'
 
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 
-export default function Daily({setLoggedIn, loggedInUser, autoLogin}) {
-  <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
+export default function Daily({autoLogin}) {
   const navigate = useNavigate();
   const [referals,setreferals]=useState([]);
   const [referalData, setreferalData] = useState([]);
@@ -118,7 +117,6 @@ useEffect(() =>
     return (
     <div>
         <ToastContainer />
-        <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
 
         <Tabs>
   <TabList isFitted>

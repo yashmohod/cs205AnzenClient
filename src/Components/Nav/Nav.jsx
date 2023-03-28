@@ -4,6 +4,7 @@ import { API_URL } from "../../Utils/API";
 import './Nav.css'
 import { useNavigate,useLocation } from "react-router-dom";
 import { BsHouse,BsHouseFill } from "react-icons/bs";
+import Logo from './Ithaca_College_logo.svg.png'
 
 import { ReactNode } from 'react';
 import {
@@ -30,6 +31,7 @@ export default function Nav({setLoggedIn, loggedInUser}) {
     const location = useLocation();
     const [showmore,setshowmore] = useState(false)
     const [darkHome,setDarkHome] = useState(false)
+    
     function home() {
         navigate("/")
         console.log(location.pathname)
@@ -64,12 +66,12 @@ export default function Nav({setLoggedIn, loggedInUser}) {
 const { isOpen, onOpen, onClose } = useDisclosure();
 
 return (
-  <>
+  <div style={{position: "relative", zIndex: 9999999, width: "100vw"}}>
     <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4} mb={10}>
       <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
         <Box>  
-            <div className="ithaca-logo-container" >
-                <img src="https://www.planetforward.org/sites/default/files/styles/840-x-variable/public/154059_ithaca-college-logo-horizontal-for-ICpg.png?itok=AcYdum-L" alt="Ithaca-Logo"  className="img-fluid mx-auto d-block ithaca-logo"/>
+            <div className="ithaca-logo-container" onClick={() => home()}>
+                <img src={Logo} alt="Ithaca-Logo"  className="img-fluid mx-auto d-block ithaca-logo"/>
             </div>
         </Box>
 
@@ -91,7 +93,7 @@ return (
                   src={'https://shop.line-scdn.net/themeshop/v1/products/32/6e/3a/326e3a9d-92a9-4299-b762-608ce00a577d/89/WEBSTORE/icon_198x278.png'}
                 />
               </MenuButton>
-              <MenuList alignItems={'center'}>
+              <MenuList alignItems={'center'} >
                 <br />
                 <Center>
                   <Avatar
@@ -122,7 +124,7 @@ return (
         </Flex>
       </Flex>
     </Box>
-  </>
+  </div>
 );
 }
 

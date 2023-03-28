@@ -9,16 +9,26 @@ import { PublicClientApplication } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
 import { msalConfig } from "./sso/authConfig";
 
+import { store } from './redux/store.js'
+import { Provider } from 'react-redux'
+
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const msalInstance = new PublicClientApplication(msalConfig);
 root.render(
-  <ChakraProvider>
-      <BrowserRouter>
-        <MsalProvider instance={msalInstance}>
+
+ 
+    <ChakraProvider>
+        <BrowserRouter>
+          <Provider store={store}>
+          <MsalProvider instance={msalInstance}>
             <App />
         </MsalProvider>
-      </BrowserRouter>,
-  </ChakraProvider>
+          </Provider>
+        </BrowserRouter>,
+    </ChakraProvider>
+
+
 );
 
 // If you want to start measuring performance in your app, pass a function
