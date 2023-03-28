@@ -173,7 +173,7 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
             dob: response.accountDetails.dob,
             email: response.accountDetails.email,
         }
-        // console.log(typeof temp.collegeId )
+        console.log(response)
         setFormData(temp)
         setoNp(response.orgNpos)
     }

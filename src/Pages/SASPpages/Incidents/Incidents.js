@@ -12,31 +12,14 @@ import { API_URL, get, post } from "../../../Utils/API";
 import EditButton from '../../../Components/Buttons/EditButton'
 import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import { ToastContainer, toast } from 'react-toastify';
+import { useLocation } from 'react-router-dom'
 
 export default function Incidents({setLoggedIn, loggedInUser, autoLogin}) {
     const [incident, setIncident] = useState("")
     const gridRef = useRef();
     const [rowData, setRowData] = useState();
 
-    const columnDefs = [
-        {field: 'incidentName'},
-        {field: 'id', 
-        headerName: '' ,
-        cellRenderer: EditButton, 
-        cellRendererParams: {
-          clicked: function(field) {
-            editIncidentHandler(field);
-          }
-        }},
-        {field: 'id',
-        headerName: '' ,
-        cellRenderer: DeleteButton, 
-        cellRendererParams: {
-          clicked: function(field) {
-            deleteIncidentHandler(field)
-          }
-        }}
-        ]
+    const [columnDefs,setColumnDef] = useState([]);
 
     function incidentChangeHandler(e) {
         setIncident(e.target.value)
@@ -86,8 +69,39 @@ export default function Incidents({setLoggedIn, loggedInUser, autoLogin}) {
         let response = await get(API_URL + "/getIncidents?token=" +  localStorage.getItem("token"))
         response = JSON.parse(response.incidents)
         setRowData(response)
+
+        
+        let editPerm  = {field: 'id', 
+                    headerName: '' ,
+                    cellRenderer: EditButton, 
+                    cellRendererParams: {
+                        clicked: function(field) {
+                        editIncidentHandler(field);
+                        }
+                    }}
+        
+        let deletePerm  ={field: 'id',
+        headerName: '' ,
+        cellRenderer: DeleteButton, 
+        cellRendererParams: {
+          clicked: function(field) {
+            deleteIncidentHandler(field)
+          }
+        }}
+        let temp =[{field: 'incidentName'}]
+        
+        if(thisFeaturePerms.edit){
+            temp.push(editPerm);
+        }
+        if(thisFeaturePerms.delete){
+            temp.push(deletePerm);
+        }
+        setColumnDef(temp);
+
         return response
     }
+const location = useLocation()
+const { thisFeaturePerms } = location.state
 
     useEffect(() => {
         autoLogin()
@@ -111,17 +125,22 @@ export default function Incidents({setLoggedIn, loggedInUser, autoLogin}) {
              <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
              <ToastContainer />
             <h1>Incidents</h1>
-            
-            <div className="container-fluid m-5">
-                <div className="row">
-                    <div className="col-12">
-                        <Form className="location-form">
-                            <Form.Control type="text" placeholder="Enter new incident" onChange={(e) => incidentChangeHandler(e)}  id="locationInput"/>
-                            <Button onClick={() => addIncidentHandler()}>Add</Button>
-                        </Form>
+            {thisFeaturePerms.create?<>
+                        <div className="container-fluid m-5">
+                        <div className="row">
+                            <div className="col-12">
+                                <Form className="location-form">
+                                    <Form.Control type="text" placeholder="Enter new incident" onChange={(e) => incidentChangeHandler(e)}  id="locationInput"/>
+                                    <Button onClick={() => addIncidentHandler()}>Add</Button>
+                                </Form>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                  </>:
+                  <div>
+
+                  </div>}
+            
 
             <div className="ag-theme-alpine incident-grid">
 				<AgGridReact
