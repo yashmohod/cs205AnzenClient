@@ -24,4 +24,5 @@ a:hover {
 
 .ag-theme-alpine {
   --ag-font-family: 'Poppins', sans-serif;
+  --ag-font-size: 10px;
 }

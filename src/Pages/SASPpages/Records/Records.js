@@ -29,10 +29,11 @@ import {
     StatGroup,
   } from '@chakra-ui/react'
 import Exporter from "../../../Components/Exporter/Exporter";
+import { defineColumns } from "../../../Utils/AG-Grid";
 
 export default function Records({autoLogin,fullVersion,reportID}) {
     const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Loc. Details\t", "Received Time\t", "Enroute Time\t", "Arrived Time\t", "Clear Time\t", "Reported By\t", "Summary\t"]
-    const keys = ["date", "incident", "location", "locationDetail", "receivedTime", "enrouteTime", "arivedTime", "clearTime", "reportedByName", "summary"]
+    const columnKeys = ["date", "incident", "location", "locationDetail", "receivedTime", "enrouteTime", "arivedTime", "clearTime", "reportedByName", "summary"]
     // edit records 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -42,10 +43,8 @@ export default function Records({autoLogin,fullVersion,reportID}) {
     const handleCloseref = () => setShowref(false);
     const handleShowref = () => setShowref(true);
 
-    const gridRef = useRef(null); // Optional - for accessing Grid's API
-    const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
-
-    // Each Column Definition results in one Column.
+    const gridRef = useRef(null);
+    const [rowData, setRowData] = useState([]);
     const[columnDefs,setColumnDefs]= useState([])
 
     const [formData, setFormData] = useState({
@@ -202,21 +201,12 @@ export default function Records({autoLogin,fullVersion,reportID}) {
         dateFromChooser.current.value=""
     }
 
-    const [miniverFeatures, setminiverFeatures] = useState([
-    {field: 'date',headerName:'Date'},
-    {field: 'incident',headerName:'Incident'},
-    {field: 'location',headerName:'Location'},
-    {field: 'locationDetail',headerName:'Loc. Details'},
-    {field: 'receivedTime',headerName:'Recived Time'},
-    {field: 'enrouteTime',headerName:'Enroute Time'},
-    {field: 'arivedTime',headerName:'Arrived Time'},
-    {field: 'clearTime',headerName:'Clear Time'},
-    {field: 'reportedByName',headerName:'Reported By'},
-    {field: 'summary',headerName:'Summary'},
+    const {loadedColumnDefs : miniverFeatures}  = useCallback(defineColumns({
+        columnKeys: columnKeys,
+        columnHeaders: columnHeaders
+    }))
 
-    ])
-
-    const [fullverFeatures, setfullverFeatures] = useState([
+    const fullverFeatures = [
         {field: 'id', 
     headerName: '' ,
     cellRenderer: CommonButton, 
@@ -227,7 +217,7 @@ export default function Records({autoLogin,fullVersion,reportID}) {
       buttonText: "View Referals",
       variant:"outline-dark",
     }},
-    ])
+    ]
 
     const [Edit_column, setEdit_columns] = useState(
     {field: 'id', 
@@ -289,35 +279,6 @@ export default function Records({autoLogin,fullVersion,reportID}) {
     }
 
 
-    // DefaultColDef sets props common to all Columns
-    const defaultColDef = useMemo( ()=> ({
-        sortable: true
-    }));
-
-    function SaveAsCSV() {
-        gridRef.current.api.exportDataAsCsv()
-    }
-
-    function SaveAsPDF() {
-        const doc = new jsPDF({orientation: "landscape",});
-        // var img = new Image()
-        // img.src = 'https://www.aashe.org/wp-content/uploads/2020/09/IthacaCollege-Logo-web.png'
-        // doc.addImage(img, 'png', 10, 10, 200, 200)
-        let bodyData = []
-        rowData.forEach((row) => {
-            let line = []
-            keys.map((key) => {
-                line.push(row[key])
-            })
-            bodyData.push(line)
-        })
-
-        autoTable(doc, {
-           head: [columnHeaders],
-           body: bodyData,
-        })
-        doc.save("export.pdf");
-    }
     // const [org,setOrg] = useState("")
     // const [pos,setPos]= useState("")
 
@@ -438,7 +399,7 @@ export default function Records({autoLogin,fullVersion,reportID}) {
                                         </Dropdown.Menu>
                                     </Dropdown>  */}
                
-                                   <Exporter {...{gridRef: gridRef, columnHeaders: columnHeaders, rowData: rowData, keys: keys}}/>
+                                   <Exporter {...{gridRef: gridRef, columnHeaders: columnHeaders, rowData: rowData, keys: columnKeys}}/>
                   
                             </div>
                             
@@ -456,7 +417,7 @@ export default function Records({autoLogin,fullVersion,reportID}) {
               <AgGridReact
                 ref={gridRef}
                 columnDefs={columnDefs}
-                defaultColDef={defaultColDef}
+                defaultColDef={{sortable: true}}
                 rowData={rowData}
                 >
               </AgGridReact>

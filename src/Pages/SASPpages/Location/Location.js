@@ -1,25 +1,23 @@
-import React, {Component, useEffect, useRef, useState,useMemo } from "react";
-import Nav from "../../../Components/Nav/Nav";
+import React, {useCallback, useEffect, useRef, useState,useMemo } from "react";
 import './Location.css'
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-alpine.css';
-import { API_URL, get, post } from '../../../Utils/API';
+import { API_URL, get, post } from '../../../Utils/API.js';
 import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import EditButton from '../../../Components/Buttons/EditButton'
 import { Button, Form } from "react-bootstrap";
 import { ToastContainer, toast } from 'react-toastify';
+import { defineColumns } from "../../../Utils/AG-Grid.js";
+import useFetch from "../../../hooks/useFetch";
 
 export default function Location({autoLogin}) {
-
+    const fetcher = useFetch()
     const [Location, setLocation] = useState("")
     let tempLocation
-    function locationChangeHandler(e) {
-        setLocation(e.target.value);
-      }
 
     async function addLocationHandler(e){
-        let response = await post(API_URL + "/enterLocation",  {location: Location,token: localStorage.getItem("token")});
+        let response = await fetcher.POST("/enterLocation",  {location: Location,token: localStorage.getItem("token")});
         if(Location != ""){
             if (response.message =="New location was successfully entered."){
                 document.getElementById("locationInput").value = "";
@@ -32,11 +30,10 @@ export default function Location({autoLogin}) {
         }else{
             toast.warning("Empty incident was entered!")
         }
-
-        
     }
+
     async function deleteLocationHandler(locationId){
-        let response = await post(API_URL + "/deleteLocation",  {id :locationId ,token: localStorage.getItem("token")});
+        let response = await fetcher.POST("/deleteLocation",  {id :locationId ,token: localStorage.getItem("token")});
         console.log(response);
         getLocations();
     }
@@ -53,63 +50,69 @@ export default function Location({autoLogin}) {
             await post(API_URL + "/editLocation",  {id :locationId ,editedLocation:locationame,token: localStorage.getItem("token")});
             getLocations();
         }
-
-        
     }
 
-
     async function getLocations(){
-        let response = await get(API_URL + "/getLocations?token=" +  localStorage.getItem("token"));
+        let response = await fetcher.GET("/getLocations?token=" +  localStorage.getItem("token"));
         response = JSON.parse(response.locations)
         setRowData(response);
-        console.log(response)
         return response
     }
 
-
-
-
-    const gridRef = useRef(); // Optional - for accessing Grid's API
+    const gridRef = useRef(null); // Optional - for accessing Grid's API
     const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
-
-    // Each Column Definition results in one Column.
-  
-    const [columnDefs, setColumnDefs] = useState([
-    {field: 'locationName'},
-    {field: 'id', 
-    headerName: '' ,
-    cellRenderer: EditButton, 
-    cellRendererParams: {
-      clicked: function(field) {
-        editLocationHandler(field);
-
-        
-      }
+    const extraColumns = useCallback([
+    {
+        field: 'id', 
+        headerName: '' ,
+        cellRenderer: EditButton, 
+        cellRendererParams: {
+        clicked: function(field) {
+            editLocationHandler(field);
+        }
     }},
-    {field: 'id',
-    headerName: '' ,
-    cellRenderer: DeleteButton, 
-    cellRendererParams: {
-      clicked: function(field) {
-        deleteLocationHandler(field)
+    {
+        field: 'id',
+        headerName: '' ,
+        cellRenderer: DeleteButton, 
+        cellRendererParams: {
+        clicked: function(field) {
+            deleteLocationHandler(field)
+        }
+    }}])
+    const {loadedColumnDefs} = useCallback(defineColumns(
+        {
+            columnKeys: ["locationName"],
+            columnHeaders: ["Location"],
+            extraColumns: extraColumns
+        }))
+  
+    const [columnDefs, setColumnDefs] = useState(loadedColumnDefs);
+
+    // useEffect(() => {
+    //     if (gridRef !== null) {
+    //         // gridRef.current.api.sizeColumnsToFit()
+    //         console.log(gridRef.current.api)
+    //     }
+    // })
+    const [gridApi, setGridApi] = useState(null);
+    const [gridColumnApi, setGridColumnApi] = useState(null);
+
+    const onGridReady = (params) => {
+      setGridApi(params.api);
+      setGridColumnApi(params.columnApi);
+    };
+  
+    useEffect(() => {
+      if (gridApi && gridColumnApi) {
+        gridColumnApi.autoSizeColumns();
       }
-    }}
-    ]);
-
-    // DefaultColDef sets props common to all Columns
-    const defaultColDef = useMemo( ()=> ({
-        sortable: true
-    }));
-
-
-
-
+    }, [gridApi, gridColumnApi, rowData]);
 
     useEffect(() => {
         autoLogin();
         getLocations();
     }, [])
-
 
     return (
         <div className="location-page">
@@ -119,7 +122,7 @@ export default function Location({autoLogin}) {
                 <div className="row">
                     <div className="col-12">
                         <Form className="location-form">
-                            <Form.Control type="text" placeholder="Enter new location" onChange={(e) => locationChangeHandler(e)}  id="locationInput"/>
+                            <Form.Control type="text" placeholder="Enter new location" onChange={(e) =>  setLocation(e.target.value)}  id="locationInput"/>
                             <Button onClick={() => addLocationHandler()}>Add</Button>
                         </Form>
                     </div>
@@ -128,16 +131,13 @@ export default function Location({autoLogin}) {
           
         
             <div className="ag-theme-alpine location-grid">
-                
 				<AgGridReact
                     ref={gridRef}
 					columnDefs={columnDefs}
-					rowData={rowData}>
+					rowData={rowData}
+                    onGridReady={onGridReady}>
 				</AgGridReact>
-        
 			</div>
-
-           
         </div>
     )
 }
