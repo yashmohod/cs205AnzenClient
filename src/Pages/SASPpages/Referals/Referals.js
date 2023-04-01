@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useRef, useState,useMemo } from "react";
-import Nav from "../../../Components/Nav/Nav";
 import './Referals.css'
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
@@ -18,15 +17,13 @@ import Modal from 'react-bootstrap/Modal';
 import Records from "../Records/Records";
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 import SaspReferal from "../../../Components/SaspReferal/SaspReferal"
-import { jsPDF } from "jspdf";
-import autoTable from 'jspdf-autotable'
 import { useLocation } from 'react-router-dom'
-import { isDisabled } from "@testing-library/user-event/dist/utils";
 import Exporter from "../../../Components/Exporter/Exporter";
+import { defineColumns } from "../../../Utils/AG-Grid";
 
 export default function Referals({autoLogin, fullVersion,reportID}) {
     const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Judical Referral\t", "First Name\t", "Last Name\t", "Middle Initial\t", "ICID\t", "DoB\t", "Address\t", "Phone No\t"]
-    const keys = ["date", "incident", "location", "judicialReferal", "firstName", "lastName", "middleInitial", "ICID", "dob", "address", "phoneNo"]
+    const columnKeys = ["date", "incident", "location", "judicialReferal", "firstName", "lastName", "middleInitial", "ICID", "dob", "address", "phoneNo"]
 
     const [Referals, setReferals] = useState("")
     const [searchData, setSearchData] = useState({
@@ -239,56 +236,19 @@ export default function Referals({autoLogin, fullVersion,reportID}) {
         }
     }
 
-    function SaveAsCSV(){
-        gridRef.current.api.exportDataAsCsv()
-    }
-
-    function SaveAsPDF() {
-        const doc = new jsPDF({orientation: "landscape",});
-        console.log(rowData)
-        let bodyData = []
-        rowData.forEach((row) => {
-            let line = []
-            keys.map((key) => {
-                line.push(row[key])
-            })
-            bodyData.push(line)
-        })
-
-        autoTable(doc, {
-           head: [columnHeaders],
-           body: bodyData,
-        })
-        doc.save("referrals-export.pdf");
-    }
-
     function searchInputHandeler(e){
         setSearchData({...searchData,  [e.target.name] : e.target.value})
     }
 
-
-
-
-
     const gridRef = useRef(); // Optional - for accessing Grid's API
     const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
 
-    // Each Column Definition results in one Column.
     const[columnDefs,setColumnDefs]= useState([])
+    const {loadedColumnDefs : miniverFeatures}=useCallback(defineColumns({
+        columnKeys: columnKeys,
+        columnHeaders: columnHeaders
+    }))
 
-    const [miniverFeatures,setMiniverFeatures]=useState([
-        {field: 'date'},
-        {field: 'incident'},
-        {field: 'location'},
-        {field: 'judicialReferal'},
-        {field: 'firstName'},
-        {field: 'lastName'},
-        {field: 'middleInitial'},
-        {field: 'ICID'},
-        {field: 'dob'},
-        {field: 'address'},
-        {field: 'phoneNo'},
-    ])
     const [fullverFeatures,setFullverFeatures]=useState([
         {field: 'reportID', 
     headerName: '' ,
@@ -531,7 +491,7 @@ export default function Referals({autoLogin, fullVersion,reportID}) {
                                   gridRef: gridRef, 
                                   columnHeaders: columnHeaders, 
                                   rowData: rowData, 
-                                  keys: keys}}/>
+                                  keys: columnKeys}}/>
                                 </div>
                             </div>
                             

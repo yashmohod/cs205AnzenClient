@@ -9,14 +9,15 @@ import EditButton from '../../../Components/Buttons/EditButton'
 import { Button, Form } from "react-bootstrap";
 import { ToastContainer, toast } from 'react-toastify';
 import { defineColumns } from "../../../Utils/AG-Grid.js";
+import useFetch from "../../../hooks/useFetch";
 
 export default function Location({autoLogin}) {
-
+    const fetcher = useFetch()
     const [Location, setLocation] = useState("")
     let tempLocation
 
     async function addLocationHandler(e){
-        let response = await post(API_URL + "/enterLocation",  {location: Location,token: localStorage.getItem("token")});
+        let response = await fetcher.POST("/enterLocation",  {location: Location,token: localStorage.getItem("token")});
         if(Location != ""){
             if (response.message =="New location was successfully entered."){
                 document.getElementById("locationInput").value = "";
@@ -30,9 +31,9 @@ export default function Location({autoLogin}) {
             toast.warning("Empty incident was entered!")
         }
     }
-    
+
     async function deleteLocationHandler(locationId){
-        let response = await post(API_URL + "/deleteLocation",  {id :locationId ,token: localStorage.getItem("token")});
+        let response = await fetcher.POST("/deleteLocation",  {id :locationId ,token: localStorage.getItem("token")});
         console.log(response);
         getLocations();
     }
@@ -52,7 +53,7 @@ export default function Location({autoLogin}) {
     }
 
     async function getLocations(){
-        let response = await get(API_URL + "/getLocations?token=" +  localStorage.getItem("token"));
+        let response = await fetcher.GET("/getLocations?token=" +  localStorage.getItem("token"));
         response = JSON.parse(response.locations)
         setRowData(response);
         return response
