@@ -1,9 +1,7 @@
 import React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback} from "react";
 import './Incidents.css'
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Nav from "../../../Components/Nav/Nav";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-alpine.css';
@@ -13,22 +11,23 @@ import EditButton from '../../../Components/Buttons/EditButton'
 import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import { ToastContainer, toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom'
+import { defineColumns } from "../../../Utils/AG-Grid.js";
 
 export default function Incidents({autoLogin}) {
     const [incident, setIncident] = useState("")
+    
     const gridRef = useRef();
     const [rowData, setRowData] = useState();
-
+ 
+    const {loadedColumnDefs} = defineColumns({
+        columnKeys: ["incidentName"],
+        columnHeaders: ["Location"]
+    })
     const [columnDefs,setColumnDef] = useState([]);
-
-    function incidentChangeHandler(e) {
-        setIncident(e.target.value)
-        console.log(e.target.value)
-    }
-
+  
     async function editIncidentHandler(incidentId) {
         let tempIncidents = await getIncidents()
-        console.log(tempIncidents)
+        // console.log(tempIncidents)
         let incidentName = "";
         for(let x =0; x <tempIncidents.length; x++){
             if(tempIncidents[x].id == incidentId){
@@ -44,7 +43,7 @@ export default function Incidents({autoLogin}) {
 
     async function deleteIncidentHandler(incidentId) {
         let response = await post(API_URL + "/deleteIncident",  {id : incidentId, token: localStorage.getItem("token")});
-        console.log(response);
+        // console.log(response);
         getIncidents();
     }
 
@@ -69,9 +68,8 @@ export default function Incidents({autoLogin}) {
         let response = await get(API_URL + "/getIncidents?token=" +  localStorage.getItem("token"))
         response = JSON.parse(response.incidents)
         setRowData(response)
-
-        
-        let editPerm  = {field: 'id', 
+         
+        var editPerm  = {field: 'id', 
                     headerName: '' ,
                     cellRenderer: EditButton, 
                     cellRendererParams: {
@@ -80,7 +78,7 @@ export default function Incidents({autoLogin}) {
                         }
                     }}
         
-        let deletePerm  ={field: 'id',
+        var deletePerm  ={field: 'id',
         headerName: '' ,
         cellRenderer: DeleteButton, 
         cellRendererParams: {
@@ -88,7 +86,7 @@ export default function Incidents({autoLogin}) {
             deleteIncidentHandler(field)
           }
         }}
-        let temp =[{field: 'incidentName'}]
+        var temp = loadedColumnDefs
         
         if(thisFeaturePerms.edit){
             temp.push(editPerm);
@@ -96,12 +94,13 @@ export default function Incidents({autoLogin}) {
         if(thisFeaturePerms.delete){
             temp.push(deletePerm);
         }
-        setColumnDef(temp);
 
+        setColumnDef(temp);
         return response
     }
-const location = useLocation()
-const { thisFeaturePerms } = location.state
+
+    const location = useLocation()
+    const {thisFeaturePerms} = location.state
 
     useEffect(() => {
         autoLogin()
@@ -124,23 +123,19 @@ const { thisFeaturePerms } = location.state
         <div className="incident-page">
              <ToastContainer />
             <h1>Incidents</h1>
-            {thisFeaturePerms.create?<>
+            {thisFeaturePerms.create &&
                         <div className="container-fluid m-5">
                         <div className="row">
                             <div className="col-12">
                                 <Form className="location-form">
-                                    <Form.Control type="text" placeholder="Enter new incident" onChange={(e) => incidentChangeHandler(e)}  id="locationInput"/>
+                                    <Form.Control type="text" placeholder="Enter new incident" onChange={(e) => setIncident(e.target.value)}  id="locationInput"/>
                                     <Button onClick={() => addIncidentHandler()}>Add</Button>
                                 </Form>
                             </div>
                         </div>
                     </div>
-                  </>:
-                  <div>
-
-                  </div>}
+            }
             
-
             <div className="ag-theme-alpine incident-grid">
 				<AgGridReact
                     ref={gridRef}

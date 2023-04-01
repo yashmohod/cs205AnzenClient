@@ -44,7 +44,7 @@ export default function Records({autoLogin,fullVersion,reportID}) {
 
     const gridRef = useRef(null); // Optional - for accessing Grid's API
     const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
-
+    
     // Each Column Definition results in one Column.
     const[columnDefs,setColumnDefs]= useState([])
 
