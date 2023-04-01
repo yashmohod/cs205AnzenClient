@@ -21,7 +21,7 @@ export default function Incidents({autoLogin}) {
  
     const {loadedColumnDefs} = defineColumns({
         columnKeys: ["incidentName"],
-        columnHeaders: ["Location"]
+        columnHeaders: ["Incident"]
     })
     const [columnDefs,setColumnDef] = useState([]);
   

@@ -59,7 +59,7 @@ export default function Location({autoLogin}) {
         return response
     }
 
-    const gridRef = useRef(); // Optional - for accessing Grid's API
+    const gridRef = useRef(null); // Optional - for accessing Grid's API
     const [rowData, setRowData] = useState(); // Set rowData to Array of Objects, one Object per Row
     const extraColumns = useCallback([
     {
@@ -89,6 +89,26 @@ export default function Location({autoLogin}) {
   
     const [columnDefs, setColumnDefs] = useState(loadedColumnDefs);
 
+    // useEffect(() => {
+    //     if (gridRef !== null) {
+    //         // gridRef.current.api.sizeColumnsToFit()
+    //         console.log(gridRef.current.api)
+    //     }
+    // })
+    const [gridApi, setGridApi] = useState(null);
+    const [gridColumnApi, setGridColumnApi] = useState(null);
+
+    const onGridReady = (params) => {
+      setGridApi(params.api);
+      setGridColumnApi(params.columnApi);
+    };
+  
+    useEffect(() => {
+      if (gridApi && gridColumnApi) {
+        gridColumnApi.autoSizeColumns();
+      }
+    }, [gridApi, gridColumnApi, rowData]);
+
     useEffect(() => {
         autoLogin();
         getLocations();
@@ -114,7 +134,8 @@ export default function Location({autoLogin}) {
 				<AgGridReact
                     ref={gridRef}
 					columnDefs={columnDefs}
-					rowData={rowData}>
+					rowData={rowData}
+                    onGridReady={onGridReady}>
 				</AgGridReact>
 			</div>
         </div>
