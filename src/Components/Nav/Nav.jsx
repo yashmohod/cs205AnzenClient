@@ -66,7 +66,7 @@ export default function Nav({setLoggedIn, loggedInUser}) {
 const { isOpen, onOpen, onClose } = useDisclosure();
 
 return (
-  <div style={{position: "relative", zIndex: 9999999, width: "100vw"}}>
+  <div style={{position: "relative", zIndex: 999, width: "100vw"}}>
     <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4} mb={10}>
       <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
         <Box>  
