@@ -30,11 +30,12 @@ export default function Exporter({gridRef, rowData, columnHeaders, keys}) {
     <div>
             <Dropdown title="Export" className="m-2">
                 <Dropdown.Item onClick={()=>SaveAsCSV()} style={{display: "flex"}} className="ps-3 pe-5">
-                    <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="" width={20} height={20}/>
+                    <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="" width={35} height={10}/>
+               
                     <p>&nbsp;Export as CSV</p>
                 </Dropdown.Item>
                 <Dropdown.Item onClick={() => SaveAsPDF()} style={{display: "flex"}} className="ps-3 pe-5">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" alt="" width={20} height={20}/>
+                    <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" alt="" width={35} height={10}/>
                     <p>&nbsp;Export as PDF</p>
                 </Dropdown.Item> 
             </Dropdown>

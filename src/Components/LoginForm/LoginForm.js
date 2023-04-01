@@ -8,15 +8,13 @@ import './LoginForm.css'
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import { Text } from '@chakra-ui/react'
-
-
+import { useSelector, useDispatch } from 'react-redux';
+import {userActions} from "../../redux/slices/user"
 //'linear-gradient(#e66465, #9198e5)'
 //linear-gradient(#1f87ab, #004961 50%, #004961 90%);
 export default function LoginForm({autoLogin, setLoading}) {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-
-    const [user, setUser] = useState();
     const [error, setError] = useState();
     const [isAuthenticated, setIsAuthenticated]= useState(false);
     
