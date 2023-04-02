@@ -23,10 +23,6 @@ export default function Daily({autoLogin}) {
   const [referalsCount,setreferalsCount] = useState(0);
   const [showReferals,setshowReferals]=useState(false);
 
-
-
-
-
   const [formData, setFormData] = useState({
     incident: "",
     date: "",
@@ -43,7 +39,7 @@ export default function Daily({autoLogin}) {
 
   function inputChangeHandler(e) {
     setFormData({...formData,  [e.target.name] : e.target.value})
-}
+  }
 
   async function saspReportSumbitHandler(){
 

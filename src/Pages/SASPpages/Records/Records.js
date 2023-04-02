@@ -6,7 +6,8 @@ import 'ag-grid-community/styles//ag-theme-alpine.css';
 import { API_URL, get, post } from '../../../Utils/API';
 import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import EditButton from '../../../Components/Buttons/EditButton'
-import { Button, Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
+import {Button} from "rsuite"
 import { ToastContainer, toast } from 'react-toastify';
 import SaspIncidents from "../../../Components/SaspIncidents/SaspIncidents"
 import SaspLocations from "../../../Components/SaspLocations/SaspLocations"
@@ -368,7 +369,7 @@ export default function Records({autoLogin,fullVersion,reportID}) {
                             
                             <div className="col" id="searchFormElement">
                                 <div className="row">
-                                <Button variant="outline-primary" type="button" onClick={() => getReps(searchData)}>Search</Button>
+                                <Button appearance="primary" color="blue" type="button" onClick={() => getReps(searchData)}>Search</Button>
                                 {/* <Button variant="outline-info" type="button" onClick={() => getAllReports()}>Search All</Button> */}
                                 </div>
                    
