@@ -20,8 +20,8 @@ export default function Login({autoLogin}) {
     }, [])
 
     return (
-        <div>
-        {loading ? <LoadingScreen class="loading-screen-layer"/>: null}
+        <div className="login-form-container">
+        {loading ? <LoadingScreen className="loading-screen-layer"/>: null}
         <div className="background"> 
             <div className="container-fluid">
                 <div className="row">

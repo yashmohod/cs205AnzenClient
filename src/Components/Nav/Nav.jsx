@@ -64,12 +64,12 @@ export default function Nav({setLoggedIn, loggedInUser}) {
 
         const { colorMode, toggleColorMode } = useColorMode();
 const { isOpen, onOpen, onClose } = useDisclosure();
-
+//px={4} mb={10}
 return (
   <div style={{position: "relative", zIndex: 999, width: "100vw"}}>
-    <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4} mb={10}>
+    <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4} mb={10}> 
       <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
-        <Box>  
+        <Box m={5}>  
             <div className="ithaca-logo-container" onClick={() => home()}>
                 <img src={Logo} alt="Ithaca-Logo"  className="img-fluid mx-auto d-block ithaca-logo"/>
             </div>
@@ -89,7 +89,7 @@ return (
                 cursor={'pointer'}
                 minW={0}>
                 <Avatar
-                  size={'md'}
+                  size={'sm'}
                   src={'https://shop.line-scdn.net/themeshop/v1/products/32/6e/3a/326e3a9d-92a9-4299-b762-608ce00a577d/89/WEBSTORE/icon_198x278.png'}
                 />
               </MenuButton>
