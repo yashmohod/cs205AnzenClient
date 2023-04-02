@@ -6,7 +6,8 @@ import Nav from "../../../Components/Nav/Nav";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-alpine.css';
-import {Form, Button} from 'react-bootstrap'
+import {Form} from 'react-bootstrap'
+import {Button} from 'rsuite'
 import { API_URL, get, post } from "../../../Utils/API";
 import EditButton from '../../../Components/Buttons/EditButton'
 import DeleteButton from '../../../Components/Buttons/DeleteButton'
@@ -227,7 +228,7 @@ export default function EmployeeAccounts({autoLogin}) {
              <ToastContainer />
             <h1>Employee Accounts</h1>
             <Form className="incident-form">
-              {thisFeaturePerms.create?<Button variant="outline-success" onClick={() => handlregeShow()}>Add Account</Button>:null}
+              {thisFeaturePerms.create?<Button appearance="primary" color="cyan" onClick={() => handlregeShow()}>Add Account</Button>:null}
             </Form>
             <Modal
               show={regshow}
@@ -299,7 +300,7 @@ export default function EmployeeAccounts({autoLogin}) {
                             
                             <div className="col" id="searchFormElement">
                                 <div className="row ">
-                                <Button variant="outline-primary" type="button" onClick={() => search()}>Search</Button>
+                                <Button appearance="primary" color="blue" onClick={() => search()}>Search</Button>
 
                                 </div>
                                 <Exporter {...{
