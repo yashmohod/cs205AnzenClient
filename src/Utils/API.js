@@ -4,7 +4,7 @@ export async function get(url) {
         return response.json()
     } catch {
         console.log("Error getting data")
-        return undefined
+        return {error: true}
     }
 }
 
@@ -28,7 +28,7 @@ export async function post(url, data) {
         return response.json()
     } catch {
         console.log("Error posting data")
-        return undefined
+        return {error: true}
     }
 }
 
@@ -52,7 +52,7 @@ export async function del(url, data) {
         return response.json()
     } catch {
         console.log("Error posting data")
-        return undefined
+        return {error: true}
     }
 }
 
@@ -76,7 +76,7 @@ export async function put(url, data) {
         return response.json()
     } catch {
         console.log("Error posting data")
-        return undefined
+        return {error: true}
     }
 }
 

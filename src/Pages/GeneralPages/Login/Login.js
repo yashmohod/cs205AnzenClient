@@ -1,16 +1,13 @@
 import React from "react";
 import './Login.css';
-// import Background from "ithaca-background.jpg";
 import LoginForm from "../../../Components/LoginForm/LoginForm";
 import { ToastContainer, toast } from 'react-toastify';
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect} from "react";
 import LoadingScreen from "../../../Components/LoadingScreen/LoadingScreen";
 
 export default function Login({autoLogin}) {
-//<img src={Background} alt="Ithaca College" className="background-image"/>
     const [loading, setLoading] = useState(false)
     
-
     useEffect(() => {
         autoLogin()
         if(!(localStorage.getItem("message") === null)){
