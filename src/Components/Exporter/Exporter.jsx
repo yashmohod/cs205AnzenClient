@@ -5,7 +5,9 @@ import { Dropdown } from 'rsuite';
 export default function Exporter({gridRef, rowData, columnHeaders, keys}) {
 
     function SaveAsCSV() {
-        gridRef.current.api.exportDataAsCsv()
+        if (gridRef !== null) {
+            gridRef.current.api.exportDataAsCsv()
+        }
     }
 
     function SaveAsPDF() {
