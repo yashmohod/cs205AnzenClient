@@ -26,7 +26,7 @@ import { userActions } from "../../redux/slices/user";
 export default function Nav() {
     const navigate = useNavigate();
     const location = useLocation();
-    const [showmore,setshowmore] = useState(false)
+    const [showmore,setShowMore] = useState(false)
     const dispatch = useDispatch()
     const { colorMode, toggleColorMode } = useColorMode();
     // const [darkHome,setDarkHome] = useState(false)
@@ -44,7 +44,7 @@ export default function Nav() {
 
     useEffect(() => {
         if (location.pathname !== "/") {
-            setshowmore(true)
+            setShowMore(true)
         }
     })
 
