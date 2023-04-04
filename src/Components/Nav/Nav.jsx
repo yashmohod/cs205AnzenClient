@@ -22,6 +22,7 @@ import {
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { useDispatch } from "react-redux";
 import { userActions } from "../../redux/slices/user";
+import { themeActions } from "../../redux/slices/theme";
 
 export default function Nav() {
     const navigate = useNavigate();
@@ -43,10 +44,14 @@ export default function Nav() {
     }
 
     useEffect(() => {
+      dispatch(themeActions.updateTheme(colorMode))
+    }, [colorMode])
+
+    useEffect(() => {
         if (location.pathname !== "/") {
             setShowMore(true)
         }
-    })
+    }, [])
 
   return (
     <div style={{position: "relative", zIndex: 999, width: "100vw"}}>

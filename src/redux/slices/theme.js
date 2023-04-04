@@ -1,17 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 export const theme = createSlice({
-  name: 'dark-theme',
+  name: 'theme',
   initialState: {
-    isDark: false
-    },
+    mode: ""
+},
   reducers: {
     updateTheme: (state, action) => {
-        const payload = action.payload
-        if (payload || !payload) {
-            return
-        }
-        state.isLoggedIn = action.payload
+      state.mode = action.payload
     },
   },
 })

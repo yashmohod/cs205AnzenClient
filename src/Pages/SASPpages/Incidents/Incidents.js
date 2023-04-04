@@ -11,7 +11,7 @@ import EditButton from '../../../Components/Buttons/EditButton'
 import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import { ToastContainer, toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom'
-import { defineColumns } from "../../../Utils/AG-Grid.js";
+import { AG_THEME_CLASS, defineColumns } from "../../../Utils/AG-Grid.js";
 
 export default function Incidents({autoLogin}) {
     const {REQUEST: fetcher} = useFetch()
@@ -116,7 +116,7 @@ export default function Incidents({autoLogin}) {
                         </div>
                     </div>}
             
-            <div className="ag-theme-alpine incident-grid">
+            <div className={AG_THEME_CLASS("incident-grid")}>
 				<AgGridReact
                     ref={gridRef}
 					columnDefs={columnDefs}

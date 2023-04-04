@@ -21,6 +21,7 @@ import SaspReferal from "../../../Components/SaspReferal/SaspReferal"
 import { useLocation } from 'react-router-dom'
 import Exporter from "../../../Components/Exporter/Exporter";
 import { defineColumns } from "../../../Utils/AG-Grid";
+import { AG_THEME_CLASS } from "../../../Utils/AG-Grid";
 
 export default function Referals({autoLogin, fullVersion,reportID}) {
     const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Judical Referral\t", "First Name\t", "Last Name\t", "Middle Initial\t", "ICID\t", "DoB\t", "Address\t", "Phone No\t"]
@@ -504,8 +505,7 @@ export default function Referals({autoLogin, fullVersion,reportID}) {
 
        
         
-            <div className="ag-theme-alpine incident-grid">
-        
+            <div className={AG_THEME_CLASS("incident-grid")}>
               <AgGridReact
                 ref={gridRef}
                 columnDefs={columnDefs}
@@ -513,8 +513,6 @@ export default function Referals({autoLogin, fullVersion,reportID}) {
                 rowData={rowData}
                 >
               </AgGridReact>
-
-
 			</div>
 
 

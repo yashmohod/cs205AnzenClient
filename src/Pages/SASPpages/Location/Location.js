@@ -9,6 +9,7 @@ import { Button, Form } from "react-bootstrap";
 import { ToastContainer, toast } from 'react-toastify';
 import { defineColumns } from "../../../Utils/AG-Grid.js";
 import useFetch from "../../../hooks/useFetch";
+import { AG_THEME_CLASS } from "../../../Utils/AG-Grid.js";
 
 export default function Location({autoLogin}) {
     const {REQUEST: fetcher} = useFetch()
@@ -117,8 +118,8 @@ export default function Location({autoLogin}) {
                     </div>
                 </div>
             </div>
-          
-            <div className="ag-theme-alpine location-grid">
+
+            <div className={AG_THEME_CLASS("location-grid")}>
 				<AgGridReact
                     ref={gridRef}
 					columnDefs={columnDefs}
