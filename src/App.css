@@ -27,6 +27,11 @@ a:hover {
   --ag-font-size: 10px;
 }
 
+.ag-theme-alpine-dark {
+  --ag-font-family: 'Poppins', sans-serif;
+  --ag-font-size: 10px;
+}
+
 body::-webkit-scrollbar {
   width: 2.5px;               /* width of the entire scrollbar */
 }
