@@ -22,9 +22,10 @@ import Accordion from 'react-bootstrap/Accordion';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useLocation } from 'react-router-dom'
 import Exporter from "../../../Components/Exporter/Exporter";
+import { useSelector } from "react-redux";
 
 export default function TimeCards({autoLogin}) {
-   
+    const themeMode = useSelector(state => state.theme.mode)
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -662,7 +663,7 @@ function SaveAsCSV(){
 
                 {/* desktop view */}
                 <div className="d-none d-xxl-block" >
-                  <div className="ag-theme-alpine incident-grid">
+                  <div className={`ag-theme-alpine${themeMode === "light" ? "" : "-dark"} incident-grid`}>
                     
                           <AgGridReact
                             ref={myTCgridRef}
@@ -692,7 +693,7 @@ function SaveAsCSV(){
                 <Tab eventKey="2" title="All Time Cards" onClick={()=>clearSearchFields()}>
                    {/* desktop view */}
                   <div className="d-none d-xxl-block" >
-                    <div className="ag-theme-alpine incident-grid">
+                    <div className={`ag-theme-alpine${themeMode === "light" ? "" : "-dark"} incident-grid`}>
                       
                             <AgGridReact
                               ref={allTCgridRef}
@@ -747,7 +748,7 @@ function SaveAsCSV(){
                                   })
                                 }
                                 <div className="d-none d-xxl-block" >
-                                  <div className="ag-theme-alpine incident-grid">
+                                  <div className={`ag-theme-alpine${themeMode === "light" ? "" : "-dark"} incident-grid`}>
                                     
                                           <AgGridReact
                                             // ref={allTCgridRef}
