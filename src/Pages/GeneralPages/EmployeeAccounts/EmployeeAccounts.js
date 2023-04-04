@@ -22,6 +22,7 @@ import UserProfile from "../../../Components/UserProfile/UserProfile";
 // import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Exporter from "../../../Components/Exporter/Exporter";
+import { AG_THEME_CLASS } from "../../../Utils/AG-Grid";
 
 export default function EmployeeAccounts({autoLogin}) {
     const [accounts, setAccounts] = useState([])
@@ -331,7 +332,7 @@ export default function EmployeeAccounts({autoLogin}) {
 
                 {/* desktop view */}
                 <div className="d-none d-xxl-block" >
-                  <div className="ag-theme-alpine incident-grid">
+                  <div className={AG_THEME_CLASS("incident-grid")}>
                     <AgGridReact
                       ref={gridRef}
                       columnDefs={commonColDef}

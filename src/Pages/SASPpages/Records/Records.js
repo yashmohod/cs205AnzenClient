@@ -30,7 +30,7 @@ import {
     StatGroup,
   } from '@chakra-ui/react'
 import Exporter from "../../../Components/Exporter/Exporter";
-import { defineColumns } from "../../../Utils/AG-Grid";
+import { AG_THEME_CLASS, defineColumns } from "../../../Utils/AG-Grid";
 
 export default function Records({autoLogin,fullVersion,reportID}) {
     const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Loc. Details\t", "Received Time\t", "Enroute Time\t", "Arrived Time\t", "Clear Time\t", "Reported By\t", "Summary\t"]
@@ -413,8 +413,7 @@ export default function Records({autoLogin,fullVersion,reportID}) {
             <Stat>
                 <StatLabel>Results   <StatNumber>{rowData.length}</StatNumber></StatLabel>
             </Stat>                        
-            <div className="ag-theme-alpine incident-grid">
-        
+            <div className={AG_THEME_CLASS("incident-grid")}>
               <AgGridReact
                 ref={gridRef}
                 columnDefs={columnDefs}
@@ -422,8 +421,6 @@ export default function Records({autoLogin,fullVersion,reportID}) {
                 rowData={rowData}
                 >
               </AgGridReact>
-
-
 			</div>
             <Modal
               show={show}

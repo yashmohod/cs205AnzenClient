@@ -1,4 +1,5 @@
 import Skeleton from 'react-loading-skeleton'
+import { useSelector } from 'react-redux'
 
 export const defineColumns = ({columnKeys, columnHeaders, extraColumns, skeletonCount}) => {
         var loadedColumnDefs = []
@@ -46,3 +47,8 @@ export const defineColumns = ({columnKeys, columnHeaders, extraColumns, skeleton
         }
 }
 
+export const AG_THEME_CLASS = (extraClasses) => {
+    const themeMode = useSelector(state => state.theme.mode);
+    if (themeMode === "") {return `ag-theme-alpine ${extraClasses}`}
+    return (themeMode === "light" ? `ag-theme-alpine ${extraClasses}` : `ag-theme-alpine-dark ${extraClasses}`) 
+}
