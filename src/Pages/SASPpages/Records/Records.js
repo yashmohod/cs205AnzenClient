@@ -410,9 +410,9 @@ export default function Records({autoLogin,fullVersion,reportID}) {
             </div>:null}
 
        
-            <Stat>
+            {/* <Stat>
                 <StatLabel>Results   <StatNumber>{rowData.length}</StatNumber></StatLabel>
-            </Stat>                        
+            </Stat>                         */}
             <div className={AG_THEME_CLASS("incident-grid")}>
               <AgGridReact
                 ref={gridRef}
@@ -482,7 +482,7 @@ export default function Records({autoLogin,fullVersion,reportID}) {
               fullscreen={true}
             >
               <Modal.Header closeButton>
-                <Modal.Title>New Password</Modal.Title>
+                <Modal.Title>View Referral</Modal.Title>
               </Modal.Header>
               <Modal.Body>
 

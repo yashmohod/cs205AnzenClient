@@ -114,26 +114,6 @@ useEffect(() =>
     <div>
         <ToastContainer />
 
-        <Tabs>
-  <TabList isFitted>
-    <Tab>One</Tab>
-    <Tab>Two</Tab>
-    <Tab>Three</Tab>
-  </TabList>
-
-  <TabPanels>
-    <TabPanel>
-      <p>one!</p>
-    </TabPanel>
-    <TabPanel>
-      <p>two!</p>
-    </TabPanel>
-    <TabPanel>
-      <p>three!</p>
-    </TabPanel>
-  </TabPanels>
-</Tabs>
-
         <h1>Daily</h1>
         <div className="container-fluid">
             <div className="row">
