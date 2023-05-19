@@ -22,7 +22,8 @@ import { useLocation } from 'react-router-dom'
 import Exporter from "../../../Components/Exporter/Exporter";
 import { defineColumns } from "../../../Utils/AG-Grid";
 import { AG_THEME_CLASS } from "../../../Utils/AG-Grid";
-
+import Accordion from 'react-bootstrap/Accordion';
+import MobileReferralsCard from '../../../Components/ReferralsCards/MobileReferralsCard';
 export default function Referals({autoLogin, fullVersion,reportID}) {
     const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Judical Referral\t", "First Name\t", "Last Name\t", "Middle Initial\t", "ICID\t", "DoB\t", "Address\t", "Phone No\t"]
     const columnKeys = ["date", "incident", "location", "judicialReferal", "firstName", "lastName", "middleInitial", "ICID", "dob", "address", "phoneNo"]
@@ -360,6 +361,15 @@ export default function Referals({autoLogin, fullVersion,reportID}) {
         }
     }
     
+      function showMobileViewReferralsCards(){
+  
+        return(
+        rowData.map(element => {
+          return(
+          <MobileReferralsCard keyNum ={rowData.indexOf(element)}  data={element} viewReport={viewReport} referalEdit={referalEdit} referalDelete={referalDelete} permisions={thisFeaturePerms} />
+         ) }))
+      }
+    
 
     // DefaultColDef sets props common to all Columns
     const defaultColDef = useMemo( ()=> ({
@@ -504,7 +514,8 @@ export default function Referals({autoLogin, fullVersion,reportID}) {
           : null }
 
        
-        
+        {/* desktop view */}
+        <div className="d-none d-xxl-block" >
             <div className={AG_THEME_CLASS("incident-grid")}>
               <AgGridReact
                 ref={gridRef}
@@ -514,6 +525,18 @@ export default function Referals({autoLogin, fullVersion,reportID}) {
                 >
               </AgGridReact>
 			</div>
+            </div>
+
+            {/* Mobile View */}
+            <div className="d-block d-xxl-none" >
+                  <div className="ag-theme-alpine incident-grid">
+                    
+                  <Accordion defaultActiveKey="0">
+                  {showMobileViewReferralsCards()}
+
+                </Accordion>
+                </div>
+            </div>
 
 
 
