@@ -21,6 +21,8 @@ import { GridApi } from "ag-grid-community";
 import { useLocation } from 'react-router-dom'
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable'
+import Accordion from 'react-bootstrap/Accordion';
+import MobileRecordsCard from "../../../Components/RecordsCards/MobileRecordsCard"
 import {
     Stat,
     StatLabel,
@@ -135,6 +137,15 @@ export default function Records({autoLogin,fullVersion,reportID}) {
             gridRef.current.api.sizeColumnsToFit();
         }
     }
+
+    function showMobileViewRecordsCards(){
+  
+        return(
+        rowData.map(element => {
+          return(
+          <MobileRecordsCard keyNum ={rowData.indexOf(element)}  data={element} viewReferals={viewReferals} reportEdit={reportEdit} reportDelete={reportDelete} permisions={thisFeaturePerms} />
+         ) }))
+      }
 
     // async function getRep(repID){
 
@@ -413,15 +424,30 @@ export default function Records({autoLogin,fullVersion,reportID}) {
             {/* <Stat>
                 <StatLabel>Results   <StatNumber>{rowData.length}</StatNumber></StatLabel>
             </Stat>                         */}
-            <div className={AG_THEME_CLASS("incident-grid")}>
-              <AgGridReact
-                ref={gridRef}
-                columnDefs={columnDefs}
-                defaultColDef={{sortable: true}}
-                rowData={rowData}
-                >
-              </AgGridReact>
-			</div>
+
+            {/* desktop view */}
+            <div className="d-none d-xxl-block" >
+                <div className={AG_THEME_CLASS("incident-grid")}>
+                <AgGridReact
+                    ref={gridRef}
+                    columnDefs={columnDefs}
+                    defaultColDef={{sortable: true}}
+                    rowData={rowData}
+                    >
+                </AgGridReact>
+                </div>
+            </div>
+            {/* Mobile View */}
+            <div className="d-block d-xxl-none" >
+                <div className="ag-theme-alpine incident-grid">
+                    <Accordion defaultActiveKey="0">
+                        {showMobileViewRecordsCards()}
+                    </Accordion>
+                </div>
+            </div>
+
+
+
             <Modal
               show={show}
               onHide={handleClose}
