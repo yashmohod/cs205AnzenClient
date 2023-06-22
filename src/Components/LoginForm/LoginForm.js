@@ -10,14 +10,14 @@ import { ToastContainer, toast } from 'react-toastify';
 import { Text } from '@chakra-ui/react'
 import { useSelector, useDispatch } from 'react-redux';
 import {userActions} from "../../redux/slices/user"
+
 //'linear-gradient(#e66465, #9198e5)'
 //linear-gradient(#1f87ab, #004961 50%, #004961 90%);
 export default function LoginForm({autoLogin, setLoading}) {
-    const [email, setEmail] = useState("")
+   const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState();
     const [isAuthenticated, setIsAuthenticated]= useState(false);
-    
 
   //   const { instance, accounts } = useMsal();
 
@@ -61,37 +61,24 @@ export default function LoginForm({autoLogin, setLoading}) {
   //       console.log(graphData);
   //       console.log(accounts);
   //   }
-
-
-
-
-
-
-
-
     const dispatch = useDispatch()
     const user = useSelector((state) => state.user)
-
-    function emailChangeHandler(e) {
-      setEmail(e.target.value)
-    }
-
-    function passwordChangeHandler(e) {
-      setPassword(e.target.value)
-    }
-
     async function loginHandler(e) {
       setLoading(true)
-
-      if (!e) {
+      if (!e && e !== "") {
         autoLogin()
         setLoading(false)
         return
       }
-      
-      let response = await post(API_URL + "/login",  {email: email, password: password})
-      var tokenVerification = await post(API_URL + "/validate-token", {token: response.token})
-    
+      var response, tokenVerification
+      try {
+        response = await post(API_URL + "/login",  {email: email, password: password})
+        tokenVerification = await post(API_URL + "/validate-token", {token: response.token})
+      } catch {
+        setLoading(false)
+        return
+      }
+
       if (tokenVerification.message === "verified") {
         toast.success(<h5>Verified. Logging you in!</h5>, {style: {fontWeight: "bold"}})
         setLoading(false)
@@ -116,11 +103,9 @@ export default function LoginForm({autoLogin, setLoading}) {
 }
 
     useEffect((e) => {
-      // checkMessage()
       loginHandler(e)
-      
-    }, [])
- 
+      }, [])
+
       return (
             <div className="form m-2 p-2">
                 <ToastContainer/>
@@ -131,11 +116,11 @@ export default function LoginForm({autoLogin, setLoading}) {
                       <Text fontSize='4xl' color="black" mb={10}>Access Page</Text>
                      <div class="mb-3">
                        <label for="exampleInputEmail1" class="form-label d-flex justify-content-start" style={{color: "black"}}>Email</label>
-                       <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={(e) => emailChangeHandler(e)} style={{color: "black"}}/>
+                       <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={(e) => setEmail(e.target.value)} style={{color: "black"}}/>
                      </div>
                      <div class="mb-3">
                        <label for="exampleInputPassword1" class="form-label d-flex justify-content-start" style={{color: "black"}}>Password</label>
-                       <input type="password" class="form-control" id="exampleInputPassword1" onChange={(e) => passwordChangeHandler(e)} style={{color: "black"}}/>
+                       <input type="password" class="form-control" id="exampleInputPassword1" onChange={(e) => setPassword(e.target.value)} style={{color: "black"}}/>
                      </div>
 
                      <Button appearance="primary" class="btn btn-primary" onClick={(e) => loginHandler(e)} color="blue" active>Login</Button>

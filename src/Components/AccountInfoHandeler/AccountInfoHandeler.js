@@ -10,10 +10,8 @@ import { useNavigate } from "react-router-dom";
 import InputGroup from 'react-bootstrap/InputGroup';
 import { position } from "@chakra-ui/react";
 
-
 export default function AccountInfoHandeler({email,handlregClose, mode,thisFeaturePerms,getAccounts,accountFoundData,addToOrg}) {
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
       firstName: accountFoundData.firstName,
       lastName: accountFoundData.lastName,
@@ -24,11 +22,6 @@ export default function AccountInfoHandeler({email,handlregClose, mode,thisFeatu
       password: "",
       password_confirm: "",
   })
-
-  // function changePosition(e) {
-  //   setFormData({...formData, position : e.target.value})
-  // }
-
   const dateRef = useRef()
 
   useEffect(() => 
@@ -37,8 +30,6 @@ export default function AccountInfoHandeler({email,handlregClose, mode,thisFeatu
     // setFormData({...formData, "email" : email})
   },[]
 )
-
-
 
     async function registerHandler() {
       let response = await post(API_URL + "/register", {

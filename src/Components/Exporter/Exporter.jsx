@@ -1,6 +1,8 @@
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable'
 import { Dropdown } from 'rsuite';
+import CSV from "./csv.png"
+import PDF from "./pdf.png"
 
 export default function Exporter({gridRef, rowData, columnHeaders, keys}) {
 
@@ -31,13 +33,10 @@ export default function Exporter({gridRef, rowData, columnHeaders, keys}) {
     return (
     <div>
             <Dropdown title="Export" className="m-2" style={{color: "black"}}>
-                <Dropdown.Item onClick={()=>SaveAsCSV()} style={{display: "flex"}} className="ps-3 pe-5">
-                    <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="" width={35} height={10}/>
-               
+                <Dropdown.Item onClick={()=> SaveAsCSV()} className="">
                     <p>&nbsp;Export as CSV</p>
                 </Dropdown.Item>
-                <Dropdown.Item onClick={() => SaveAsPDF()} style={{display: "flex"}} className="ps-3 pe-5">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" alt="" width={35} height={10}/>
+                <Dropdown.Item onClick={() => SaveAsPDF()} className="">
                     <p>&nbsp;Export as PDF</p>
                 </Dropdown.Item> 
             </Dropdown>

@@ -20,17 +20,22 @@ import {
   Center,
 } from '@chakra-ui/react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { userActions } from "../../redux/slices/user";
 import { themeActions } from "../../redux/slices/theme";
+import HomeIcon from "./icons/home.png"
+import SettingIcon from "./icons/settings.png"
+import LogoutIcon from "./icons/logout.png"
 
 export default function Nav() {
     const navigate = useNavigate();
     const location = useLocation();
+    const user = useSelector(state => state.user)
     const [showmore,setShowMore] = useState(false)
     const dispatch = useDispatch()
     const { colorMode, toggleColorMode } = useColorMode();
     // const [darkHome,setDarkHome] = useState(false)
+    
     
     function home() {
         navigate("/")
@@ -53,11 +58,29 @@ export default function Nav() {
         }
     }, [])
 
+  const navbarOptions = [
+      {
+        title: "Home",
+        icon: HomeIcon,
+        onClickAction: () => navigate("/"),
+      },
+      {
+        title: "Settings",
+        icon: SettingIcon,
+        onClickAction: () => navigate("/UserPersonalProfile"),
+      },
+      {
+        title: "Logout",
+        icon: LogoutIcon,
+        onClickAction: () => logoutUserHandler(),
+      },
+    ]
+
   return (
     <div style={{position: "relative", zIndex: 999, width: "100vw"}}>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4} mb={10}> 
-        <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
-          <Box m={5}>  
+        <Flex alignItems={'center'} justifyContent={'space-between'} h={24}>
+          <Box m={10}>  
               <div className="ithaca-logo-container" onClick={() => home()}>
                   <img src={Logo} alt="Ithaca-Logo"  className="img-fluid mx-auto d-block ithaca-logo"/>
               </div>
@@ -91,21 +114,22 @@ export default function Nav() {
                   </Center>
                   <br />
                   <Center>
-                    <p>Hi, {localStorage.getItem("firstName")}</p>
+                    <p>Hi, {user.metadata?.firstName}</p>
                   </Center>
                   <br />
                   <MenuDivider />
-                  <MenuItem onClick={() => navigate("/")}>
-                  <img src="https://img.icons8.com/dusk/512/home-page.png" alt="" width={40} height={40}/> Home
-                  </MenuItem>
-
-                  <MenuItem onClick={() => navigate("/UserPersonalProfile")}>
-                    <img src="https://img.icons8.com/plasticine/512/settings.png" alt="" width={40} height={40}/> Settings
-                  </MenuItem>
-                  
-                  <MenuItem onClick={() => logoutUserHandler()}>
-                      <img src="https://img.icons8.com/plasticine/512/logout-rounded.png" alt="" width={40} height={40}/> Logout
-                  </MenuItem>
+                  {
+                    navbarOptions?.map((option) => {
+                      return (
+                        <MenuItem onClick={option.onClickAction} className=" hover:bg-blue-300 active:bg-white">
+                            <div className="flex items-center space-x-2">
+                              <div className="basis-3/6"><img src={option.icon} alt="" width={40} height={40}/></div>
+                              <div className="basis-3/6">{option.title}</div>
+                            </div>
+                        </MenuItem>
+                      ) 
+                    })
+                  }
                 </MenuList>
               </Menu>
             </Stack>

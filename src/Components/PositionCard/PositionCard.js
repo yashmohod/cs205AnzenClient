@@ -16,10 +16,6 @@ export default function({curpos,keyNum,editPermissions,edit_promotionNdemotion})
 
     const defaultColDef= { resizable: true}
     const gridRef= useRef()
-    
-
-
-
   
     const columnDefs_permissions = [
       {field: 'featureName', headerName: 'Feature' ,cellStyle: { 'textAlign': 'center' }},
@@ -121,9 +117,6 @@ export default function({curpos,keyNum,editPermissions,edit_promotionNdemotion})
     useEffect(() => {
 
     },[])
-
- 
-   
 
     return (
         
