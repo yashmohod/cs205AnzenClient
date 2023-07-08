@@ -89,7 +89,7 @@ export default function UserPersonalProfile({autoLogin }) {
             dob: response.accountDetails.dob,
             email: response.accountDetails.email,
         }
-        console.log(response )
+        // console.log(response )
         setFormData(temp)
         setoNp(response.orgNpos)
     }

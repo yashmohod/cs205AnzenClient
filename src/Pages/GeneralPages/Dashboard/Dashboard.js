@@ -48,7 +48,7 @@ export default function({autoLogin}) {
     async function clockIn() {
 
         let response = await post(API_URL + "/clockIn", {token: localStorage.getItem("token"), org:curOrgClock})
-        if(response.status == 400){
+        if(response.status != 200){
             toast.warning(response.message)
         }
         if(response.status == 200){
@@ -64,7 +64,7 @@ export default function({autoLogin}) {
     async function clockOut(shiftType) {
         handleadClose()
         let response = await post(API_URL + "/clockOut", {token: localStorage.getItem("token"), org:curOrgClock, note:note, shiftName: shiftType})
-        if(response.status == 400){
+        if(response.status != 200){
             toast.warning(response.message)
         }
         if(response.status == 200){

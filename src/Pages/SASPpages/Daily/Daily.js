@@ -44,7 +44,7 @@ export default function Daily({autoLogin}) {
   async function saspReportSumbitHandler(){
 
   let response = await post(API_URL + "/enterSaspReport", {token: localStorage.getItem("token"),saspReportData:formData, referalData:referalData})
-  if(response.message === "New SASP incident report was successfully entered."){
+  if(response.status == 200){
     localStorage.setItem("message", response.message);
     navigate("/");
   }else{

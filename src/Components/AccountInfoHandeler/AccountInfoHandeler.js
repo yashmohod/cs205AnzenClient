@@ -88,7 +88,7 @@ export default function AccountInfoHandeler({email,handlregClose, mode,thisFeatu
             positions.push(position_titles[i].PosName);
           }
       }
-      console.log(response.positions)
+      // console.log(response.positions)
       const temp = {
           "position_titles":position_titles,
           "positions":positions,

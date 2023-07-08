@@ -85,10 +85,10 @@ export default function TimeCards({autoLogin}) {
 
     const[atcPerm, setAtcPerm] =useState(false);
     async function setORGnPOS(){
-        const atcPerm_response = (await get(API_URL + "/getPermision?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org+"&featureName=All Time Cards"));
+        let atcPerm_response = (await get(API_URL + "/getPermision?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org+"&featureName=All Time Cards"));
         // console.log(atcPerm_response)
         let atc_access = atcPerm_response.permission.view && !atcPerm_response.permission.blackListed;
-        console.log(atcPerm_response.permission.view)
+        // console.log(atcPerm_response.permission.view)
         setAtcPerm(atc_access)
         getAlltc()
     }
@@ -96,8 +96,7 @@ export default function TimeCards({autoLogin}) {
     const[allTC,setALLtc]=useState([])
 
     async function getAlltc(){
-      let responseALL = null
-          responseALL = await get(API_URL + "/getTimeCards?token=" +  localStorage.getItem("token")+
+          let responseALL  = await get(API_URL + "/getTimeCards?token=" +  localStorage.getItem("token")+
           "&admin_emp="+allTCpreviousSearchData.employeeId+
           "&admin_dateFrom="+allTCpreviousSearchData.dateFrom+
           "&admin_dateTo="+allTCpreviousSearchData.dateTo+
@@ -106,7 +105,7 @@ export default function TimeCards({autoLogin}) {
           "&dateFrom="+myTCpreviousSearchData.dateFrom+
           "&dateTo="+myTCpreviousSearchData.dateTo+
           "&status="+myTCpreviousSearchData.approval)
-      console.log(responseALL)
+
       if(responseALL.status == 200) {
         var data = "0";
         data = responseALL.UserTimeCards.map((tc)=>{
@@ -524,7 +523,7 @@ function SaveAsCSV(){
           "&org="+thisFeaturePerms.org+
           "&shift="+reportSearchData.shiftName)
     if(response.status == 200){
-      console.log(response.report)
+      // console.log(response.report)
       setReportData(response.report.reports)
     }else{
       toast.warning(response.message)

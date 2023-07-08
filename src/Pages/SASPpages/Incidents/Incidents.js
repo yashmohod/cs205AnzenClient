@@ -18,35 +18,48 @@ export default function Incidents({autoLogin}) {
     const [incident, setIncident] = useState("")
     const gridRef = useRef();
     const [rowData, setRowData] = useState();
-    const {loadedColumnDefs} = defineColumns({
-        columnKeys: ["incidentName"],
-        columnHeaders: ["Incident"]
-    })
     const [columnDefs,setColumnDef] = useState([]);
   
     async function editIncidentHandler(incidentId) {
         var tempIncidents = await getIncidents()
         var incidentName = "";
+
         for(let x = 0; x <tempIncidents.length; x++){
+
             if (tempIncidents[x].id === incidentId) {
+                
                 incidentName = tempIncidents[x].incidentName;
             }
         }
+
         var newIncidentName = String(window.prompt("Enter the updated name", incidentName));
         if(newIncidentName !== "" && newIncidentName != null &&  newIncidentName != "null")  {
-            await fetcher("POST",  "/editIncident",  {id : incidentId , editedIncident: newIncidentName, token: localStorage.getItem("token")});
+            let response = await fetcher("POST",  "/editIncident",  {id : incidentId , editedIncident: newIncidentName, token: localStorage.getItem("token")});
             getIncidents();
+            if (response.status === 200) {
+                toast.success(String(response["message"]));
+            } else {
+                toast.warning(response["message"] )
+            }
+            getIncidents()
         }
     }
 
     async function deleteIncidentHandler(incidentId) {
-        const response = await fetcher("POST", "/deleteIncident",  {id : incidentId, token: localStorage.getItem("token")});
+        let response = await fetcher("POST", "/deleteIncident",  {id : incidentId, token: localStorage.getItem("token")});
         getIncidents();
+        console.log(response)
+        if (response.status === 200) {
+            toast.success(String(response["message"]));
+        } else {
+            toast.warning(response["message"] )
+        }
+        getIncidents()
     }
 
     async function addIncidentHandler() {
         if (incident !== ""){
-            const response = await fetcher("POST", "/enterIncident", {incident : incident, token: localStorage.getItem("token")}) 
+            let response = await fetcher("POST", "/enterIncident", {incident : incident, token: localStorage.getItem("token")}) 
             if (response.status === 200) {
                 document.getElementById("locationInput").value = "";
                 setIncident("")
@@ -62,7 +75,7 @@ export default function Incidents({autoLogin}) {
     }
 
     const getIncidents = useCallback(async () => {
-        const response = await fetcher("GET", "/getIncidents?token=" +  localStorage.getItem("token"))
+        let response = await fetcher("GET", "/getIncidents?token=" +  localStorage.getItem("token"))
         const responseJson = JSON.parse(response.incidents)
         var editPerm  = {
             field: 'id', 
@@ -83,13 +96,16 @@ export default function Incidents({autoLogin}) {
                 deleteIncidentHandler(field)
                 }
         }}
-        var temp = loadedColumnDefs
+        var temp = [{
+            field: 'incidentName', 
+            headerName: 'Incident' 
+        }]
         
         if (thisFeaturePerms.edit) temp.push(editPerm);
         if (thisFeaturePerms.delete) temp.push(deletePerm);
         setColumnDef(temp);
         setRowData(responseJson)
-        return response
+        return responseJson
     })
 
     const location = useLocation()

@@ -11,7 +11,7 @@ export default function SaspIncidents(props) {
         response.unshift( {"id":"","incidentName":""} );
         setInceidents(response)
         
-        console.log(incidents)
+        // console.log(incidents)
       }
 
 

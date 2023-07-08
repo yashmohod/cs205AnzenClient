@@ -39,10 +39,10 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
     const [pnd,setPnd] = useState();
     const [isPromotion, setIsPromotion] = useState(false);
     async function getPromotionsNdemotions(){
-        console.log(userAcc)
+        // console.log(userAcc)
         let response = await get(API_URL + "/getPromotionsNdemotions?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org+"&user_id="+userAcc)
-        console.log( response.demoteTo)
-        console.log( response.promoteTo)
+        // console.log( response.demoteTo)
+        // console.log( response.promoteTo)
         const promoteTo_titles = response.promoteTo;
         const demoteTo_titles = response.demoteTo;
         let promote_positions =[]
@@ -89,7 +89,7 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
             title:posTitle,
             isPomotion:isPromo,
         });
-        console.log(response)
+        // console.log(response)
         if(response.status ==200){
             toast.success(response.message);
         }
@@ -173,7 +173,7 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
             dob: response.accountDetails.dob,
             email: response.accountDetails.email,
         }
-        console.log(response)
+        // console.log(response)
         setFormData(temp)
         setoNp(response.orgNpos)
     }
@@ -289,7 +289,7 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
       org:thisFeaturePerms.org,
       permissionFunction:true,
     }},
-    {field: 'blackList',
+    {field: 'blackListed',
     headerName: '' ,
     cellRenderer: CheckButton, 
     headerName: 'Black List',
@@ -328,6 +328,7 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
     let response = await post(API_URL + "/updatePermission",  {
         token: localStorage.getItem("token"),
         permId: prop.data.id,
+        userID: userAcc,
         featureName:featureName,
         permissionName:permissionName,
         value:value,

@@ -12,7 +12,7 @@ export default function SaspLocations(props) {
         response.unshift( {"id":"","locationName":""} );
         setlocations(response)
         
-        console.log(locations)
+        // console.log(locations)
       }
 
 

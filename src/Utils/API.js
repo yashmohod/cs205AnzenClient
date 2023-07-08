@@ -1,7 +1,7 @@
 export async function get(url) {
     try {
-        let response = await fetch(url)
-        return response.json()
+        let response = await fetch(url).then(r =>  r.json().then(data => ({...data,"status": r.status})))
+        return response
     } catch {
         console.log("Error getting data")
         return {error: true}
@@ -24,8 +24,8 @@ export async function post(url, data) {
     }
 
     try {
-        let response = await fetch(url, requestOptions)
-        return response.json()
+        let response = await fetch(url, requestOptions).then(r =>  r.json().then(data => ({...data,"status": r.status})))
+        return response
     } catch {
         console.log("Error posting data")
         return {error: true}
@@ -48,8 +48,8 @@ export async function del(url, data) {
     }
 
     try {
-        let response = await fetch(url, requestOptions)
-        return response.json()
+        let response = await fetch(url, requestOptions).then(r =>  r.json().then(data => ({...data,"status": r.status})))
+        return response
     } catch {
         console.log("Error posting data")
         return {error: true}
@@ -72,8 +72,8 @@ export async function put(url, data) {
     }
 
     try {
-        let response = await fetch(url, requestOptions)
-        return response.json()
+        let response = await fetch(url, requestOptions).then(r =>  r.json().then(data => ({...data,"status": r.status})))
+        return response
     } catch {
         console.log("Error posting data")
         return {error: true}

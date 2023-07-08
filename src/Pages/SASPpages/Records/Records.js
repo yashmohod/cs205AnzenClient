@@ -268,7 +268,7 @@ export default function Records({autoLogin,fullVersion,reportID}) {
     async function reportEdit(reportId){
         let response = await get(API_URL + "/getSaspReport?token=" +  localStorage.getItem("token")+"&reportID="+reportId)
         let oldData = response.SaspIncidentReport;
-        console.log(oldData)
+        // console.log(oldData)
         let data = {
         reportID:reportId,
         incident: oldData.incident,

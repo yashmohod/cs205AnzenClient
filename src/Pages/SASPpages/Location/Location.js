@@ -7,9 +7,9 @@ import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import EditButton from '../../../Components/Buttons/EditButton'
 import { Button, Form } from "react-bootstrap";
 import { ToastContainer, toast } from 'react-toastify';
-import { defineColumns } from "../../../Utils/AG-Grid.js";
 import useFetch from "../../../hooks/useFetch";
 import { AG_THEME_CLASS } from "../../../Utils/AG-Grid.js";
+import { useLocation } from 'react-router-dom'
 
 export default function Location({autoLogin}) {
     const {REQUEST: fetcher} = useFetch()
@@ -18,7 +18,7 @@ export default function Location({autoLogin}) {
     async function addLocationHandler(e) {
         let response = await fetcher("POST", "/enterLocation",  {location: location,token: localStorage.getItem("token")});
         if (location !== "") {
-            if (response.message =="New location was successfully entered.") {
+            if (response.status == 200) {
                 document.getElementById("locationInput").value = "";
                 getLocations();
                 toast.success(response.message + " : " + location);
@@ -32,7 +32,13 @@ export default function Location({autoLogin}) {
     }
 
     async function deleteLocationHandler(locationId){
-        const response = await fetcher("POST", "/deleteLocation",  {id :locationId ,token: localStorage.getItem("token")});
+        let response = await fetcher("POST", "/deleteLocation",  {id :locationId ,token: localStorage.getItem("token")});
+        if (response.status === 200) {
+            toast.success(String(response["message"]));
+
+        } else {
+            toast.warning(response["message"] )
+        }
         getLocations();
     }
     async function editLocationHandler(locationId){
@@ -45,46 +51,25 @@ export default function Location({autoLogin}) {
         }
         var locationame = String(window.prompt("Enter the updated name", locName));
         if( locationame != "" && locationame != null &&  locationame != "null")  {
-            await fetch("POST", "/editLocation",  {id :locationId ,editedLocation:locationame,token: localStorage.getItem("token")});
+            let response = await fetcher("POST", "/editLocation",  {id :locationId ,editedLocation:locationame,token: localStorage.getItem("token")});
+            if (response.status === 200) {
+                toast.success(String(response["message"]));
+
+            } else {
+                toast.warning(response["message"] )
+            }
             getLocations();
         }
     }
 
-    async function getLocations() {
-        const response = await fetcher("GET", "/getLocations?token=" +  localStorage.getItem("token"));
-        const responseJson = JSON.parse(response.locations)
-        setRowData(responseJson);
-        return responseJson
-    }
+
 
     const gridRef = useRef(null);
     const [rowData, setRowData] = useState();
-    const extraColumns = useCallback([
-    {
-        field: 'id', 
-        headerName: '' ,
-        cellRenderer: EditButton, 
-        cellRendererParams: {
-        clicked: function(field) {
-            editLocationHandler(field);
-        }
-    }},
-    {
-        field: 'id',
-        headerName: '' ,
-        cellRenderer: DeleteButton, 
-        cellRendererParams: {
-        clicked: function(field) {
-            deleteLocationHandler(field)
-        }
-    }}])
-    const {loadedColumnDefs} = useCallback(defineColumns(
-        {
-            columnKeys: ["locationName"],
-            columnHeaders: ["Location"],
-            extraColumns: extraColumns
-        }))
-    const [columnDefs, setColumnDefs] = useState(loadedColumnDefs);
+
+    
+
+    const [columnDefs, setColumnDefs] = useState([]);
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
 
@@ -92,22 +77,59 @@ export default function Location({autoLogin}) {
       setGridApi(params.api);
       setGridColumnApi(params.columnApi);
     };
-  
-    useEffect(() => {
-      if (gridApi && gridColumnApi) {
-        gridColumnApi.autoSizeColumns();
-      }
-    }, [gridApi, gridColumnApi, rowData]);
+    const locationPrem = useLocation()
+    const {thisFeaturePerms} = locationPrem.state
+
+    const getLocations = useCallback(async () => {
+        let response = await fetcher("GET", "/getLocations?token=" +  localStorage.getItem("token"));
+        console.log(response)
+        const responseJson = JSON.parse(response.locations)
+        var editPerm  = {
+            field: 'id', 
+            headerName: '' ,
+            cellRenderer: EditButton, 
+            cellRendererParams: {
+                clicked: function(field) {
+                    editLocationHandler(field);
+                }
+        }}
+        
+        var deletePerm = {
+            field: 'id',
+            headerName: '' ,
+            cellRenderer: DeleteButton, 
+            cellRendererParams: {
+            clicked: function(field) {
+                deleteLocationHandler(field)
+                }
+        }}
+
+        var temp = [{
+            field: 'locationName', 
+            headerName: 'Location' 
+        }]
+
+        if (thisFeaturePerms.edit) temp.push(editPerm);
+        if (thisFeaturePerms.delete) temp.push(deletePerm);
+        setColumnDefs(temp);
+        setRowData(responseJson);
+
+        return responseJson
+    })
 
     useEffect(() => {
         autoLogin();
         getLocations();
-    }, [])
+
+    }, []);
+
 
     return (
         <div className="location-page">
              <ToastContainer />
             <h1>Locations</h1>
+
+            {thisFeaturePerms.create?
             <div className="container-fluid m-5">
                 <div className="row">
                     <div className="col-12">
@@ -117,7 +139,7 @@ export default function Location({autoLogin}) {
                         </Form>
                     </div>
                 </div>
-            </div>
+            </div>:null}
 
             <div className={AG_THEME_CLASS("location-grid")}>
 				<AgGridReact
