@@ -329,6 +329,7 @@ export default function Referals({autoLogin, fullVersion,reportID}) {
         if(response.status == 200){
             toast.success(response.message)
             handleCloserefEdit()
+            getRefs(prevSearchData)
         }else{
             toast.warning(response.message)
         }
@@ -394,7 +395,7 @@ export default function Referals({autoLogin, fullVersion,reportID}) {
         }else{
             getRefsOFrep(reportID);
         }
-
+        console.log(thisFeaturePerms.edit)
         // edit permision
         if(thisFeaturePerms.edit){
             temp.push(editFeature);

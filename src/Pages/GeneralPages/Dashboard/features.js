@@ -29,8 +29,8 @@ export function Features(props) {
     return (
         <>
         {props.features.map((item) => {
-            console.log(item.title)
-            console.log(item.dashboardFeature)
+            // console.log(item.title)
+            // console.log(item.dashboardFeature)
                     if(item.access && item.dashboardFeature){
                         return (
                             <div className="col-lg-6 col-md-6 col-sm-12">

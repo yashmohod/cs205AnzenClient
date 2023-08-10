@@ -103,9 +103,22 @@ function removeReferals(){
 }
 const location = useLocation()
 const { thisFeaturePerms } = location.state
+const[recordsPrems,setrecordesPerm] = useState({})
+
+
+async function getPermissionFromRecords(){
+  let perm_response = await get(API_URL + "/getPermision?token=" +  localStorage.getItem("token")+"&org=" + thisFeaturePerms.org+"&featureName=Records");
+  if(perm_response.status == 200){
+    setrecordesPerm(perm_response.permission)
+    console.log(perm_response)
+  }else{
+    console.log(perm_response)
+  }
+  
+}
 useEffect(() => 
 {   
-  console.log(thisFeaturePerms);
+  getPermissionFromRecords()
 },[referals,referalData,referalsCount,showReferals])
 
 
@@ -120,7 +133,7 @@ useEffect(() =>
               <div className="col-0 col-md-2"></div>
                 <div className="col-12 col-md-8 justify-content-center">
                   <Form className="register-form-container p-5">
-                  {thisFeaturePerms.create?<>
+                  {recordsPrems.create?<>
                   <div className="register-form">
                   
                   <Form.Label className=" d-flex justify-content-start">Incident</Form.Label>

@@ -12,6 +12,7 @@ import EmployeeAccounts from './Pages/GeneralPages/EmployeeAccounts/EmployeeAcco
 import TimeCards from './Pages/GeneralPages/TimeCards/TimeCards';
 import UserPersonalProfile from './Pages/GeneralPages/UserPersonalProfile/UserPersonalProfile'
 import Positions from './Pages/GeneralPages/Positions/Positions'
+import Shifts from './Pages/GeneralPages/Shifts/Shifts';
 import { useNavigate } from "react-router-dom";
 import 'rsuite/styles/index.less';
 import 'rsuite/dist/rsuite.min.css'
@@ -61,6 +62,8 @@ function App() {
           <Route path="/employee-accounts" element={<EmployeeAccounts autoLogin={() => autoLogin()}/>}/>
           <Route path="/time-cards" element={<TimeCards autoLogin={() => autoLogin()}/>}/>
           <Route path="/UserPersonalProfile" element={<UserPersonalProfile autoLogin={() => autoLogin()}/>}/>
+          <Route path="/positions" element={<Positions autoLogin={() => autoLogin()}/>}/>
+          <Route path="/shifts" element={<Shifts autoLogin={() => autoLogin()}/>}/>
 
           {/* sasp routes */}
           <Route path="/SASPpages/daily" element={<Daily autoLogin={() => autoLogin()}/>}/>

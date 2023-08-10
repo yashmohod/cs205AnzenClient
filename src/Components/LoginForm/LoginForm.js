@@ -92,7 +92,7 @@ export default function LoginForm({autoLogin, setLoading}) {
         dispatch(userActions.updateLoggedIn(false))
         dispatch(userActions.updateUserMetadata(null))
         setLoading(false)
-        toast.error(<h5>Wrong Credentials!</h5>, {style: {fontWeight: "bold"}})
+        toast.error(<h5>{response.message}</h5>, {style: {fontWeight: "bold"}})
       }
    }
    function checkMessage(){

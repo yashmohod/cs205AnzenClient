@@ -27,6 +27,7 @@ export default function({autoLogin}) {
 
     function tabChange(e){
         console.log(sortedFeatures[e].org)
+        checkClockInAccess(sortedFeatures[e])
         set_curOrgClock(sortedFeatures[e].org)
         checkClockinStatus(sortedFeatures[e].org)
     }
@@ -41,9 +42,11 @@ export default function({autoLogin}) {
     const [note,setNote] = useState("");
 
     async function getShifts(){
-        let response = await get(API_URL + "/getShifts?token=" +  localStorage.getItem("token"))
+        let response = await get(API_URL + "/getAllShifts?token=" +  localStorage.getItem("token"))
         setShifts(response.shifts)
     }
+
+
 
     async function clockIn() {
 
@@ -78,6 +81,7 @@ export default function({autoLogin}) {
 
     const [orgs,setOrgs] = useState([]);
     const [sortedFeatures,setSortedFeatures]=useState([]);
+
     async function setFeatures(){
         let temp = []
 
@@ -146,11 +150,22 @@ export default function({autoLogin}) {
 
         }
 
+        checkClockInAccess(temp_sortedFeatures[0])
         setOrgs(temp)
         setSortedFeatures(temp_sortedFeatures)
         set_curOrgClock(temp_sortedFeatures[0].org)
         checkClockinStatus(temp_sortedFeatures[0].org)
         setshowFeatures(true)
+    }
+
+    const [clockinfeature,setclocinfeature] = useState(false);
+    function checkClockInAccess(permissons){
+        permissons.features.map((cur)=>{
+            if(cur.title == "Time Cards"){
+
+                setclocinfeature( cur.create)
+            }
+        })
     }
 
     const checkClockinStatus = async (Org) => {
@@ -223,7 +238,10 @@ export default function({autoLogin}) {
               <Form>
                 <Form.Label className=" d-flex justify-content-start">Select a shift type!</Form.Label>
                 {shifts.map((shift)=>{
-                    return (<Button variant="success" style={{marginRight:"5px"}} onClick={()=>clockOut(shift.shiftName)}>{shift.shiftName}</Button>)
+                    if(shift.orgName ==curOrgClock ){
+                        return (<Button variant="success" style={{marginRight:"5px"}} onClick={()=>clockOut(shift.shiftName)}>{shift.shiftName}</Button>)
+                    }
+                    
                 })}
                 </Form>
               </Modal.Footer>
@@ -238,10 +256,14 @@ export default function({autoLogin}) {
                 <Tab eventKey={sortedFeatures.indexOf(SF)} title={SF.org}>
                     <div className="features container-fluid mt-5 ">
                         <div className="row">
+                        {clockinfeature?
                             <div className="col-12">
                                 {clockin ?  <div onClick={() => clockOutButtonHandler()}><Card title="Clock Out" description="End your work shift" style={Rstyle}/></div> : <div onClick={() => clockIn()}><Card title="Clock In" description="Start your work shift" style={Gstyle}/></div> }
                             </div>
+                            :null
+                        }
                         </div>
+                        
                         <div className="row justify-content-center"  >
                 
                             { showFeatures ? <Features features={SF.features}/> : null }

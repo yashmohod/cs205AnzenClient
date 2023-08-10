@@ -8,7 +8,8 @@ import CheckButton from '../Buttons/CheckButton';
 import "./PositionCard.css"
 import { Form, Accordion} from 'react-bootstrap';
 import Position from "rsuite/esm/Overlay/Position";
-export default function({curpos,keyNum,editPermissions,edit_promotionNdemotion}) {
+import Button from 'rsuite/Button';
+export default function({curpos,keyNum,editPermissions,edit_promotionNdemotion,editPositions,deletePositions}) {
 
     const cardRef = useRef(null);
 
@@ -112,20 +113,38 @@ export default function({curpos,keyNum,editPermissions,edit_promotionNdemotion})
       },
         ]
 
+    
+    
     const { thisFeaturePerms } = location.state
 
     useEffect(() => {
-
     },[])
 
     return (
         
         <Accordion.Item eventKey={keyNum} id ="positionCard">
-        <Accordion.Header ref={cardRef} id="positionCardHeader" >{curpos.PosName ==curpos.title?<>{curpos.PosName}</>:<>{curpos.PosName+","+curpos.title}</>} </Accordion.Header>
+        <Accordion.Header ref={cardRef} id="positionCardHeader" >{curpos.PosName ==curpos.title?<>{curpos.PosName}</>:<>{curpos.PosName+","+curpos.title}</>}</Accordion.Header>
         <Accordion.Body id="positionCardBody">
-          <Accordion defaultActiveKey="0">
+        <div className="col"> 
+        <div className = "buttonsDiv">
+        <div className="row" >
+          <div className="col-3"></div>
+          <div className="col-3" id="editbutton">
+            <Button color="green" appearance="primary" onClick={()=>editPositions(curpos)} className="p-1" title="Edit">
+              Edit
+            </Button>
+          </div>
+          <div className="col-3" id="deletebutton">
+            <Button color="red" appearance="primary" onClick = {()=>deletePositions(curpos.id)} className="p-1" title="Delete">
+              Delete 
+            </Button>
+          </div>
+          <div className="col-3"></div>
+          </div>
+        </div>
+        <Accordion defaultActiveKey="0">
             <Accordion.Item eventKey={0} >
-            <Accordion.Header  >Permissions </Accordion.Header>
+            <Accordion.Header  >Permissions  </Accordion.Header>
             <Accordion.Body>
               <div>
                 <div className="ag-theme-alpine incident-grid" id = "permissionsDiv" >
@@ -156,7 +175,9 @@ export default function({curpos,keyNum,editPermissions,edit_promotionNdemotion})
               </div>
             </Accordion.Body>
            </Accordion.Item>
-          </Accordion>
+          </Accordion>  
+        </div>
+         
 
 
         </Accordion.Body>
