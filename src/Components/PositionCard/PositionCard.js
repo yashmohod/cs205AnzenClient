@@ -161,19 +161,19 @@ export default function({curpos,keyNum,editPermissions,edit_promotionNdemotion,e
            </Accordion.Item>
            <Accordion.Item eventKey={1} >
             <Accordion.Header  >Promotion Settings</Accordion.Header>
-            <Accordion.Body>
-              <div>
-                <div className="ag-theme-alpine incident-grid" id = "promotionsDiv">
-                    <AgGridReact
-                    ref={gridRef}
-                    columnDefs={columnDefs_promotionD}
-                    defaultColDef={defaultColDef}
-                    rowData={curpos.promotionD}
-                    >
-                    </AgGridReact>
-                </div>  
-              </div>
-            </Accordion.Body>
+              <Accordion.Body>
+                <div>
+                  <div className="ag-theme-alpine incident-grid" id = "promotionsDiv">
+                      <AgGridReact
+                      ref={gridRef}
+                      columnDefs={columnDefs_promotionD}
+                      defaultColDef={defaultColDef}
+                      rowData={curpos.promotionD}
+                      >
+                      </AgGridReact>
+                  </div>  
+                </div>
+              </Accordion.Body>
            </Accordion.Item>
           </Accordion>  
         </div>

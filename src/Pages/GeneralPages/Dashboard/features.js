@@ -18,7 +18,11 @@ export function Features(props) {
         "border-radius": "15px",
     }
     
-
+    const getClickableLink = link => {
+        return link.startsWith("http://") || link.startsWith("https://") ?
+          link
+          : `http://${link}`;
+      };
 
 
     useEffect(() => {
@@ -34,8 +38,8 @@ export function Features(props) {
                     if(item.access && item.dashboardFeature){
                         return (
                             <div className="col-lg-6 col-md-6 col-sm-12">
-                                {!item.internallyManaged ?    
-                                <a href={item.external_url} target="_blank">
+                                {!item.internallyManaged ?   
+                                <a href={getClickableLink(item.external_url)} target="_blank"  rel="noopener noreferrer">
                                     <Card title={item.title} description={item.description} style={style}/>
                                 </a>
                             :    <Link to={item.internal_url} state={{ thisFeaturePerms:item }}className="feature-url">

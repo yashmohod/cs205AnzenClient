@@ -9,7 +9,7 @@ import {Accordion, Button, Form, Modal} from 'react-bootstrap';
 import PositionCard from "../../../Components/PositionCard/PositionCard"
 import "./position.css"
 import useFetch from "../../../hooks/useFetch";
-export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
+export default function Positions({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
 
     const [positions,setPositions] = useState([]);
     const {REQUEST: fetcher} = useFetch()

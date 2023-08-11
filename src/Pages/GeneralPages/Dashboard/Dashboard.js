@@ -87,6 +87,7 @@ export default function({autoLogin}) {
 
         let permisions_response = await get(API_URL + "/getFeaturePermissions?token=" +  localStorage.getItem("token"));
         const perms = permisions_response.featurePermissions
+        console.log(perms)
         let temp_sortedFeatures=[]
         for(let x =0; x<perms.length; x++){
             if(!temp.includes(perms[x].org)){
@@ -153,6 +154,7 @@ export default function({autoLogin}) {
         checkClockInAccess(temp_sortedFeatures[0])
         setOrgs(temp)
         setSortedFeatures(temp_sortedFeatures)
+
         set_curOrgClock(temp_sortedFeatures[0].org)
         checkClockinStatus(temp_sortedFeatures[0].org)
         setshowFeatures(true)
