@@ -24,6 +24,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { userActions } from './redux/slices/user';
 import Nav from './Components/Nav/Nav';
 import useFetch from './hooks/useFetch';
+import SelfEvals from './Pages/SASPpages/SelfEvals/SelfEvals';
 
 function App() {
   const navigate = useNavigate();
@@ -73,6 +74,7 @@ function App() {
           <Route path="/SASPpages/incidents" element={<Incidents autoLogin={() => autoLogin()}/>}/>
           <Route path="/SASPpages/Records" element={<Records autoLogin={() => autoLogin()} fullVersion={true} reportID={""}/>}/>
           <Route path="/SASPpages/referrals" element={<Referals autoLogin={() => autoLogin()} fullVersion={true} reportID={""}/>}/>
+          <Route path="/SASPpages/SelfEvals" element={<SelfEvals autoLogin={() => autoLogin()} />}/>
         </Routes>                 
     </div>
   );

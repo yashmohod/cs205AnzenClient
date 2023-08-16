@@ -9,7 +9,7 @@ import "./LinkCard.css"
 import { Form, Accordion} from 'react-bootstrap';
 import Position from "rsuite/esm/Overlay/Position";
 import Button from 'rsuite/Button';
-export default function LinkCard({curLink,keyNum,editLink,deleteLink,positions, userperms,updateLinkVisibility}) {
+export default function LinkCard({curLink,keyNum,editLink,deleteLink,thisFeaturePerms, userperms,updateLinkVisibility}) {
   
   
   const gridRef = useRef(null);
@@ -32,7 +32,7 @@ export default function LinkCard({curLink,keyNum,editLink,deleteLink,positions, 
       permissionFunction:true,
     }}]
     
-    function editRowData(){
+    function editRowData(positions){
       console.log("here")
       let temp = []
       for(let x = 0; x <positions.length;x++ ){
@@ -62,10 +62,18 @@ export default function LinkCard({curLink,keyNum,editLink,deleteLink,positions, 
       }
       console.log(temp)
       setRowData(temp)
+      
+    }
+    async function getpositions(){
+
+        let response = await get(API_URL + "/getPositions?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org);
+        var positionAll = response.positions;
+        editRowData(positionAll);
     }
 
     useEffect(() => {
-      editRowData()
+
+      getpositions();
     },[])
 
     return (

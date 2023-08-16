@@ -130,14 +130,7 @@ export default function Links({autoLogin}) {
         }
     }
 
-    const [positions,setPositions] = useState([])
-    async function getpositions(){
 
-        let response = await get(API_URL + "/getPositions?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org);
-        var positionAll = response.positions;
-        setPositions(positionAll)
-        console.log(positionAll)
-    }
 
     async function updateLinkVisibility(prop,e,org){
         // console.log(prop.data)
@@ -171,10 +164,10 @@ export default function Links({autoLogin}) {
         return !!urlPattern.test(urlString);
       }
         if(isAdd){
-            console.log(isValidUrl(addData.url))
+            // console.log(isValidUrl(addData.url))
             return isValidUrl(addData.url)
         }else{
-            console.log(isValidUrl(editData.url))
+            // console.log(isValidUrl(editData.url))
             return isValidUrl(editData.url)
         }
         // return false
@@ -185,7 +178,7 @@ export default function Links({autoLogin}) {
         return(
             links.map(element => {
           return(
-          <LinkCard keyNum={links.indexOf(element)}  curLink={element} deleteLink={deleteLink} editLink={editLink} positions={positions} userperms= {thisFeaturePerms} updateLinkVisibility={updateLinkVisibility}/>
+          <LinkCard keyNum={links.indexOf(element)}  curLink={element} deleteLink={deleteLink} editLink={editLink} thisFeaturePerms={thisFeaturePerms} userperms= {thisFeaturePerms} updateLinkVisibility={updateLinkVisibility}/>
          ) }))
       }
     
@@ -193,7 +186,6 @@ export default function Links({autoLogin}) {
     useEffect(() => {
         autoLogin();
         getLinks();
-        getpositions();
 
     }, []);
 
