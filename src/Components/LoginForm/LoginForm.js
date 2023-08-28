@@ -10,69 +10,27 @@ import { ToastContainer, toast } from 'react-toastify';
 import { Text } from '@chakra-ui/react'
 import { useSelector, useDispatch } from 'react-redux';
 import {userActions} from "../../redux/slices/user"
+import { useMsal } from "@azure/msal-react";
 
-//'linear-gradient(#e66465, #9198e5)'
-//linear-gradient(#1f87ab, #004961 50%, #004961 90%);
+
 export default function LoginForm({autoLogin, setLoading}) {
-   const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [error, setError] = useState();
-    const [isAuthenticated, setIsAuthenticated]= useState(false);
-
-  //   const { instance, accounts } = useMsal();
-
-  //   function login (){
-  //     instance.loginPopup(loginRequest).catch(e => {
-  //         console.log(e);
-  //         // setIsAuthenticated(false);
-  //       });
-  //       setIsAuthenticated(true);
-  //   }
-
-  // function logout (){
-  //         instance.logoutPopup({
-  //             postLogoutRedirectUri: "/",
-  //             mainWindowRedirectUri: "/" // redirects the top level app after logout
-  //         });
-  //         setIsAuthenticated(false);
-  // }
 
 
 
-  //   const [graphData, setGraphData] = useState(null);
+  const dispatch = useDispatch()
+  const { instance } = useMsal();
+  function login(){
 
-  //   const name = accounts[0] && accounts[0].name;
-
-  //   function RequestProfileData() {
-  //       const request = {
-  //           ...loginRequest,
-  //           account: accounts[0]
-  //       };
-
-  //       // Silently acquires an access token which is then attached to a request for Microsoft Graph data
-  //       instance.acquireTokenSilent(request).then((response) => {
-  //           callMsGraph(response.accessToken).then(response => setGraphData(response));
-  //       }).catch((e) => {
-  //           instance.acquireTokenPopup(request).then((response) => {
-  //               callMsGraph(response.accessToken).then(response => setGraphData(response));
-  //           });
-  //       });
-
-  //       console.log(graphData);
-  //       console.log(accounts);
-  //   }
-    const dispatch = useDispatch()
-    const user = useSelector((state) => state.user)
-    async function loginHandler(e) {
-      setLoading(true)
-      if (!e && e !== "") {
-        autoLogin()
-        setLoading(false)
-        return
-      }
-      var response, tokenVerification
+    instance.loginPopup().then(getToken)
+    
+  }
+  async function getToken(){
+    setLoading(true);
+    const currentAccount = instance.getActiveAccount();
+    var response, tokenVerification
       try {
-        response = await post(API_URL + "/login",  {email: email, password: password})
+        response = await post(API_URL + "/login",  {email: currentAccount.username})
+        // console.log(response)
         tokenVerification = await post(API_URL + "/validate-token", {token: response.token})
       } catch {
         setLoading(false)
@@ -92,18 +50,16 @@ export default function LoginForm({autoLogin, setLoading}) {
         dispatch(userActions.updateLoggedIn(false))
         dispatch(userActions.updateUserMetadata(null))
         setLoading(false)
-        toast.error(<h5>Wrong Credentials!</h5>, {style: {fontWeight: "bold"}})
+        toast.error(<h5>{response.message}</h5>, {style: {fontWeight: "bold"}})
       }
-   }
-   function checkMessage(){
-    if(!(localStorage.getItem("message") === null)){
-        toast.success(String(localStorage.getItem("message")));
-        localStorage.removeItem("message");
-    }
-}
+  }
+  
+
+
+ 
 
     useEffect((e) => {
-      loginHandler(e)
+      autoLogin()
       }, [])
 
       return (
@@ -114,24 +70,7 @@ export default function LoginForm({autoLogin, setLoading}) {
                 </div>
                 <form className='m-5'>
                       <Text fontSize='4xl' color="black" mb={10}>Access Page</Text>
-                     <div class="mb-3">
-                       <label for="exampleInputEmail1" class="form-label d-flex justify-content-start" style={{color: "black"}}>Email</label>
-                       <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={(e) => setEmail(e.target.value)} style={{color: "black"}}/>
-                     </div>
-                     <div class="mb-3">
-                       <label for="exampleInputPassword1" class="form-label d-flex justify-content-start" style={{color: "black"}}>Password</label>
-                       <input type="password" class="form-control" id="exampleInputPassword1" onChange={(e) => setPassword(e.target.value)} style={{color: "black"}}/>
-                     </div>
-
-                     <Button appearance="primary" class="btn btn-primary" onClick={(e) => loginHandler(e)} color="blue" active>Login</Button>
-                     {/* {useIsAuthenticated()?
-                     <>
-                     <Button variant="secondary" onClick={RequestProfileData}>Request Access Token</Button>
-                     <Button appearance="primary" className="btn btn-primary" onClick={() => logout()} color="blue" active>Log out</Button>
-                     </>
-                     :
                      <Button appearance="primary" className="btn btn-primary" onClick={()=>login()} color="blue" active>Login</Button>
-                     } */}
                 </form>
             </div>
       )

@@ -18,7 +18,11 @@ export function Features(props) {
         "border-radius": "15px",
     }
     
-
+    const getClickableLink = link => {
+        return link.startsWith("http://") || link.startsWith("https://") ?
+          link
+          : `http://${link}`;
+      };
 
 
     useEffect(() => {
@@ -29,13 +33,28 @@ export function Features(props) {
     return (
         <>
         {props.features.map((item) => {
-            console.log(item.title)
-            console.log(item.dashboardFeature)
+            // console.log(item.title)
+            // console.log(item.dashboardFeature)
                     if(item.access && item.dashboardFeature){
                         return (
+                            // <>
+                            // <div className="col-lg-1 col-md-1 col-sm-12"></div>
+                            // <div className="col-lg-4 col-md-4 col-sm-12">
+                            //     {!item.internallyManaged ?   
+                            //     <a href={getClickableLink(item.external_url)} target="_blank"  rel="noopener noreferrer">
+                            //         <Card title={item.title} description={item.description} style={style}/>
+                            //     </a>
+                            // :    <Link to={item.internal_url} state={{ thisFeaturePerms:item }}className="feature-url">
+                            //         <Card title={item.title} description={item.description} style={style}/>
+                            //     </Link>
+                             
+                            //     }
+                            // </div>
+                            // <div className="col-lg-1 col-md-1 col-sm-12"></div>
+                            // </>
                             <div className="col-lg-6 col-md-6 col-sm-12">
-                                {!item.internallyManaged ?    
-                                <a href={item.external_url} target="_blank">
+                                {!item.internallyManaged ?   
+                                <a href={getClickableLink(item.external_url)} target="_blank"  rel="noopener noreferrer">
                                     <Card title={item.title} description={item.description} style={style}/>
                                 </a>
                             :    <Link to={item.internal_url} state={{ thisFeaturePerms:item }}className="feature-url">

@@ -8,9 +8,11 @@ import { useLocation } from 'react-router-dom'
 import {Accordion, Button, Form, Modal} from 'react-bootstrap';
 import PositionCard from "../../../Components/PositionCard/PositionCard"
 import "./position.css"
-export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
+import useFetch from "../../../hooks/useFetch";
+export default function Positions({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
 
     const [positions,setPositions] = useState([]);
+    const {REQUEST: fetcher} = useFetch()
     // const [promotionD, setPromotionD] = useState([]);
     const gridRef = useRef();
     const defaultColDef= { resizable: true}
@@ -21,7 +23,6 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     const [isAdd, setIsAdd] = useState();
 
     const [positionData, setPositionData] = useState({
-        "id":"",
         "PosName":"",
         "title":"",
         "availableNoPos":"",
@@ -30,17 +31,18 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
 
 
     async function getpositions(){
+        // console.log(thisFeaturePerms)
         let response = await get(API_URL + "/getPositions?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org);
-        cutomizePromotionDetails(response.positions);
+        // var positionAll = Array.from(response.positions);
+        var positionAll = response.positions;
 
-    }
 
-    function cutomizePromotionDetails(positionAll){
         for(let position of positionAll){
             let dataGrid =[];
             for(let otherPositions of positionAll){
                 if(position.id != otherPositions.id){
                     let isPromote = false;
+                    console.log(position.promoteTo)
                 for(let pormoteToPos of position.promoteTo){
                     if(pormoteToPos.title == otherPositions.title){
                         isPromote = true;
@@ -61,9 +63,13 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
             }
             position.promotionD = dataGrid;
         }   
-        console.log(positionAll);
+        // console.log(positionAll);
+    
+        console.log(positionAll)
         setPositions(positionAll);
+
     }
+
 
     async function addPositions(){
         console.log(positionData);
@@ -91,20 +97,94 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     }
 
     async function deletePositions(positionID){
+        let response = await fetcher("POST", "/deletePosition",  {id :positionID ,token: localStorage.getItem("token"), org : thisFeaturePerms.org});
+        if (response.status === 200) {
+            toast.success(String(response["message"]));
 
+        } else {
+            toast.warning(String(response["message"] ));
+        }
+        refresh();
     }
 
-    async function editPositions(positionID,data){
+    const [editData,setEditData]= useState({
+        "id":"",
+        "PosName":"",
+        "title":"",
+        "availableNoPos":"",
+    });
+    function editDataChangeHandler(e){
+        setEditData({...editData,  [e.target.name] : e.target.value})
+        console.log(editData)
+        }
 
+    function editPositions(curPos){
+        setEditData({
+            "id":curPos.id,
+            "PosName":curPos.PosName,
+            "title":curPos.title,
+            "availableNoPos":curPos.availableNoPos,
+        })
+        handleadShow_posModal();
+        setIsAdd(false);
+
+        
     }
+    async function editPositionsSubmit(){
+        // console.log(editData)
+        let response = await fetcher("POST", "/editPosition",  {
+            id :editData.id,
+            PosName:editData.PosName,
+            title:editData.title, 
+            availableNoPos:editData.availableNoPos,
+            token: localStorage.getItem("token"), 
+            org : thisFeaturePerms.org});
+        if (response.status === 200) {
+            toast.success(String(response["message"]));
+            setEditData({
+                "id":"",
+                "PosName":"",
+                "title":"",
+                "availableNoPos":"",})
+            handleadClose_posModal();
+            refresh();
+
+        } else {
+            toast.warning(String(response["message"] ));
+        }
+    }
+
+    async function addPositionsSubmit(){
+        console.log(positionData)
+        let response = await fetcher("POST", "/addPosition",  {
+            PosName:positionData.PosName,
+            title:positionData.title, 
+            availableNoPos:positionData.availableNoPos,
+            token: localStorage.getItem("token"), 
+            org : thisFeaturePerms.org});
+        if (response.status === 200) {
+            toast.success(String(response["message"]));
+            setPositionData({
+                "PosName":"",
+                "title":"",
+                "availableNoPos":"",})
+            handleadClose_posModal();
+            refresh();
+
+        } else {
+            toast.warning(String(response["message"] ));
+        }
+    }
+    
+
 
     
     async function edit_promotionNdemotion(transitionOf, transitionTo, isPromotion, updateValue ){
         // set_promotionsNdemotions
-        console.log(transitionOf)
-        console.log(transitionTo)
-        console.log(isPromotion)
-        console.log(updateValue)
+        // console.log(transitionOf)
+        // console.log(transitionTo)
+        // console.log(isPromotion)
+        // console.log(updateValue)
         let response = await post(API_URL + "/set_promotionsNdemotions",  {
             token: localStorage.getItem("token"),
             org: thisFeaturePerms.org,
@@ -149,19 +229,19 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     function refresh(){
         autoLogin();
         getpositions();
-        console.log(thisFeaturePerms)
+        // console.log(thisFeaturePerms)
     }
 
     function showPositionCards(){
-  
+        // console.log(positions)s
         return(
         positions.map(element => {
           return(
-          <PositionCard keyNum={positions.indexOf(element)} curpos={element} editPermissions={editPermissions}  edit_promotionNdemotion={edit_promotionNdemotion}/>
+          <PositionCard keyNum={positions.indexOf(element)} curpos={element} editPermissions={editPermissions}  edit_promotionNdemotion={edit_promotionNdemotion} editPositions={editPositions} deletePositions = {deletePositions}/>
          ) }))
       }
 
-    function inputPasswordChangeHandler(e){
+    function addPositionChangeHandler(e){
     setPositionData({...positionData,  [e.target.name] : e.target.value})
     }
 
@@ -181,10 +261,8 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
     return (
         
         <div>
-        
-            <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={autoLogin}/>
              <ToastContainer />
-            <h1>Positions & Permissions</h1>
+            <h1>Positions</h1>
             <div className="">
                 <div className="row">
                     <div className="col-12">
@@ -194,13 +272,15 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
                     </div>
                 </div>
             </div>
-            <div className="CardsDiv" >
+            <div className="ag-theme-alpine incident-grid">
+                <div className="col" id="CardsDiv" >
+                    <Accordion defaultActiveKey="0" id="PositionCardHolder" alwaysOpen>
+                        {showPositionCards()}
+                    </Accordion>
 
-                <Accordion defaultActiveKey="0" id="PositionCardHolder" alwaysOpen>
-                    {showPositionCards()}
-                </Accordion>
-
+                </div>
             </div>
+            
             <Modal
             show={posModal}
             onHide={handleadClose_posModal}
@@ -211,19 +291,34 @@ export default function({loggedIn, setLoggedIn, loggedInUser,autoLogin}) {
             <Modal.Title>{isAdd?"Add Position":"Edit Position"}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+                {isAdd?
                 <div className="register-form">
                     <Form.Group className="mb-3" controlId="formBasicFirstName">
                     <Form.Label className=" d-flex justify-content-start">Positions Name</Form.Label>
-                    <Form.Control type="text" placeholder="" name="PosName" onChange={(e) =>inputPasswordChangeHandler(e)}/>
+                    <Form.Control type="text" placeholder="" name="PosName" onChange={(e) =>addPositionChangeHandler(e)}/>
                     <Form.Label className=" d-flex justify-content-start">Title</Form.Label>
-                    <Form.Control type="text" placeholder="" name="title" onChange={(e) => inputPasswordChangeHandler(e)}/>
+                    <Form.Control type="text" placeholder="" name="title" onChange={(e) => addPositionChangeHandler(e)}/>
                     <Form.Label className=" d-flex justify-content-start">Available Positions #</Form.Label>
-                    <Form.Control type="number" placeholder="" name="availableNoPos" onChange={(e) => inputPasswordChangeHandler(e)}/>
+                    <Form.Control type="number" placeholder="" name="availableNoPos" onChange={(e) => addPositionChangeHandler(e)}/>
                     </Form.Group>
                 </div>
+                :
+                <div className="register-form">
+                    <Form.Group className="mb-3" controlId="formBasicFirstName">
+                    <Form.Label className=" d-flex justify-content-start">Positions Name</Form.Label>
+                    <Form.Control type="text" placeholder="" name="PosName" value = {editData.PosName} onChange={(e) =>editDataChangeHandler(e)}/>
+                    <Form.Label className=" d-flex justify-content-start">Title</Form.Label>
+                    <Form.Control type="text" placeholder="" name="title" value = {editData.title} onChange={(e) => editDataChangeHandler(e)}/>
+                    <Form.Label className=" d-flex justify-content-start">Available Positions #</Form.Label>
+                    <Form.Control type="number" placeholder="" name="availableNoPos" value = {editData.availableNoPos} onChange={(e) => editDataChangeHandler(e)}/>
+                    </Form.Group>
+                </div>
+                }
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="primary" onClick={()=>addPositions()}>Submit</Button>
+                {isAdd?
+                <Button variant="primary" onClick={()=>addPositionsSubmit()}>Submit</Button>:
+                <Button variant="primary" onClick={()=>editPositionsSubmit()}>Submit</Button>}
             </Modal.Footer>
         </Modal>
        

@@ -26,6 +26,7 @@ import { themeActions } from "../../redux/slices/theme";
 import HomeIcon from "./icons/home.png"
 import SettingIcon from "./icons/settings.png"
 import LogoutIcon from "./icons/logout.png"
+import { useMsal } from "@azure/msal-react";
 
 export default function Nav() {
     const navigate = useNavigate();
@@ -34,6 +35,7 @@ export default function Nav() {
     const [showmore,setShowMore] = useState(false)
     const dispatch = useDispatch()
     const { colorMode, toggleColorMode } = useColorMode();
+    const { instance } = useMsal();
     // const [darkHome,setDarkHome] = useState(false)
     
     
@@ -46,6 +48,7 @@ export default function Nav() {
         localStorage.removeItem("firstName")
         document.location.replace("/")
         dispatch(userActions.updateLoggedIn(false))
+        instance.logoutPopup()
     }
 
     useEffect(() => {

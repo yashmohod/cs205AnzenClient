@@ -493,7 +493,7 @@ function SaveAsCSV(){
 
 
     async function getShifts(){
-      let response = await get(API_URL + "/getShifts?token=" +  localStorage.getItem("token"))
+      let response = await get(API_URL + "/getOrgShifts?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org)
       setShifts(response.shifts)
   }
 
@@ -570,10 +570,13 @@ function SaveAsCSV(){
              <ToastContainer />
             <h1>{thisFeaturePerms.org}</h1>
             <h1>Time Cards</h1>
+            {thisFeaturePerms.create?
+            
             <Form className="incident-form">
                 <Button appearance="primary" color="cyan" onClick={() =>showAndClear() }>Add Time Card</Button>
                 
             </Form>
+            :null}
             
           {/* search */}
           <div className="container">

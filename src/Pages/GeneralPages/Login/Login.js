@@ -10,10 +10,6 @@ export default function Login({autoLogin}) {
     
     useEffect(() => {
         autoLogin()
-        if(!(localStorage.getItem("message") === null)){
-            toast.warning(String(localStorage.getItem("message")));
-            localStorage.removeItem("message");
-        }
     }, [])
 
     return (
@@ -25,7 +21,6 @@ export default function Login({autoLogin}) {
                     <div className="col-1 col-md-4"></div>
                     <div className="col-10 col-md-4">
                         <div className="login-form">
-                            <ToastContainer />
                             <LoginForm autoLogin={autoLogin} setLoading={setLoading}/>
                         </div>
                     </div>

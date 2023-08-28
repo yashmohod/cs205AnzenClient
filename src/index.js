@@ -5,7 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ChakraProvider } from '@chakra-ui/react'
-import { PublicClientApplication } from "@azure/msal-browser";
+import { PublicClientApplication, EventType } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
 import { msalConfig } from "./sso/authConfig";
 
@@ -15,6 +15,17 @@ import { Provider } from 'react-redux'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const msalInstance = new PublicClientApplication(msalConfig);
+
+
+// Listen for sign-in event and set active account
+msalInstance.addEventCallback((event) => {
+  if (event.eventType === EventType.LOGIN_SUCCESS && event.payload.account) {
+      const account = event.payload.account;
+      msalInstance.setActiveAccount(account);
+      console.log(event);
+  }
+});
+
 root.render(
 
  
@@ -25,7 +36,7 @@ root.render(
             <App />
         </MsalProvider>
           </Provider>
-        </BrowserRouter>,
+        </BrowserRouter>
     </ChakraProvider>
 
 

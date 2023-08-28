@@ -98,14 +98,12 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
         getUserAccPermissions();
         getPromotionsNdemotions();
       }
-      async function changeAccountStatue() {
-        commonApiRequest("/changeAccountStatus",userAcc,false)
-      }
+
    
   
       async function commonApiRequest(endpoint,accountId,exit){
         let response = await post(API_URL + endpoint,  {userID: accountId,token: localStorage.getItem("token"),org:thisFeaturePerms.org});
-  
+        console.log(response.status)
         if(response.status === 200){
           toast.success(response.message);
         }else{
@@ -302,13 +300,26 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
       permissionFunction: true,
     }},
     ]
-
+    async function changeStatus(){
+        let response = await post(API_URL + "/changeAccountStatus",  {token: localStorage.getItem("token"), org:thisFeaturePerms.org,userID :userAcc});
+        if(response.status ==200){
+            toast.success(response.message);
+        }else{
+            toast.warning(response.message);
+        }
+        getUserAccPermissions()
+        getAccounts()
+    }
+    const[statusAccount,setstatusAccount] = useState(false)
   async function getUserAccPermissions(){
     let permisions_response = await get(API_URL + "/getFeaturePermissions?token=" +  localStorage.getItem("token")+"&userId=" + userAcc);
     const perms = permisions_response.featurePermissions
     let curOrgPerms = []
     for(let x = 0; x<perms.length; x++){
-        if(perms[x].org == thisFeaturePerms.org){
+        if(perms[x].featureName == "Status"){
+            setstatusAccount(perms[x].blackListed);
+        }
+        if(perms[x].org == thisFeaturePerms.org && perms[x].permissionManagement ){
             curOrgPerms.push(perms[x])
         }
     }
@@ -484,7 +495,7 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
                                     </div>
                                     {!personalProfileAccess?<>
                                     <div className="col">
-                                        <Button variant={userAcc.status=="Active"? "outline-info": "outline-danger"}  >{userAcc.status=="Active"? userAcc.status: "Deactivate"}</Button>
+                                        <Button variant={statusAccount? "outline-success": "outline-danger"} onClick={()=>changeStatus()} >{statusAccount? "Activate": "Deactivate"}</Button>
                                     </div>
                                     <div className="col">
                                         <Button variant="outline-success" onClick={()=>promoteAccount()} >Promote</Button>

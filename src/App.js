@@ -12,6 +12,8 @@ import EmployeeAccounts from './Pages/GeneralPages/EmployeeAccounts/EmployeeAcco
 import TimeCards from './Pages/GeneralPages/TimeCards/TimeCards';
 import UserPersonalProfile from './Pages/GeneralPages/UserPersonalProfile/UserPersonalProfile'
 import Positions from './Pages/GeneralPages/Positions/Positions'
+import Shifts from './Pages/GeneralPages/Shifts/Shifts';
+import Links from './Pages/GeneralPages/Links/links';
 import { useNavigate } from "react-router-dom";
 import 'rsuite/styles/index.less';
 import 'rsuite/dist/rsuite.min.css'
@@ -22,8 +24,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { userActions } from './redux/slices/user';
 import Nav from './Components/Nav/Nav';
 import useFetch from './hooks/useFetch';
+import SelfEvals from './Pages/SASPpages/SelfEvals/SelfEvals';
+import { useMsal } from "@azure/msal-react";
 
 function App() {
+  const { instance } = useMsal();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {REQUEST: fetcher} = useFetch();
@@ -42,7 +47,7 @@ function App() {
         return true
       }
       else{
-        localStorage.setItem("message", "Login Session expired!")
+        // localStorage.setItem("message", "Login Session expired!")
         dispatch(userActions.updateLoggedIn(false))
         navigate("/")
         return false
@@ -50,7 +55,7 @@ function App() {
     }
   }, [user])
 
-//<Route path='/sasp-eval-for-trainee' element={() => { window.location.href = 'https://google.com'; return null;} }/>
+
   return (
     <div className="App">
         {user.isLoggedIn && <Nav autoLogin={autoLogin}/>}
@@ -61,6 +66,9 @@ function App() {
           <Route path="/employee-accounts" element={<EmployeeAccounts autoLogin={() => autoLogin()}/>}/>
           <Route path="/time-cards" element={<TimeCards autoLogin={() => autoLogin()}/>}/>
           <Route path="/UserPersonalProfile" element={<UserPersonalProfile autoLogin={() => autoLogin()}/>}/>
+          <Route path="/positions" element={<Positions autoLogin={() => autoLogin()}/>}/>
+          <Route path="/shifts" element={<Shifts autoLogin={() => autoLogin()}/>}/>
+          <Route path="/links" element={<Links autoLogin={() => autoLogin()}/>}/>
 
           {/* sasp routes */}
           <Route path="/SASPpages/daily" element={<Daily autoLogin={() => autoLogin()}/>}/>
@@ -68,6 +76,7 @@ function App() {
           <Route path="/SASPpages/incidents" element={<Incidents autoLogin={() => autoLogin()}/>}/>
           <Route path="/SASPpages/Records" element={<Records autoLogin={() => autoLogin()} fullVersion={true} reportID={""}/>}/>
           <Route path="/SASPpages/referrals" element={<Referals autoLogin={() => autoLogin()} fullVersion={true} reportID={""}/>}/>
+          <Route path="/SASPpages/SelfEvals" element={<SelfEvals autoLogin={() => autoLogin()} />}/>
         </Routes>                 
     </div>
   );

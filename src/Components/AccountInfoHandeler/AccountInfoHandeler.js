@@ -80,6 +80,7 @@ export default function AccountInfoHandeler({email,handlregClose, mode,thisFeatu
       let response = await get(API_URL + "/getPositions?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org)
       // setPos(response.positions)
       const position_titles = response.positions;
+      console.log(response)
 
       let positions =[]
 
