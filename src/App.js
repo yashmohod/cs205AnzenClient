@@ -25,8 +25,10 @@ import { userActions } from './redux/slices/user';
 import Nav from './Components/Nav/Nav';
 import useFetch from './hooks/useFetch';
 import SelfEvals from './Pages/SASPpages/SelfEvals/SelfEvals';
+import { useMsal } from "@azure/msal-react";
 
 function App() {
+  const { instance } = useMsal();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {REQUEST: fetcher} = useFetch();
@@ -45,7 +47,7 @@ function App() {
         return true
       }
       else{
-        localStorage.setItem("message", "Login Session expired!")
+        // localStorage.setItem("message", "Login Session expired!")
         dispatch(userActions.updateLoggedIn(false))
         navigate("/")
         return false
@@ -53,7 +55,7 @@ function App() {
     }
   }, [user])
 
-//<Route path='/sasp-eval-for-trainee' element={() => { window.location.href = 'https://google.com'; return null;} }/>
+
   return (
     <div className="App">
         {user.isLoggedIn && <Nav autoLogin={autoLogin}/>}

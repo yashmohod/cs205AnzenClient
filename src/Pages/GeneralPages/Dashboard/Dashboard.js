@@ -79,23 +79,25 @@ export default function({autoLogin}) {
 
 
 
-    const [orgs,setOrgs] = useState([]);
+
     const [sortedFeatures,setSortedFeatures]=useState([]);
 
     async function setFeatures(){
-        let temp = []
+        let orgs = []
 
         let permisions_response = await get(API_URL + "/getFeaturePermissions?token=" +  localStorage.getItem("token"));
         const perms = permisions_response.featurePermissions
         console.log(perms)
-        let temp_sortedFeatures=[]
+        let temp_sortedFeatures_perOrg=[]
         for(let x =0; x<perms.length; x++){
-            if(!temp.includes(perms[x].org)){
-                temp.push(perms[x].org)
+            if(!orgs.includes(perms[x].org)){
+                orgs.push(perms[x].org)
             }
-            let count =0;
-            for(let y =0; y < temp_sortedFeatures.length; y++){
-                if(perms[x].org == temp_sortedFeatures[y].org){
+        }
+        for(let y =0; y<orgs.length; y++){
+            let CurOrgFeatures = []
+            for(let x =0; x<perms.length; x++){
+                if(orgs[y]== perms[x].org){
                     let accessBol = perms[x].view;
                     if(perms[x].blackListed){
                         accessBol = false;
@@ -113,51 +115,87 @@ export default function({autoLogin}) {
                         delete:perms[x].delete,
                         dashboardFeature: perms[x].dashboardFeature,
                     };
-                    temp_sortedFeatures[y].features.push(curFeature);
-                    count++;
+                    CurOrgFeatures.push(curFeature)
                 }
-                if(count>0){
-                    break
-                }
-            
-            }
-            if(count == 0){
-                temp_sortedFeatures.push({"org":perms[x].org, "features":[]})
-                let accessBol = perms[x].view;
-                for(let y =0; y < temp_sortedFeatures.length; y++){
-                    if(perms[x].org == temp_sortedFeatures[y].org){
-                        let accessBol = perms[x].view;
-                        if(perms[x].blackListed){
-                            accessBol = false;
-                        }
-                        let curFeature = {
-                            id:perms[x].id,
-                            org :perms[x].org,
-                            access:accessBol,
-                            title: perms[x].featureName, 
-                            internallyManaged:perms[x].internallyManaged, 
-                            internal_url: perms[x].internalUrl,
-                            external_url: perms[x].externalUrl, 
-                            create:perms[x].create, 
-                            edit:perms[x].edit, 
-                            delete:perms[x].delete,
-                            dashboardFeature: perms[x].dashboardFeature,
-                        }  ;
-                        temp_sortedFeatures[y].features.push(curFeature);
-                    }
                 
-                }
             }
+            temp_sortedFeatures_perOrg.push({"org":orgs[y], "features":CurOrgFeatures})
 
         }
-
-        checkClockInAccess(temp_sortedFeatures[0])
-        setOrgs(temp)
-        setSortedFeatures(temp_sortedFeatures)
-
-        set_curOrgClock(temp_sortedFeatures[0].org)
-        checkClockinStatus(temp_sortedFeatures[0].org)
+        checkClockInAccess(temp_sortedFeatures_perOrg[0])
+        setSortedFeatures(temp_sortedFeatures_perOrg)
+        set_curOrgClock(orgs[0])
+        checkClockinStatus(orgs[0])
         setshowFeatures(true)
+
+        // for(let x =0; x<perms.length; x++){
+            
+
+
+        // for(let x =0; x<perms.length; x++){
+        //     if(!temp.includes(perms[x].org)){
+        //         temp.push(perms[x].org)
+        //     }
+        //     let count =0;
+        //     for(let y =0; y < temp_sortedFeatures.length; y++){
+        //         if(perms[x].org == temp_sortedFeatures[y].org){
+        //             let accessBol = perms[x].view;
+        //             if(perms[x].blackListed){
+        //                 accessBol = false;
+        //             }
+        //             let curFeature = {
+        //                 id:perms[x].id,
+        //                 org :perms[x].org,
+        //                 access:accessBol,
+        //                 title: perms[x].featureName, 
+        //                 internallyManaged:perms[x].internallyManaged, 
+        //                 internal_url: perms[x].internalUrl,
+        //                 external_url: perms[x].externalUrl, 
+        //                 create:perms[x].create, 
+        //                 edit:perms[x].edit, 
+        //                 delete:perms[x].delete,
+        //                 dashboardFeature: perms[x].dashboardFeature,
+        //             };
+        //             temp_sortedFeatures[y].features.push(curFeature);
+        //             count++;
+        //         }
+        //         if(count>0){
+        //             break
+        //         }
+            
+        //     }
+        //     // if(count == 0){
+        //     //     temp_sortedFeatures.push({"org":perms[x].org, "features":[]})
+        //     //     let accessBol = perms[x].view;
+        //     //     for(let y =0; y < temp_sortedFeatures.length; y++){
+        //     //         if(perms[x].org == temp_sortedFeatures[y].org){
+        //     //             let accessBol = perms[x].view;
+        //     //             if(perms[x].blackListed){
+        //     //                 accessBol = false;
+        //     //             }
+        //     //             let curFeature = {
+        //     //                 id:perms[x].id,
+        //     //                 org :perms[x].org,
+        //     //                 access:accessBol,
+        //     //                 title: perms[x].featureName, 
+        //     //                 internallyManaged:perms[x].internallyManaged, 
+        //     //                 internal_url: perms[x].internalUrl,
+        //     //                 external_url: perms[x].externalUrl, 
+        //     //                 create:perms[x].create, 
+        //     //                 edit:perms[x].edit, 
+        //     //                 delete:perms[x].delete,
+        //     //                 dashboardFeature: perms[x].dashboardFeature,
+        //     //             }  ;
+        //     //             temp_sortedFeatures[y].features.push(curFeature);
+        //     //         }
+                
+        //     //     }
+        //     // }
+
+        // }
+
+        
+        // }
     }
 
     const [clockinfeature,setclocinfeature] = useState(false);
