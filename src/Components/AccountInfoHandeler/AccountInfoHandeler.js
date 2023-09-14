@@ -19,8 +19,8 @@ export default function AccountInfoHandeler({email,handlregClose, mode,thisFeatu
       dob: accountFoundData.dob,
       orgNpos: "",
       email: email,
-      password: "",
-      password_confirm: "",
+      // password: "",
+      // password_confirm: "",
   })
   const dateRef = useRef()
 
@@ -35,7 +35,7 @@ export default function AccountInfoHandeler({email,handlregClose, mode,thisFeatu
       let response = await post(API_URL + "/register", {
         token: localStorage.getItem("token"),
         email: formData.email,
-        password: formData.password,
+        // password: formData.password,
         firstName: formData.firstName,
         lastName: formData.lastName,
         collegeId: formData.collegeId,
@@ -62,13 +62,13 @@ export default function AccountInfoHandeler({email,handlregClose, mode,thisFeatu
       const form = e.currentTarget;
       e.preventDefault();
       e.stopPropagation();
-      if(formData.password == formData.password_confirm){
+      // if(formData.password == formData.password_confirm){
         if (form.checkValidity()) {
           registerHandler()
         }
-      }else{
-        toast.warn("Passwords do not match!")
-      }
+      // }else{
+      //   toast.warn("Passwords do not match!")
+      // }
 
   
     }
@@ -188,7 +188,7 @@ export default function AccountInfoHandeler({email,handlregClose, mode,thisFeatu
               }
 
             </Form.Group>
-              {!addToOrg?<>
+              {/* {!addToOrg?<>
             <Form.Group className="mb-3" controlId="formBasicPassword">
               <Form.Label className=" d-flex justify-content-start">Password</Form.Label>
                 <Form.Control type="password" placeholder="Enter Password"  name="password"  onChange={(e) => inputChangeHandler(e)} required/>
@@ -204,7 +204,7 @@ export default function AccountInfoHandeler({email,handlregClose, mode,thisFeatu
               Please enter matching password!
             </Form.Control.Feedback>
             </Form.Group>
-            </>:null}
+            </>:null} */}
    
             <Button variant="primary" type="submit" >Register</Button>
             

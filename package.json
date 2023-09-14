@@ -1,6 +1,7 @@
 {
   "name": "cs205_project",
   "version": "0.1.0",
+  "homepage": "https://anzen.ithaca.edu",
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^2.32.2",
