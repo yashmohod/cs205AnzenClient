@@ -11,30 +11,53 @@ import { Text } from '@chakra-ui/react'
 import { useSelector, useDispatch } from 'react-redux';
 import {userActions} from "../../redux/slices/user"
 import { useMsal } from "@azure/msal-react";
-
+import Dev_Settings from "../../Utils/Dev_Settings.json"
 
 export default function LoginForm({autoLogin, setLoading}) {
 
-
+  
 
   const dispatch = useDispatch()
   const { instance } = useMsal();
   function login(){
+    // console.log(Dev_Settings.DEV_MODE);
+    if(Dev_Settings.DEV_MODE){
+      getToken(Dev_Settings.DEV_EMAIL);
+   }
+   else{
+    if(instance.getActiveAccount() != null){
+      getToken(instance.getActiveAccount().username);
 
-    instance.loginPopup().then(getToken)
+    }else{
+      const loginRequest = {
+        scopes: ["user.read"],
+    //     prompt: 'select_account',
+      }
+      instance.loginPopup(loginRequest)
+        .then(response => {
+          console.log(response);
+          getToken(response.account.username);
+        })
+        .catch(error => {
+            // handle errors
+            toast.error(error);
+        });
+    } 
+    
+   }
     
   }
-  async function getToken(){
+  async function getToken(email){
     setLoading(true);
-    const currentAccount = instance.getActiveAccount();
+    // const currentAccount = instance.getActiveAccount();
     var response, tokenVerification
       try {
-        response = await post(API_URL + "/login",  {email: currentAccount.username})
-        // console.log(response)
+          response = await post(API_URL + "/login", {email: email} )
+
         tokenVerification = await post(API_URL + "/validate-token", {token: response.token})
       } catch {
         setLoading(false)
-        return
+        toast.error(<h5>Some went wrong!</h5>, {style: {fontWeight: "bold"}})
       }
 
       if (tokenVerification.message === "verified") {
@@ -46,11 +69,13 @@ export default function LoginForm({autoLogin, setLoading}) {
           dispatch(userActions.updateUserMetadata(tokenVerification.user))
           localStorage.setItem("firstName", tokenVerification.user.firstName)
         }, 1500)
+        return true
       } else {
         dispatch(userActions.updateLoggedIn(false))
         dispatch(userActions.updateUserMetadata(null))
         setLoading(false)
         toast.error(<h5>{response.message}</h5>, {style: {fontWeight: "bold"}})
+        return false
       }
   }
   
@@ -59,7 +84,7 @@ export default function LoginForm({autoLogin, setLoading}) {
  
 
     useEffect((e) => {
-      autoLogin()
+      autoLogin();
       }, [])
 
       return (

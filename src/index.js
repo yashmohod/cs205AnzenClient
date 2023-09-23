@@ -22,7 +22,7 @@ msalInstance.addEventCallback((event) => {
   if (event.eventType === EventType.LOGIN_SUCCESS && event.payload.account) {
       const account = event.payload.account;
       msalInstance.setActiveAccount(account);
-      console.log(event);
+      // console.log(event);
   }
 });
 

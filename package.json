@@ -23,6 +23,7 @@
     "bootstrap": "^5.2.0",
     "bootstrap-icons": "^1.10.3",
     "framer-motion": "^8.2.4",
+    "jshashes": "^1.0.8",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.5.25",
     "moment": "^2.29.4",

@@ -1,5 +1,8 @@
-echo "Switching to master branch"
-git checkout master
+echo "Warning:"
+echo "Please make sure the production settings are on before deploying!!!"
+
+# echo "Switching to master branch"
+# git checkout master
 
 echo "Building app..."
 npm run build

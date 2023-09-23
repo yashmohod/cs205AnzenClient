@@ -1,3 +1,4 @@
+
 export async function get(url) {
     try {
         let response = await fetch(url).then(r =>  r.json().then(data => ({...data,"status": r.status})))
@@ -79,5 +80,7 @@ export async function put(url, data) {
         return {error: true}
     }
 }
+
+
 
 export const API_URL = process.env.REACT_APP_DEV_API
