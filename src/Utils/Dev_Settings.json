@@ -1,5 +1,5 @@
 {
-    "DEV_MODE" : true,
+    "DEV_MODE" : false,
     "DEV_EMAIL" : "dev@ithaca.edu",
     "DEV_API":"http://localhost:5000"
 }

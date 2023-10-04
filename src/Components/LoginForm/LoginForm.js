@@ -14,6 +14,7 @@ import { useMsal } from "@azure/msal-react";
 import Dev_Settings from "../../Utils/Dev_Settings.json"
 
 
+
 export default function LoginForm({autoLogin, setLoading}) {
 
   
@@ -23,7 +24,18 @@ export default function LoginForm({autoLogin, setLoading}) {
   // const { accounts } = useMsal();
   // const username = accounts[0];
 
+  function login(){
+    console.log("cliked")
+    let type = (window.navigator.userAgent.split("(")[1].split(";")[0]);
+    if(type =="Windows"){
+      loginDeskTop();
+    }else{
+      loginMobile();
+    }
+    // console.log(type)
+  }
   function loginDeskTop(){
+    // console.log(Dev_Settings.DEV_EMAIL)
     if(Dev_Settings.DEV_MODE){
       getToken(Dev_Settings.DEV_EMAIL);
    }
@@ -42,6 +54,7 @@ export default function LoginForm({autoLogin, setLoading}) {
   }
 
   function loginMobile(){
+    console.log(Dev_Settings.DEV_EMAIL)
     if(Dev_Settings.DEV_MODE){
       getToken(Dev_Settings.DEV_EMAIL);
    }
@@ -106,14 +119,15 @@ export default function LoginForm({autoLogin, setLoading}) {
                 </div>
                 <form className='m-5'>
                   <Text fontSize='4xl' color="black" mb={10}>Access Page</Text>
-                  {/* desktop view */}
+                  <Button appearance="primary" className="btn btn-primary" onClick={()=>login()} color="blue" active>Login</Button>
+                  {/* desktop view
                   <div className="d-none d-xxl-block" >
                     <Button appearance="primary" className="btn btn-primary" onClick={()=>loginDeskTop()} color="blue" active>Login</Button>
                   </div>
                   {/* Mobile view */}
-                  <div className="d-block d-xxl-none" >
+                  {/* <div className="d-block d-xxl-none" >
                     <Button appearance="primary" className="btn btn-primary" onClick={()=>loginMobile()} color="blue" active>Login</Button>
-                  </div>
+                  </div>  */}
                 </form>
             </div>
       )
