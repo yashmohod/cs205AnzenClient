@@ -1,0 +1,20 @@
+.register-form-container {
+    border-radius: 15px;
+    border: 0; 
+    border:1px solid rgba(0, 0 , 0, 0.25);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+.register-form {
+    width: 80%;
+}
+
+
+/* gets rid of the arrows in the number input */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { 
+	-webkit-appearance: none;
+} 

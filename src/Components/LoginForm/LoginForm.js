@@ -2,75 +2,118 @@ import React, { Component, useEffect, useState } from 'react'
 import { API_URL, get, post } from '../../Utils/API'
 import { Button } from 'rsuite';
 import IthacaLogo from '../../Images/logo.png'
+import TextField from '@mui/material/TextField';
+import { Input } from '@chakra-ui/react'
 import './LoginForm.css'
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
+import { Text } from '@chakra-ui/react'
+import { useSelector, useDispatch } from 'react-redux';
+import {userActions} from "../../redux/slices/user"
+import { useMsal } from "@azure/msal-react";
+import Dev_Settings from "../../Utils/Dev_Settings.json"
 
 
-//'linear-gradient(#e66465, #9198e5)'
-//linear-gradient(#1f87ab, #004961 50%, #004961 90%);
-export default function LoginForm({setLoggedIn, setLoggedInUser, autoLogin, setLoading}) {
-    const [userName, setuserName] = useState("")
-    const [password, setPassword] = useState("")
+export default function LoginForm({autoLogin, setLoading}) {
 
-    function userNameChangeHandler(e) {
-      setuserName(e.target.value)
-    }
+  
 
-    function passwordChangeHandler(e) {
-      setPassword(e.target.value)
-    }
+  const dispatch = useDispatch()
+  const { instance } = useMsal();
+  // const { accounts } = useMsal();
+  // const username = accounts[0];
 
-    async function loginHandler(e) {
-      setLoading(true)
-
-      if (!e) {
-        autoLogin()
-        setLoading(false)
-        return
+  function loginDeskTop(){
+    if(Dev_Settings.DEV_MODE){
+      getToken(Dev_Settings.DEV_EMAIL);
+   }
+   else{
+      if(instance.getActiveAccount() == null){
+        instance.loginPopup().then(response => {
+          getToken(instance.getActiveAccount().username);
+            })
+            .catch(error => {
+                toast.error(error);
+            });
+      }else{
+        getToken(instance.getActiveAccount().username);
       }
-      
-      let response = await post(API_URL + "/login",  {userName: userName, password: password})
-      var tokenVerification = await post(API_URL + "/validate-token", {token: response.token})
-    
+   }
+  }
+
+  function loginMobile(){
+    if(Dev_Settings.DEV_MODE){
+      getToken(Dev_Settings.DEV_EMAIL);
+   }
+   else{
+      if(instance.getActiveAccount() == null){
+        instance.loginRedirect()
+      }else{
+        getToken(instance.getActiveAccount().username);
+      }
+   }
+  }
+  async function getToken(email){
+    setLoading(true);
+    // const currentAccount = instance.getActiveAccount();
+    var response, tokenVerification
+      try {
+          response = await post(API_URL + "/login", {email: email} )
+
+        tokenVerification = await post(API_URL + "/validate-token", {token: response.token})
+      } catch {
+        setLoading(false)
+        toast.error(<h5>Some went wrong!</h5>, {style: {fontWeight: "bold"}})
+      }
+
       if (tokenVerification.message === "verified") {
         toast.success(<h5>Verified. Logging you in!</h5>, {style: {fontWeight: "bold"}})
         setLoading(false)
         setTimeout(() => {
           localStorage.setItem("token", response.token)
-          setLoggedIn(true)
-          setLoggedInUser(tokenVerification.user)
+          dispatch(userActions.updateLoggedIn(true))
+          dispatch(userActions.updateUserMetadata(tokenVerification.user))
+          localStorage.setItem("firstName", tokenVerification.user.firstName)
         }, 1500)
+        return true
       } else {
-        setLoggedIn(false)
-        setLoggedInUser(null)
+        dispatch(userActions.updateLoggedIn(false))
+        dispatch(userActions.updateUserMetadata(null))
         setLoading(false)
-        toast.error(<h5>Wrong Credentials!</h5>, {style: {fontWeight: "bold"}})
+        toast.error(<h5>{response.message}</h5>, {style: {fontWeight: "bold"}})
+        return false
       }
-   }
+  }
+  
+
+
+ 
 
     useEffect((e) => {
-      loginHandler(e)
-    }, [])
- 
+      autoLogin();
+      // if(localStorage.getItem("tryAgain")){
+      //   localStorage.setItem("tryAgain",false);
+      //   login();
+      // }
+      
+      }, [])
+
       return (
-            <div className="form p-5">
+            <div className="form m-2 p-2">
                 <ToastContainer/>
-                <div className="ithaca-logo-login-container">
+                <div className="ithaca-logo-login-container" style={{color: "black"}}>
                     <img src={IthacaLogo} alt="" className="ithaca-logo-login"/>
                 </div>
                 <form className='m-5'>
-                    <h1>Access Page</h1>
-                     <div class="mb-3">
-                       <label for="exampleInputEmail1" class="form-label d-flex justify-content-start">Username</label>
-                       <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={(e) => userNameChangeHandler(e)}/>
-                     </div>
-                     <div class="mb-3">
-                       <label for="exampleInputPassword1" class="form-label d-flex justify-content-start">Password</label>
-                       <input type="password" class="form-control" id="exampleInputPassword1" onChange={(e) => passwordChangeHandler(e)}/>
-                     </div>
-
-                     <Button appearance="primary" class="btn btn-primary" onClick={(e) => loginHandler(e)} color="blue" active>Login</Button>
+                  <Text fontSize='4xl' color="black" mb={10}>Access Page</Text>
+                  {/* desktop view */}
+                  <div className="d-none d-xxl-block" >
+                    <Button appearance="primary" className="btn btn-primary" onClick={()=>loginDeskTop()} color="blue" active>Login</Button>
+                  </div>
+                  {/* Mobile view */}
+                  <div className="d-block d-xxl-none" >
+                    <Button appearance="primary" className="btn btn-primary" onClick={()=>loginMobile()} color="blue" active>Login</Button>
+                  </div>
                 </form>
             </div>
       )

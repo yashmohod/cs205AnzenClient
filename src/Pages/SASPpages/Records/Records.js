@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useRef, useState,useMemo } from "react";
-import Nav from "../../../Components/Nav/Nav";
 import './Records.css'
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
@@ -7,7 +6,8 @@ import 'ag-grid-community/styles//ag-theme-alpine.css';
 import { API_URL, get, post } from '../../../Utils/API';
 import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import EditButton from '../../../Components/Buttons/EditButton'
-import { Button, Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
+import {Button} from "rsuite"
 import { ToastContainer, toast } from 'react-toastify';
 import SaspIncidents from "../../../Components/SaspIncidents/SaspIncidents"
 import SaspLocations from "../../../Components/SaspLocations/SaspLocations"
@@ -15,15 +15,28 @@ import EmployeeList from "../../../Components/EmployeeList/EmployeeList"
 import CommonButton from '../../../Components/Buttons/CommonButton'
 import Modal from 'react-bootstrap/Modal';
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
-import Dropdown from 'react-bootstrap/Dropdown';
+import { Dropdown } from 'rsuite';
 import Referals from "../Referals/Referals";
 import { GridApi } from "ag-grid-community";
+import { useLocation } from 'react-router-dom'
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable'
+import Accordion from 'react-bootstrap/Accordion';
+import MobileRecordsCard from "../../../Components/RecordsCards/MobileRecordsCard"
+import {
+    Stat,
+    StatLabel,
+    StatNumber,
+    StatHelpText,
+    StatArrow,
+    StatGroup,
+  } from '@chakra-ui/react'
+import Exporter from "../../../Components/Exporter/Exporter";
+import { AG_THEME_CLASS, defineColumns } from "../../../Utils/AG-Grid";
 
-export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersion,reportID}) {
+export default function Records({autoLogin,fullVersion,reportID}) {
     const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Loc. Details\t", "Received Time\t", "Enroute Time\t", "Arrived Time\t", "Clear Time\t", "Reported By\t", "Summary\t"]
-    const keys = ["date", "incident", "location", "locationDetail", "receivedTime", "enrouteTime", "arivedTime", "clearTime", "reportedByName", "summary"]
+    const columnKeys = ["date", "incident", "location", "locationDetail", "receivedTime", "enrouteTime", "arivedTime", "clearTime", "reportedByName", "summary"]
     // edit records 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -33,10 +46,8 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
     const handleCloseref = () => setShowref(false);
     const handleShowref = () => setShowref(true);
 
-    const gridRef = useRef(null); // Optional - for accessing Grid's API
-    const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
-
-    // Each Column Definition results in one Column.
+    const gridRef = useRef(null);
+    const [rowData, setRowData] = useState([]);
     const[columnDefs,setColumnDefs]= useState([])
 
     const [formData, setFormData] = useState({
@@ -127,6 +138,15 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
         }
     }
 
+    function showMobileViewRecordsCards(){
+  
+        return(
+        rowData.map(element => {
+          return(
+          <MobileRecordsCard keyNum ={rowData.indexOf(element)}  data={element} viewReferals={viewReferals} reportEdit={reportEdit} reportDelete={reportDelete} permisions={thisFeaturePerms} />
+         ) }))
+      }
+
     // async function getRep(repID){
 
     //     let response = await get(API_URL + "/getSaspReport?token="+localStorage.getItem("token")+"&reportID="+repID)
@@ -193,21 +213,12 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
         dateFromChooser.current.value=""
     }
 
-    const [miniverFeatures, setminiverFeatures] = useState([
-    {field: 'date',headerName:'Date'},
-    {field: 'incident',headerName:'Incident'},
-    {field: 'location',headerName:'Location'},
-    {field: 'locationDetail',headerName:'Loc. Details'},
-    {field: 'receivedTime',headerName:'Recived Time'},
-    {field: 'enrouteTime',headerName:'Enroute Time'},
-    {field: 'arivedTime',headerName:'Arrived Time'},
-    {field: 'clearTime',headerName:'Clear Time'},
-    {field: 'reportedByName',headerName:'Reported By'},
-    {field: 'summary',headerName:'Summary'},
+    const {loadedColumnDefs : miniverFeatures}  = useCallback(defineColumns({
+        columnKeys: columnKeys,
+        columnHeaders: columnHeaders
+    }))
 
-    ])
-
-    const [fullverFeatures, setfullverFeatures] = useState([
+    const fullverFeatures = [
         {field: 'id', 
     headerName: '' ,
     cellRenderer: CommonButton, 
@@ -218,9 +229,9 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
       buttonText: "View Referals",
       variant:"outline-dark",
     }},
-    ])
+    ]
 
-    const [morecolumns, setmoreColumns] = useState([
+    const [Edit_column, setEdit_columns] = useState(
     {field: 'id', 
     headerName: '' ,
     cellRenderer: EditButton, 
@@ -229,14 +240,16 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
         reportEdit(field)
       }
     }},
-    {field: 'id',
-    headerName: '' ,
-    cellRenderer: DeleteButton, 
-    cellRendererParams: {
-      clicked: function(field) {
-        reportDelete(field)
-      }
-    }}]);
+    );
+    const [Delete_column, setDelete_columns] = useState(
+        {field: 'id',
+        headerName: '' ,
+        cellRenderer: DeleteButton, 
+        cellRendererParams: {
+          clicked: function(field) {
+            reportDelete(field)
+          }
+        }});
 
     async function reportDelete(reportId){
         let response = await post(API_URL + "/deleteSaspReports", {reportID:reportId,token: localStorage.getItem("token")})
@@ -255,7 +268,7 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
     async function reportEdit(reportId){
         let response = await get(API_URL + "/getSaspReport?token=" +  localStorage.getItem("token")+"&reportID="+reportId)
         let oldData = response.SaspIncidentReport;
-        console.log(oldData)
+        // console.log(oldData)
         let data = {
         reportID:reportId,
         incident: oldData.incident,
@@ -278,67 +291,34 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
     }
 
 
-    // DefaultColDef sets props common to all Columns
-    const defaultColDef = useMemo( ()=> ({
-        sortable: true
-    }));
-
-    function SaveAsCSV() {
-        gridRef.current.api.exportDataAsCsv()
-    }
-
-    function SaveAsPDF() {
-        const doc = new jsPDF({orientation: "landscape",});
-
-        let bodyData = []
-        rowData.forEach((row) => {
-            let line = []
-            keys.map((key) => {
-                line.push(row[key])
-            })
-            bodyData.push(line)
-        })
-
-        autoTable(doc, {
-           head: [columnHeaders],
-           body: bodyData,
-        })
-        doc.save("records-export.pdf");
-    }
     // const [org,setOrg] = useState("")
     // const [pos,setPos]= useState("")
 
+    const location = useLocation()
+    const { thisFeaturePerms } = location.state
 
+    async function setThisFeature(){
 
-    async function getOrgNPos(){
-        const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
-        const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
-        let locOrg = orgres["organization"]
-        let locPos = posres["position"]
-        // setOrg(locOrg)
-        // setPos(locPos)
-
-        //set mini version features
-        setColumnDefs( miniverFeatures);
+        //set mini version feature
+        let cols = miniverFeatures
         //set full version features
         if(fullVersion){
-            let cols = miniverFeatures
             for(let i=0; i<fullverFeatures.length; i++){
                 cols.push(fullverFeatures[i])
             }
-            setColumnDefs(cols);
+
 
         }
-        //set admin version features
-        if(locPos== "admin"){
-            let cols = miniverFeatures
-            for(let i=0; i<morecolumns.length; i++){
-                cols.push(morecolumns[i])
-            }
-            setColumnDefs(cols);
+        if(thisFeaturePerms.edit){
+            cols.push(Edit_column);
+        } 
+        if(thisFeaturePerms.delete){
+            cols.push(Delete_column);
+        } 
 
-        }
 
+
+        setColumnDefs(cols);
         gridRef.current.api.sizeColumnsToFit();
 
     }
@@ -347,22 +327,18 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
 
     useEffect(() => {
         autoLogin();
-        getOrgNPos();
-        // if(!fullVersion){getRep(reportID)}
+        setThisFeature();
     }, [])
-
-    useEffect(() => {
-        console.log(JSON.stringify(rowData))
-    })
 
     return (
         <div className="location-page">
             {fullVersion?
             <>
-            <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
              <ToastContainer />
              </>
              :null}
+
+             
 
             <h1>Records</h1>
             {fullVersion?
@@ -370,6 +346,14 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
                 <div className="row">
                     <div className="col">
                         <div className="row" id = "location-form">
+                            {/* desktop view */}
+                        <div className="d-none d-l-block" >
+                            Big Hi
+                        </div>
+                        {/* Mobile View */}
+                        <div className="d-block d-l-none" >
+                            Small Hi
+                        </div>
                             <div className="col" id="searchFormElement">
                             <Form.Label className=" d-flex justify-content-start">Employee</Form.Label>
                             <Form.Select aria-label="Default select example" ref={EmployeeDropdown}  name="employeeId" onChange={(e) => searchInputHandeler(e)}>
@@ -404,23 +388,39 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
                             
                             <div className="col" id="searchFormElement">
                                 <div className="row">
-                                <Button variant="outline-primary" type="button" onClick={() => getReps(searchData)}>Search</Button>
+                                <Button appearance="primary" color="blue" type="button" onClick={() => getReps(searchData)}>Search</Button>
                                 {/* <Button variant="outline-info" type="button" onClick={() => getAllReports()}>Search All</Button> */}
                                 </div>
-                                {(rowData.length > 0)? 
-                                <div className="row">
-                                    <Dropdown>
+                   
+                        
+                                    {/* <Dropdown>
                                         <Dropdown.Toggle variant="outline-black" id="dropdown-basic">
                                             Export File
                                         </Dropdown.Toggle>
 
                                         <Dropdown.Menu className="text-center">
-                                            <Dropdown.Item onClick={()=>SaveAsCSV()}>CSV <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="CSV" className="csv-logo"/></Dropdown.Item>
-                                            <Dropdown.Item onClick={() => SaveAsPDF()}>PDF <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" className="pdf-logo" alt=""/></Dropdown.Item>
+                                            <Dropdown.Item onClick={()=>SaveAsCSV()} style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                                            <div>
+                                                <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="CSV" className="csv-logo" width={30} height={30}/>
+                                            </div>
+                                            <div className="ms-2">
+                                                CSV 
+                                            </div>
+                                            
+                                            </Dropdown.Item>
+                                            <Dropdown.Item onClick={() => SaveAsPDF()} style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                                            <div>
+                                                <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" className="pdf-logo" alt="" width={30} height={30}/> 
+                                            </div>
+                                            <div className="ms-2">
+                                                PDF
+                                            </div>
+                                            </Dropdown.Item>
                                         </Dropdown.Menu>
-                                    </Dropdown> 
-                                </div>
-                                : null}
+                                    </Dropdown>  */}
+               
+                                   <Exporter {...{gridRef: gridRef, columnHeaders: columnHeaders, rowData: rowData, keys: columnKeys}}/>
+                  
                             </div>
                             
                         </div>
@@ -429,19 +429,33 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
             </div>:null}
 
        
-        
-            <div className="ag-theme-alpine incident-grid">
-        
-              <AgGridReact
-                ref={gridRef}
-                columnDefs={columnDefs}
-                defaultColDef={defaultColDef}
-                rowData={rowData}
-                >
-              </AgGridReact>
+            {/* <Stat>
+                <StatLabel>Results   <StatNumber>{rowData.length}</StatNumber></StatLabel>
+            </Stat>                         */}
+
+            {/* desktop view */}
+            <div className="d-none d-xxl-block" >
+                <div className={AG_THEME_CLASS("incident-grid")}>
+                <AgGridReact
+                    ref={gridRef}
+                    columnDefs={columnDefs}
+                    defaultColDef={{sortable: true}}
+                    rowData={rowData}
+                    >
+                </AgGridReact>
+                </div>
+            </div>
+            {/* Mobile View */}
+            <div className="d-block d-xxl-none" >
+                <div className="ag-theme-alpine incident-grid">
+                    <Accordion defaultActiveKey="0">
+                        {showMobileViewRecordsCards()}
+                    </Accordion>
+                </div>
+            </div>
 
 
-			</div>
+
             <Modal
               show={show}
               onHide={handleClose}
@@ -502,11 +516,11 @@ export default function Records({setLoggedIn, loggedInUser, autoLogin,fullVersio
               fullscreen={true}
             >
               <Modal.Header closeButton>
-                <Modal.Title>New Password</Modal.Title>
+                <Modal.Title>View Referral</Modal.Title>
               </Modal.Header>
               <Modal.Body>
 
-            <Referals setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} autoLogin={() => autoLogin()} fullVersion={false} reportID={reportIdForRef}/>
+            <Referals autoLogin={() => autoLogin()} fullVersion={false} reportID={reportIdForRef}/>
 
 
             </Modal.Body>

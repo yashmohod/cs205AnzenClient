@@ -1,80 +1,229 @@
 /* eslint-disable import/no-anonymous-default-export */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Card from "../../../Components/Card/Card";
 import Nav from "../../../Components/Nav/Nav";
 import './Dashboard.css'
 import { API_URL, post,get } from "../../../Utils/API";
 import { ToastContainer, toast } from 'react-toastify';
 import {Features} from "./features"
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
 import { useNavigate } from "react-router-dom";
+import Modal from 'react-bootstrap/Modal';
+import {Form, Button} from 'react-bootstrap'
 
-export default function({loggedIn, setLoggedIn, loggedInUser}) {
+export default function({autoLogin}) {
     const [clockin, setClockin] = useState(false)
-    const [org,setOrg] = useState("")
-    const [pos,setPos]= useState("")
     const [showFeatures,setshowFeatures] =useState(false)
+    const [features,setfeatures] = useState();
 
     function checkMessage(){
-        // if(!(localStorage.getItem("message") === null)){
-        //     toast.success(String(localStorage.getItem("message")));
-        //     localStorage.removeItem("message");
-        // }
+        if(!(localStorage.getItem("message") === null)){
+            toast.success(String(localStorage.getItem("message")));
+            localStorage.removeItem("message");
+        }
     }
     
+
+    function tabChange(e){
+        console.log(sortedFeatures[e].org)
+        checkClockInAccess(sortedFeatures[e])
+        set_curOrgClock(sortedFeatures[e].org)
+        checkClockinStatus(sortedFeatures[e].org)
+    }
+    const [curOrgClock, set_curOrgClock] = useState()
+
+
+    const [adshow, setadShow] = useState(false);
+    const handleadClose = () => setadShow(false);
+    const handleadShow = () => setadShow(true);
+    const [shifts, setShifts] = useState([]);
+    const [addNote,setAddNote]= useState(false);
+    const [note,setNote] = useState("");
+
+    async function getShifts(){
+        let response = await get(API_URL + "/getAllShifts?token=" +  localStorage.getItem("token"))
+        setShifts(response.shifts)
+    }
 
 
 
     async function clockIn() {
-        let response = await post(API_URL + "/clockIn", {token: localStorage.getItem("token")})
-        setClockin(true) 
-    }
 
-    async function clockOut() {
-        let response = await post(API_URL + "/clockOut", {token: localStorage.getItem("token")})
-        setClockin(false)
+        let response = await post(API_URL + "/clockIn", {token: localStorage.getItem("token"), org:curOrgClock})
+        if(response.status != 200){
+            toast.warning(response.message)
+        }
+        if(response.status == 200){
+            toast.success(response.message)
+            setClockin(true) 
+        }
     }
     
-    async function setFeatures(){
-        const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
-        const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
-        setOrg(orgres["organization"])
-        setPos(posres["position"])
-        setshowFeatures(true)
+    function clockOutButtonHandler(){
+        handleadShow()
     }
 
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if(!loggedIn){
-            navigate("/")
+    async function clockOut(shiftType) {
+        handleadClose()
+        let response = await post(API_URL + "/clockOut", {token: localStorage.getItem("token"), org:curOrgClock, note:note, shiftName: shiftType})
+        if(response.status != 200){
+            toast.warning(response.message)
         }
-        const checkClockinStatus = async () => {
-            let response = await post(API_URL + "/checkClockInStatus", {token: localStorage.getItem("token")})
-            if (response.clock_in === true) {
-                setClockin(true)
-            } else {
-                setClockin(false)
+        if(response.status == 200){
+            toast.success(response.message)
+            setClockin(false) 
+        }
+    }
+
+
+
+
+
+    const [sortedFeatures,setSortedFeatures]=useState([]);
+
+    async function setFeatures(){
+        let orgs = []
+
+        let permisions_response = await get(API_URL + "/getFeaturePermissions?token=" +  localStorage.getItem("token"));
+        const perms = permisions_response.featurePermissions
+        let temp_sortedFeatures_perOrg=[]
+        for(let x =0; x<perms.length; x++){
+            if(!orgs.includes(perms[x].org)){
+                orgs.push(perms[x].org)
             }
         }
-        checkClockinStatus()
-        checkMessage()
+        for(let y =0; y<orgs.length; y++){
+            let CurOrgFeatures = []
+            for(let x =0; x<perms.length; x++){
+                if(orgs[y]== perms[x].org){
+                    let accessBol = perms[x].view;
+                    if(perms[x].blackListed){
+                        accessBol = false;
+                    }
+                    let curFeature = {
+                        id:perms[x].id,
+                        org :perms[x].org,
+                        access:accessBol,
+                        title: perms[x].featureName, 
+                        internallyManaged:perms[x].internallyManaged, 
+                        internal_url: perms[x].internalUrl,
+                        external_url: perms[x].externalUrl, 
+                        create:perms[x].create, 
+                        edit:perms[x].edit, 
+                        delete:perms[x].delete,
+                        dashboardFeature: perms[x].dashboardFeature,
+                    };
+                    CurOrgFeatures.push(curFeature)
+                }
+                
+            }
+            temp_sortedFeatures_perOrg.push({"org":orgs[y], "features":CurOrgFeatures})
+
+        }
+        checkClockInAccess(temp_sortedFeatures_perOrg[0])
+        setSortedFeatures(temp_sortedFeatures_perOrg)
+        set_curOrgClock(orgs[0])
+        checkClockinStatus(orgs[0])
+        setshowFeatures(true)
+
+        // for(let x =0; x<perms.length; x++){
+            
+
+
+        // for(let x =0; x<perms.length; x++){
+        //     if(!temp.includes(perms[x].org)){
+        //         temp.push(perms[x].org)
+        //     }
+        //     let count =0;
+        //     for(let y =0; y < temp_sortedFeatures.length; y++){
+        //         if(perms[x].org == temp_sortedFeatures[y].org){
+        //             let accessBol = perms[x].view;
+        //             if(perms[x].blackListed){
+        //                 accessBol = false;
+        //             }
+        //             let curFeature = {
+        //                 id:perms[x].id,
+        //                 org :perms[x].org,
+        //                 access:accessBol,
+        //                 title: perms[x].featureName, 
+        //                 internallyManaged:perms[x].internallyManaged, 
+        //                 internal_url: perms[x].internalUrl,
+        //                 external_url: perms[x].externalUrl, 
+        //                 create:perms[x].create, 
+        //                 edit:perms[x].edit, 
+        //                 delete:perms[x].delete,
+        //                 dashboardFeature: perms[x].dashboardFeature,
+        //             };
+        //             temp_sortedFeatures[y].features.push(curFeature);
+        //             count++;
+        //         }
+        //         if(count>0){
+        //             break
+        //         }
+            
+        //     }
+        //     // if(count == 0){
+        //     //     temp_sortedFeatures.push({"org":perms[x].org, "features":[]})
+        //     //     let accessBol = perms[x].view;
+        //     //     for(let y =0; y < temp_sortedFeatures.length; y++){
+        //     //         if(perms[x].org == temp_sortedFeatures[y].org){
+        //     //             let accessBol = perms[x].view;
+        //     //             if(perms[x].blackListed){
+        //     //                 accessBol = false;
+        //     //             }
+        //     //             let curFeature = {
+        //     //                 id:perms[x].id,
+        //     //                 org :perms[x].org,
+        //     //                 access:accessBol,
+        //     //                 title: perms[x].featureName, 
+        //     //                 internallyManaged:perms[x].internallyManaged, 
+        //     //                 internal_url: perms[x].internalUrl,
+        //     //                 external_url: perms[x].externalUrl, 
+        //     //                 create:perms[x].create, 
+        //     //                 edit:perms[x].edit, 
+        //     //                 delete:perms[x].delete,
+        //     //                 dashboardFeature: perms[x].dashboardFeature,
+        //     //             }  ;
+        //     //             temp_sortedFeatures[y].features.push(curFeature);
+        //     //         }
+                
+        //     //     }
+        //     // }
+
+        // }
+
+        
+        // }
+    }
+
+    const [clockinfeature,setclocinfeature] = useState(false);
+    function checkClockInAccess(permissons){
+        permissons.features.map((cur)=>{
+            if(cur.title == "Time Cards"){
+
+                setclocinfeature( cur.create)
+            }
+        })
+    }
+
+    const checkClockinStatus = async (Org) => {
+        let response = await post(API_URL + "/checkClockInStatus", {token: localStorage.getItem("token"),org:Org})
+        if (response.clock_in === true) {
+            setClockin(true)
+        } else {
+            setClockin(false)
+        }
+    }
+
+    useEffect(() => {
+        autoLogin()
+        // checkMessage()
+        getShifts()
         setFeatures()
     },[])
-    const features = 
-    [{org:"SASP",accessLevel:0,title: "Daily", description:"", url: "/SASPpages/daily", },
-     {org:"SASP",accessLevel:0,title: "Records", description:"", url: "/SASPpages/Records", },
-     {org:"SASP",accessLevel:0,title: "Referrals", description:"", url: "/SASPpages/referrals", },
-     {org:"SASP",accessLevel:0,title: "Time Cards", description:"", url: "/time-cards",},
-     {org:"SASP",accessLevel:2,title: "Senior Evaluation for Probationary Members", description:"", url: "/senior-eval-for-proba-member", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSdhKZICw5BhHMp1ubDEJlFZEeVRVEOnx5iPDQieziG-fRl_vA/viewform"},
-     {org:"SASP",accessLevel:2,title: "Senior Evaluation for Junior Member", description:"", url: "/senior-eval-for-junior-member", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSc1Ihg_MKrxUjs37x1tjAtun0zCW7UznTrUbUzOpL0N25Oj_Q/viewform"},
-     {org:"SASP",accessLevel:0,title: "SASP Evaluation for a Trainee", description:"", url: "/sasp-eval-for-trainee", external_url: "https://docs.google.com/forms/d/e/1FAIpQLSdoUWDh2nKgE8lSAvnRFQb0llbqCiYhjVBMDmkXhJQsP2d35Q/viewform"},
-     {org:"SASP",accessLevel:4,title: "Incidents", description:"", url: "/SASPpages/incidents"},
-     {org:"SASP",accessLevel:4,title: "Locations", description:"", url: "/SASPpages/locations",},
-     {org:"SASP",accessLevel:3,title: "Employee Accounts", description:"", url: "/employee-accounts",},
 
-     {org:"RESLIFE",accessLevel:0,title: "Time Cards", description:"", url: "/time-cards",},
-     {org:"RESLIFE",accessLevel:0,title: "Employee Accounts", description:"", url: "/employee-accounts",},
-    ]
+
     const Gstyle ={
         "height": "100px",
         "display": "flex",
@@ -101,22 +250,72 @@ export default function({loggedIn, setLoggedIn, loggedInUser}) {
     return (
         
         <div>
-        
-        <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
         <ToastContainer />
-        <div className="features container-fluid mt-5 ">
-            <div className="row">
-                <div className="col-12">
-                    {clockin ?  <div onClick={() => clockOut()}><Card title="Clock Out" description="End your work shift" style={Rstyle}/></div> : <div onClick={() => clockIn()}><Card title="Clock In" description="Start your work shift" style={Gstyle}/></div> }
-                </div>
-            </div>
-            <div className="row justify-content-center"  >
-    
-                { showFeatures ? <Features features={features} pos ={pos} org ={org}/> : null }
+        <Modal
+              show={adshow}
+              onHide={handleadClose}
+              backdrop="static"
+              keyboard={false}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Clock Out</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Form>
+                    {addNote?
+                    <>
+                        <Form.Control as="textarea" placeholder="Note..." name="note" onChange={(e) => setNote(e.target.value)}/>
+                        <Button variant="danger" style={{marginTop:"10px"}} onClick={()=>{setAddNote(false);setNote("")}}>Cancel</Button>
+                    </>
+                    :
+                    <>
+                    <Button variant="primary" onClick={()=>setAddNote(true)}>Add Note</Button>
+                    </>}
+                </Form>
+              </Modal.Body>
+              <Modal.Footer>
+              <Form>
+                <Form.Label className=" d-flex justify-content-start">Select a shift type!</Form.Label>
+                {shifts.map((shift)=>{
+                    if(shift.orgName ==curOrgClock ){
+                        return (<Button variant="success" style={{marginRight:"5px"}} onClick={()=>clockOut(shift.shiftName)}>{shift.shiftName}</Button>)
+                    }
+                    
+                })}
+                </Form>
+              </Modal.Footer>
+              
+            </Modal>
 
-            </div>
-        </div>
 
+
+        <Tabs id="uncontrolled-tab-example"className="mb-3"defaultActiveKey="0" justify onSelect={(e) =>tabChange(e)} >
+            {sortedFeatures.map((SF)=>{
+                return(
+                <Tab eventKey={sortedFeatures.indexOf(SF)} title={SF.org}>
+                    <div className="features container-fluid mt-5 ">
+                        <div className="row">
+                        {clockinfeature?
+                            <div className="col-12">
+                                {clockin ?  <div onClick={() => clockOutButtonHandler()}><Card title="Clock Out" description="End your work shift" style={Rstyle}/></div> : <div onClick={() => clockIn()}><Card title="Clock In" description="Start your work shift" style={Gstyle}/></div> }
+                            </div>
+                            :null
+                        }
+                        </div>
+                        
+                        <div className="row justify-content-center"  >
+                
+                            { showFeatures ? <Features features={SF.features}/> : null }
+
+                        </div>
+                    </div>
+
+
+                </Tab>
+            )})}
+
+        </Tabs>
+        
     </div>
     )
 }

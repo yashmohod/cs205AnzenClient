@@ -15,7 +15,7 @@ export default function Card(props) {
 
     return (
         <div className="card-container"  style={styles}>
-            <div className="card-item">     
+            <div className="card-item" style={{color: "black"}}>     
                 <h3>{props.title}</h3>
                 <p>{props.description}</p>
             </div>

@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useRef, useState,useMemo } from "react";
-import Nav from "../../../Components/Nav/Nav";
 import './Referals.css'
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
@@ -7,7 +6,8 @@ import 'ag-grid-community/styles//ag-theme-alpine.css';
 import { API_URL, get, post } from '../../../Utils/API';
 import DeleteButton from '../../../Components/Buttons/DeleteButton'
 import EditButton from '../../../Components/Buttons/EditButton'
-import { Button, Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
+import {Button} from 'rsuite'
 import { ToastContainer, toast } from 'react-toastify';
 import SaspIncidents from "../../../Components/SaspIncidents/SaspIncidents"
 import SaspLocations from "../../../Components/SaspLocations/SaspLocations"
@@ -18,12 +18,15 @@ import Modal from 'react-bootstrap/Modal';
 import Records from "../Records/Records";
 import TimePicker24H from "../../../Components/TimePicker24H/TimePicker24H"
 import SaspReferal from "../../../Components/SaspReferal/SaspReferal"
-import { jsPDF } from "jspdf";
-import autoTable from 'jspdf-autotable'
-
-export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVersion,reportID}) {
+import { useLocation } from 'react-router-dom'
+import Exporter from "../../../Components/Exporter/Exporter";
+import { defineColumns } from "../../../Utils/AG-Grid";
+import { AG_THEME_CLASS } from "../../../Utils/AG-Grid";
+import Accordion from 'react-bootstrap/Accordion';
+import MobileReferralsCard from '../../../Components/ReferralsCards/MobileReferralsCard';
+export default function Referals({autoLogin, fullVersion,reportID}) {
     const columnHeaders = ["Date\t", "Incident\t", "Location\t",  "Judical Referral\t", "First Name\t", "Last Name\t", "Middle Initial\t", "ICID\t", "DoB\t", "Address\t", "Phone No\t"]
-    const keys = ["date", "incident", "location", "judicialReferal", "firstName", "lastName", "middleInitial", "ICID", "dob", "address", "phoneNo"]
+    const columnKeys = ["date", "incident", "location", "judicialReferal", "firstName", "lastName", "middleInitial", "ICID", "dob", "address", "phoneNo"]
 
     const [Referals, setReferals] = useState("")
     const [searchData, setSearchData] = useState({
@@ -236,56 +239,19 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
         }
     }
 
-    function SaveAsCSV(){
-        gridRef.current.api.exportDataAsCsv()
-    }
-
-    function SaveAsPDF() {
-        const doc = new jsPDF({orientation: "landscape",});
-        console.log(rowData)
-        let bodyData = []
-        rowData.forEach((row) => {
-            let line = []
-            keys.map((key) => {
-                line.push(row[key])
-            })
-            bodyData.push(line)
-        })
-
-        autoTable(doc, {
-           head: [columnHeaders],
-           body: bodyData,
-        })
-        doc.save("referrals-export.pdf");
-    }
-
     function searchInputHandeler(e){
         setSearchData({...searchData,  [e.target.name] : e.target.value})
     }
 
-
-
-
-
-    const gridRef = useRef(null); // Optional - for accessing Grid's API
+    const gridRef = useRef(); // Optional - for accessing Grid's API
     const [rowData, setRowData] = useState([]); // Set rowData to Array of Objects, one Object per Row
 
-    // Each Column Definition results in one Column.
     const[columnDefs,setColumnDefs]= useState([])
+    const {loadedColumnDefs : miniverFeatures}=useCallback(defineColumns({
+        columnKeys: columnKeys,
+        columnHeaders: columnHeaders
+    }))
 
-    const [miniverFeatures,setMiniverFeatures]=useState([
-        {field: 'date'},
-        {field: 'incident'},
-        {field: 'location'},
-        {field: 'judicialReferal'},
-        {field: 'firstName'},
-        {field: 'lastName'},
-        {field: 'middleInitial'},
-        {field: 'ICID'},
-        {field: 'dob'},
-        {field: 'address'},
-        {field: 'phoneNo'},
-    ])
     const [fullverFeatures,setFullverFeatures]=useState([
         {field: 'reportID', 
     headerName: '' ,
@@ -298,16 +264,17 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
       variant:"outline-dark",
     }},
     ])
-
-    const [adminverFeatures, setadminverFeatures] = useState([
-    {field: 'id', 
-    headerName: '' ,
-    cellRenderer: EditButton, 
-    cellRendererParams: {
-      clicked: function(field) {
-        referalEdit(field)
-      }
-    }},
+    const [editFeature, seteditFeature] = useState(
+        {field: 'id', 
+        headerName: '' ,
+        cellRenderer: EditButton, 
+        cellRendererParams: {
+          clicked: function(field) {
+            referalEdit(field)
+          }
+        }},
+    )
+    const [deleteFeature, setdeleteFeature] = useState(
     {field: 'id',
     headerName: '' ,
     cellRenderer: DeleteButton, 
@@ -315,7 +282,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
       clicked: function(field) {
         referalDelete(field)
       }
-    }}]);
+    }});
 
 
     async function referalDelete(refID){
@@ -362,6 +329,7 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
         if(response.status == 200){
             toast.success(response.message)
             handleCloserefEdit()
+            getRefs(prevSearchData)
         }else{
             toast.warning(response.message)
         }
@@ -394,43 +362,51 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
         }
     }
     
+      function showMobileViewReferralsCards(){
+  
+        return(
+        rowData.map(element => {
+          return(
+          <MobileReferralsCard keyNum ={rowData.indexOf(element)}  data={element} viewReport={viewReport} referalEdit={referalEdit} referalDelete={referalDelete} permisions={thisFeaturePerms} />
+         ) }))
+      }
+    
 
     // DefaultColDef sets props common to all Columns
     const defaultColDef = useMemo( ()=> ({
         sortable: true
     }));
 
-    const [org,setOrg] = useState("")
-    const [pos,setPos]= useState("")
+
+    const location = useLocation()
+    const { thisFeaturePerms } = location.state
 
     async function getOrgNPos(){
-        const orgres = (await get(API_URL + "/getOrganization?token=" +  localStorage.getItem("token")))
-        const posres = (await get(API_URL + "/getPosition?token=" +  localStorage.getItem("token")))
-        let locOrg = orgres["organization"]
-        let locPos = posres["position"]
-        setOrg(locOrg)
-        setPos(locPos)
 
         //set mini version features
-        setColumnDefs( miniverFeatures);
+        let temp = miniverFeatures;
+
         //set full version features
         if(fullVersion){
-            let cols = miniverFeatures
             for(let i=0; i<fullverFeatures.length; i++){
-                cols.push(fullverFeatures[i])
+                temp.push(fullverFeatures[i]);
             }
-            setColumnDefs(cols);
 
+        }else{
+            getRefsOFrep(reportID);
         }
-        //set admin version features
-        if(locPos== "admin"){
-            let cols = miniverFeatures
-            for(let i=0; i<adminverFeatures.length; i++){
-                cols.push(adminverFeatures[i])
-            }
-            setColumnDefs(cols);
+        console.log(thisFeaturePerms.edit)
+        // edit permision
+        if(thisFeaturePerms.edit){
+            temp.push(editFeature);
+        }
 
+        // delete permision
+        if(thisFeaturePerms.delete){
+            temp.push(deleteFeature);
         }
+        setColumnDefs(temp);
+        gridRef.current.api.sizeColumnsToFit();
     }
 
 
@@ -466,16 +442,14 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
     useEffect(() => {
         autoLogin();
         getOrgNPos();
-        if(reportID!==""){
-            getRefsOFrep(reportID)
-        }
+
     }, [])
 
 
     return (
         <div className="location-page">
             {fullVersion?
-             <><Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser} /><ToastContainer /></>: null }
+             <><ToastContainer /></>: null }
             <h1>Referrals</h1>
             {fullVersion?
             <div className="container">
@@ -521,23 +495,16 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
                             <div className="col" id="searchFormElement">
                             <div className="col">
                                 <div className="row">
-                                <Button variant="outline-primary" type="button" onClick={() => getRefs(searchData)}>Search</Button>
+                                <Button appearance="primary" color="blue" type="button" onClick={() => getRefs(searchData)}>Search</Button>
                                 {/* <Button variant="outline-info" type="button" onClick={() => getAllReferals()}>Search All</Button> */}
                                 </div>
                                 </div>
                                 <div className="col">
-                                {(rowData.length > 0)? 
-                                    <Dropdown>
-                                        <Dropdown.Toggle variant="outline-black" id="dropdown-basic">
-                                            Export File
-                                        </Dropdown.Toggle>
-
-                                        <Dropdown.Menu className="text-center">
-                                            <Dropdown.Item onClick={()=>SaveAsCSV()}>CSV <img src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png" alt="CSV" className="csv-logo"/></Dropdown.Item>
-                                            <Dropdown.Item onClick={() => SaveAsPDF()}>PDF <img src="https://cdn-icons-png.flaticon.com/512/3143/3143460.png" className="pdf-logo" alt=""/></Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown> 
-                                : null}
+                                <Exporter {...{
+                                  gridRef: gridRef, 
+                                  columnHeaders: columnHeaders, 
+                                  rowData: rowData, 
+                                  keys: columnKeys}}/>
                                 </div>
                             </div>
                             
@@ -548,9 +515,9 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
           : null }
 
        
-        
-            <div className="ag-theme-alpine incident-grid">
-        
+        {/* desktop view */}
+        <div className="d-none d-xxl-block" >
+            <div className={AG_THEME_CLASS("incident-grid")}>
               <AgGridReact
                 ref={gridRef}
                 columnDefs={columnDefs}
@@ -558,9 +525,19 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
                 rowData={rowData}
                 >
               </AgGridReact>
-
-
 			</div>
+            </div>
+
+            {/* Mobile View */}
+            <div className="d-block d-xxl-none" >
+                  <div className="ag-theme-alpine incident-grid">
+                    
+                  <Accordion defaultActiveKey="0">
+                  {showMobileViewReferralsCards()}
+
+                </Accordion>
+                </div>
+            </div>
 
 
 
@@ -600,8 +577,8 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
                 <div className="register-form">
                   
                   <Form.Label className=" d-flex justify-content-start">Incident</Form.Label>
-                  <Form.Select aria-label="Default select example"  name="incident" onChange={(e) => reportInputChangeHandler(e)}>
-                  <SaspIncidents selected = {formData.incident}  />
+                  <Form.Select aria-label="Default select example"  name="incident" onChange={(e) => reportInputChangeHandler(e)}   >
+                  <SaspIncidents selected = {formData.incident} />
                   </Form.Select>
               
                   <Form.Label className=" d-flex justify-content-start">Date </Form.Label>
@@ -630,14 +607,17 @@ export default function Referals({setLoggedIn, loggedInUser, autoLogin, fullVers
                   <Form.Label className=" d-flex justify-content-start">Summary</Form.Label>
                   <Form.Control as="textarea" placeholder="" value={formData.summary} name="summary" onChange={(e) => reportInputChangeHandler(e)}/>
                   </div>
+                  
                 </Form>
               </Modal.Body>
-              {pos=="admin"?
               <Modal.Footer>
+              {thisFeaturePerms.edit?
+              <>
                 <Button variant="primary" onClick={()=>reportChangeSubmit()}>Submit</Button>
-                <Button variant="primary" onClick={()=>reportDelete()}>Delete</Button>
-              </Modal.Footer>
+                {thisFeaturePerms.delete?
+                <Button variant="primary" onClick={()=>reportDelete()}>Delete</Button>:null}</>
               :null}
+              </Modal.Footer>
             </Modal>
            
         </div>

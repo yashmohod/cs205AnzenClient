@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { API_URL, post } from "../../../Utils/API";
 
 
-export default function ChangePassword({setLoggedIn, loggedInUser, autoLogin}) {
+export default function ChangePassword({autoLogin}) {
 
     function inputChangeHandler() {
 
@@ -21,7 +21,6 @@ export default function ChangePassword({setLoggedIn, loggedInUser, autoLogin}) {
     return (
         <div>
                 <ToastContainer/>
-              <Nav setLoggedIn={setLoggedIn} loggedInUser={loggedInUser}/>
               <h1>Account Password Change</h1>
               <div className="container-fluid">
                 <div className="row">

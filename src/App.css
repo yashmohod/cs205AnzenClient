@@ -1,5 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+
 .App {
   text-align: center;
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
 }
 
 .App-logo {
@@ -16,4 +20,27 @@ a {
 a:hover {
   text-decoration: none;
   color: black;
+}
+
+.ag-theme-alpine {
+  --ag-font-family: 'Poppins', sans-serif;
+  --ag-font-size: 10px;
+}
+
+.ag-theme-alpine-dark {
+  --ag-font-family: 'Poppins', sans-serif;
+  --ag-font-size: 10px;
+}
+
+body::-webkit-scrollbar {
+  width: 2.5px;               /* width of the entire scrollbar */
+}
+
+body::-webkit-scrollbar-track {
+  background: none;        /* color of the tracking area */
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: gray;    /* color of the scroll thumb */
+  border-radius: 20px;       /* roundness of the scroll thumb */
 }

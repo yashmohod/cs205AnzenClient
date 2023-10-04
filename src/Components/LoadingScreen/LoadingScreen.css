@@ -1,9 +1,14 @@
 .loading-screen {
     width: 100vw;
     height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
     background: black;
     display: flex;
     justify-content: center;
     align-items: center;
     opacity: 0.75;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
