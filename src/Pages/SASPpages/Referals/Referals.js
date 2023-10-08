@@ -203,7 +203,7 @@ export default function Referals({autoLogin, fullVersion,reportID}) {
             )
         })
         setRowData(data);
-        gridRef.current.api.sizeColumnsToFit();
+        // gridRef.current.api.sizeColumnsToFit();
         
 
         return response
@@ -406,7 +406,7 @@ export default function Referals({autoLogin, fullVersion,reportID}) {
             temp.push(deleteFeature);
         }
         setColumnDefs(temp);
-        gridRef.current.api.sizeColumnsToFit();
+        // gridRef.current.api.sizeColumnsToFit();
     }
 
 

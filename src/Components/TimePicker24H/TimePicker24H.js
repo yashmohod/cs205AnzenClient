@@ -16,15 +16,15 @@ export default function TimePicker24H(props) {
         
         let Thours =[]
         let Tminutes =[]
-        for (let i = 0; i <=24;i++) {Thours.push(String(i).padStart(2,"0"))}
-        for (let i = 0; i <=60;i++) {Tminutes.push(String(i).padStart(2,"0"))}
+        for (let i = 0; i <=23;i++) {Thours.push(String(i).padStart(2,"0"))}
+        for (let i = 0; i <=59;i++) {Tminutes.push(String(i).padStart(2,"0"))}
         setHours(Thours)
         setMinutes(Tminutes)
     }
     function setTime(h,m){
         
         let value = h+":"+m;
-        console.log(value)
+        // console.log(value)
         let target={"value":value,"name":props.name}
         let e = {"target":target}
         props.inputChangeHandler(e)

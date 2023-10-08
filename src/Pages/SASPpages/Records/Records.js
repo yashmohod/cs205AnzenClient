@@ -134,7 +134,7 @@ export default function Records({autoLogin,fullVersion,reportID}) {
             )
              })
             setRowData(data);
-            gridRef.current.api.sizeColumnsToFit();
+            // gridRef.current.api.sizeColumnsToFit();
         }
     }
 
@@ -319,7 +319,7 @@ export default function Records({autoLogin,fullVersion,reportID}) {
 
 
         setColumnDefs(cols);
-        gridRef.current.api.sizeColumnsToFit();
+        // gridRef.current.api.sizeColumnsToFit();
 
     }
 
@@ -357,7 +357,7 @@ export default function Records({autoLogin,fullVersion,reportID}) {
                             <div className="col" id="searchFormElement">
                             <Form.Label className=" d-flex justify-content-start">Employee</Form.Label>
                             <Form.Select aria-label="Default select example" ref={EmployeeDropdown}  name="employeeId" onChange={(e) => searchInputHandeler(e)}>
-                            <EmployeeList  />
+                            <EmployeeList org={thisFeaturePerms.org} />
                             </Form.Select>
                             </div>
 

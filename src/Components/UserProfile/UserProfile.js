@@ -391,8 +391,9 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
                     <ListGroup.Item as="button" key="1" active={userDetails}>Account Details</ListGroup.Item>
                     {!personalProfileAccess?<>
                     <ListGroup.Item as="button" key="2" active={userPermissions} onClick={()=>getUserAccPermissions()}>Permisions</ListGroup.Item>
-                    <ListGroup.Item as="button" key="3" active={changePassword}>Change Password</ListGroup.Item>
-                    </>:null}
+                    {/* <ListGroup.Item as="button" key="3" active={changePassword}>Change Password</ListGroup.Item>
+                    */} 
+                    </>:null} 
                 </ListGroup>
             </div>
             {!personalProfileAccess?
@@ -405,7 +406,7 @@ export default function UserProfile({thisFeaturePerms,getAccounts,handleadClose,
                     <ListGroup.Item as="button" key="1" active={userDetails}>Account Details</ListGroup.Item>
                     {!personalProfileAccess?<>
                     <ListGroup.Item as="button" key="2" active={userPermissions} onClick={()=>getUserAccPermissions()}>Permisions</ListGroup.Item>
-                    <ListGroup.Item as="button" key="3" active={changePassword}>Change Password</ListGroup.Item>
+                    {/* <ListGroup.Item as="button" key="3" active={changePassword}>Change Password</ListGroup.Item> */}
                     </>:null}
                 </ListGroup>
             </div>:null}

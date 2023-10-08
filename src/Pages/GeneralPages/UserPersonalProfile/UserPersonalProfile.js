@@ -17,7 +17,7 @@ export default function UserPersonalProfile({autoLogin }) {
     const navigate = useNavigate();
     const [userDetails,setUserDetails] = useState(true);
     const [settings,setSettings] = useState(false);
-    const [changePassword,setChanePassword] = useState(false);
+    // const [changePassword,setChanePassword] = useState(false);
 
     const [validated, setValidated] = useState(false);
 
@@ -105,9 +105,9 @@ export default function UserPersonalProfile({autoLogin }) {
             case "Settings":
                 setSettings(true)
                 break
-            case "Change Password":
-                setChanePassword(true)
-                break
+            // case "Change Password":
+            //     setChanePassword(true)
+            //     break
             default:
                 break
         }
@@ -116,26 +116,26 @@ export default function UserPersonalProfile({autoLogin }) {
 
 
 
-    const [passwords, setPassword] = useState({
-      password:'',
-      password_confirm:''
-    })
-    async function passwordChangeSubmit(){
-      if(passwords.password === passwords.password_confirm){
-        let response = await post(API_URL + "/editAccountPassword",  {userID: userAcc,password:passwords.password,token: localStorage.getItem("token")});
-        if(response.status === 200){
-          toast.success(response.message);
-        }else{
-          toast.warning(response.message);
-        }
-      }else{
-        toast.warning("Passwords do not match!")
-      }
-    }
+    // const [passwords, setPassword] = useState({
+    //   password:'',
+    //   password_confirm:''
+    // })
+    // async function passwordChangeSubmit(){
+    //   if(passwords.password === passwords.password_confirm){
+    //     let response = await post(API_URL + "/editAccountPassword",  {userID: userAcc,password:passwords.password,token: localStorage.getItem("token")});
+    //     if(response.status === 200){
+    //       toast.success(response.message);
+    //     }else{
+    //       toast.warning(response.message);
+    //     }
+    //   }else{
+    //     toast.warning("Passwords do not match!")
+    //   }
+    // }
 
-    function inputPasswordChangeHandler(e){
-      setPassword({...passwords,  [e.target.name] : e.target.value})
-    }
+    // function inputPasswordChangeHandler(e){
+    //   setPassword({...passwords,  [e.target.name] : e.target.value})
+    // }
 
 
 
@@ -175,7 +175,7 @@ const personalProfileAccess = true;
             <Offcanvas.Body>
                 <ListGroup variant="flush" style={{textAlignLast: "right"}} onClick={(e)=>ListGroupHandler(e)}>
                     <ListGroup.Item as="button" key="1" active={userDetails}>Account Details</ListGroup.Item>
-                    <ListGroup.Item as="button" key="3" active={changePassword}>Change Password</ListGroup.Item>
+                    {/* <ListGroup.Item as="button" key="3" active={changePassword}>Change Password</ListGroup.Item> */}
                     <ListGroup.Item as="button" key="3" active={settings}>Settings</ListGroup.Item>
                 </ListGroup>
             </Offcanvas.Body>
@@ -185,7 +185,7 @@ const personalProfileAccess = true;
             <div className="col-4 d-none d-md-block ">
                 <ListGroup variant="flush" style={{textAlignLast: "right"}} onClick={(e)=>ListGroupHandler(e)}>
                     <ListGroup.Item as="button" key="1" active={userDetails}>Account Details</ListGroup.Item>
-                    <ListGroup.Item as="button" key="3" active={changePassword}>Change Password</ListGroup.Item>
+                    {/* <ListGroup.Item as="button" key="3" active={changePassword}>Change Password</ListGroup.Item> */}
                     <ListGroup.Item as="button" key="3" active={settings}>Settings</ListGroup.Item>
                 </ListGroup>
             </div>
@@ -287,7 +287,7 @@ const personalProfileAccess = true;
                 
 
                 
-                {changePassword?<>
+                {/* {changePassword?<>
                 <Form className="register-form-container p-5">
                     <div className="register-form">
                         <Form.Group className="mb-3" controlId="formBasicFirstName">
@@ -299,7 +299,7 @@ const personalProfileAccess = true;
                         <Button variant="primary" onClick={()=>passwordChangeSubmit()}>Submit</Button>
                     </div>
                 </Form>
-                </>:null}
+                </>:null} */}
             </div>
         </div>
 
