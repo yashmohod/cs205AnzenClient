@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import './Shifts.css'
-import {AgGridReact} from 'ag-grid-react';
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-alpine.css';
 import DeleteButton from '../../../Components/Buttons/DeleteButton'
@@ -11,12 +11,12 @@ import useFetch from "../../../hooks/useFetch";
 import { AG_THEME_CLASS } from "../../../Utils/AG-Grid.js";
 import { useLocation } from 'react-router-dom'
 
-export default function Shifts({autoLogin}) {
-    const {REQUEST: fetcher} = useFetch()
+export default function Shifts({ autoLogin }) {
+    const { REQUEST: fetcher } = useFetch()
     const [shift, setShift] = useState("")
 
     async function addShiftHandler(e) {
-        let response = await fetcher("POST", "/enterShift",  {shift: shift,org:thisFeaturePerms.org,token: localStorage.getItem("token")});
+        let response = await fetcher("POST", "/enterShift", { shift: shift, org: thisFeaturePerms.org, token: localStorage.getItem("token") });
         if (shift !== "") {
             if (response.status == 200) {
                 document.getElementById("locationInput").value = "";
@@ -27,36 +27,36 @@ export default function Shifts({autoLogin}) {
                 toast.warning(response.message);
             }
         } else {
-            toast.warning("Empty incident was entered!")
+            toast.warning("Empty shift was entered!")
         }
     }
 
-    async function deleteLocationHandler(locationId){
-        let response = await fetcher("POST", "/deleteShift",  {id :locationId ,token: localStorage.getItem("token")});
+    async function deleteLocationHandler(locationId) {
+        let response = await fetcher("POST", "/deleteShift", { id: locationId, token: localStorage.getItem("token") });
         if (response.status === 200) {
             toast.success(String(response["message"]));
 
         } else {
-            toast.warning(response["message"] )
+            toast.warning(response["message"])
         }
         getShifts();
     }
-    async function editShiftHandler(shiftId){
+    async function editShiftHandler(shiftId) {
         var tempShifts = await getShifts()
         let shifName = "";
-        for(let x =0; x <tempShifts.length; x++){
-            if(tempShifts[x].id == shiftId){
+        for (let x = 0; x < tempShifts.length; x++) {
+            if (tempShifts[x].id == shiftId) {
                 shifName = tempShifts[x].shiftName;
             }
         }
         var shiftname = String(window.prompt("Enter the updated name", shifName));
-        if( shiftname != "" && shiftname != null &&  shiftname != "null")  {
-            let response = await fetcher("POST", "/editShift",  {id :shiftId ,editedShift:shiftname,token: localStorage.getItem("token")});
+        if (shiftname != "" && shiftname != null && shiftname != "null") {
+            let response = await fetcher("POST", "/editShift", { id: shiftId, editedShift: shiftname, token: localStorage.getItem("token") });
             if (response.status === 200) {
                 toast.success(String(response["message"]));
 
             } else {
-                toast.warning(response["message"] )
+                toast.warning(response["message"])
             }
             getShifts();
         }
@@ -67,46 +67,48 @@ export default function Shifts({autoLogin}) {
     const gridRef = useRef(null);
     const [rowData, setRowData] = useState();
 
-    
+
 
     const [columnDefs, setColumnDefs] = useState([]);
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
 
     const onGridReady = (params) => {
-      setGridApi(params.api);
-      setGridColumnApi(params.columnApi);
+        setGridApi(params.api);
+        setGridColumnApi(params.columnApi);
     };
     const locationPrem = useLocation()
-    const {thisFeaturePerms} = locationPrem.state
+    const { thisFeaturePerms } = locationPrem.state
 
     const getShifts = useCallback(async () => {
-        let response = await fetcher("GET", "/getOrgShifts?token=" +  localStorage.getItem("token")+"&org="+thisFeaturePerms.org);
+        let response = await fetcher("GET", "/getOrgShifts?token=" + localStorage.getItem("token") + "&org=" + thisFeaturePerms.org);
         console.log(response.shifts)
         // const responseJson = JSON.parse(response.shifts)
-        var editPerm  = {
-            field: 'id', 
-            headerName: '' ,
-            cellRenderer: EditButton, 
+        var editPerm = {
+            field: 'id',
+            headerName: '',
+            cellRenderer: EditButton,
             cellRendererParams: {
-                clicked: function(field) {
+                clicked: function (field) {
                     editShiftHandler(field);
                 }
-        }}
-        
+            }
+        }
+
         var deletePerm = {
             field: 'id',
-            headerName: '' ,
-            cellRenderer: DeleteButton, 
+            headerName: '',
+            cellRenderer: DeleteButton,
             cellRendererParams: {
-            clicked: function(field) {
-                deleteLocationHandler(field)
+                clicked: function (field) {
+                    deleteLocationHandler(field)
                 }
-        }}
+            }
+        }
 
         var temp = [{
-            field: 'shiftName', 
-            headerName: 'Shifts' 
+            field: 'shiftName',
+            headerName: 'Shifts'
         }]
 
         if (thisFeaturePerms.edit) temp.push(editPerm);
@@ -126,29 +128,29 @@ export default function Shifts({autoLogin}) {
 
     return (
         <div className="location-page">
-             <ToastContainer />
+            <ToastContainer />
             <h1>{thisFeaturePerms.org} Shifts</h1>
 
-            {thisFeaturePerms.create?
-            <div className="container-fluid m-5">
-                <div className="row">
-                    <div className="col-12">
-                        <Form className="location-form">
-                            <Form.Control type="text" placeholder="Enter new shift" onChange={(e) =>  setShift(e.target.value)}  id="locationInput"/>
-                            <Button onClick={() => addShiftHandler()}>Add</Button>
-                        </Form>
+            {thisFeaturePerms.create ?
+                <div className="container-fluid m-5">
+                    <div className="row">
+                        <div className="col-12">
+                            <Form className="location-form">
+                                <Form.Control type="text" placeholder="Enter new shift" onChange={(e) => setShift(e.target.value)} id="locationInput" />
+                                <Button onClick={() => addShiftHandler()}>Add</Button>
+                            </Form>
+                        </div>
                     </div>
-                </div>
-            </div>:null}
+                </div> : null}
 
             <div className={AG_THEME_CLASS("location-grid")}>
-				<AgGridReact
+                <AgGridReact
                     ref={gridRef}
-					columnDefs={columnDefs}
-					rowData={rowData}
+                    columnDefs={columnDefs}
+                    rowData={rowData}
                     onGridReady={onGridReady}>
-				</AgGridReact>
-			</div>
+                </AgGridReact>
+            </div>
         </div>
     )
 }

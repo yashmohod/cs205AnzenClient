@@ -1,0 +1,25 @@
+.location-grid {
+    height: 66vh;
+    width: 100vw;
+}
+
+.table {
+
+    
+}
+
+#disciplinaryActionInput {
+    width: 300px;
+
+}
+
+.ag-header-cell-label {
+    justify-content: center;
+}
+
+
+.location-form {
+    display: flex;
+    /* justify-content: center; */
+    margin-left: -35px;
+}

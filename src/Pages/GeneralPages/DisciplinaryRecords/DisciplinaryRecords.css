@@ -1,0 +1,14 @@
+.incident-grid {}
+
+#dr_button {
+    width: 200px;
+    margin-bottom: 10px;
+}
+
+#searchFormElement {
+    margin: 10px;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
