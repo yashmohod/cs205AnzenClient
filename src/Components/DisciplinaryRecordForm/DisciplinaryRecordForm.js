@@ -6,7 +6,7 @@ import DisciplinaryActionsList from "../DisciplinaryActionsList/DisciplinaryActi
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { ToastContainer, toast } from 'react-toastify';
 
-export default function DisciplinaryRecordForm(props) {
+export default function DisciplinaryRecordForm({ org, show, handleClose, editable, prvformData, reSearchReports, viewable, fullVersion, getUserSpecificRecord }) {
 
 
 
@@ -14,9 +14,9 @@ export default function DisciplinaryRecordForm(props) {
         date: "",
         employeeId: "",
         disciplinaryActionsName: "",
-        suspendableDurationDays: "0",
+        suspendableDurationDays: "",
         note: "",
-        org: props.org,
+        org: org,
     });
 
     function reportInputChangeHandler(e) {
@@ -24,71 +24,142 @@ export default function DisciplinaryRecordForm(props) {
     }
 
     async function reportChangeSubmit() {
-        let response = await post(API_URL + "/enterDisciplinaryRecord", {
-            token: localStorage.getItem("token"), DisciplinaryRecord: formData
+        let response = {
+            status: 0,
+            message: "Unable to connect to server!"
+        };
+        console.log(formData);
+        console.log(viewable || editable)
+        if (editable) {
+            response = await post(API_URL + "/editDisciplinaryRecord", {
+                token: localStorage.getItem("token"), EditedRecord: formData
+            })
 
-        })
+        } else {
+            console.log("here")
+            response = await post(API_URL + "/enterDisciplinaryRecord", {
+                token: localStorage.getItem("token"), DisciplinaryRecord: formData
 
+            })
+        }
         if (response.status == 200) {
+            if (fullVersion) {
+                reSearchReports();
+            } else {
+                getUserSpecificRecord();
+            }
             toast.success(response.message);
-            props.handleClose();
+            handleClose();
             setFormData({
                 date: "",
                 employeeId: "",
                 disciplinaryActionsName: "",
                 suspendableDurationDays: "",
+                org: org,
                 note: "",
             });
         } else {
             toast.warning(response.message)
         }
+
     }
 
 
+    function handleCloseAndclear() {
+        setFormData({
+            date: "",
+            employeeId: "",
+            disciplinaryActionsName: "",
+            suspendableDurationDays: "",
+            org: org,
+            note: "",
+        });
+        handleClose();
+    }
+
 
     useEffect(() => {
-        setFormData(props.formData);
+        if (viewable || editable || !fullVersion) {
 
-    }, [])
+            if (editable) {
+                let date = prvformData.date
+                if (date) {
+                    date = date.toString().split("/")
+                    prvformData.date = date[2] + "-" + date[0] + "-" + date[1]
+                }
+            }
+
+            setFormData(prvformData);
+        }
+    }, [prvformData])
 
     return (
         <>
+            {/* <ToastContainer /> */}
             <Modal
-                show={props.show}
-                onHide={props.handleClose}
+                show={show}
+                onHide={handleCloseAndclear}
                 backdrop="static"
                 keyboard={false}
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Report Edit</Modal.Title>
+                    {editable ? <Modal.Title>Report Edit</Modal.Title> : null}
+                    {viewable ? <Modal.Title>Report View</Modal.Title> : null}
+                    {(!viewable && !editable) ? <Modal.Title>Add Report</Modal.Title> : null}
+
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <div className="register-form">
 
                             <Form.Label className=" d-flex justify-content-start">Disciplinary Action</Form.Label>
-                            <Form.Select aria-label="Default select example" name="disciplinaryActionsName" onChange={(e) => reportInputChangeHandler(e)}>
-                                <DisciplinaryActionsList selected={formData.incident} org={props.org} />
-                            </Form.Select>
+
+                            {viewable ?
+                                <Form.Control type="input" placeholder="" value={formData.disciplinaryActionsName} readOnly />
+                                :
+                                <Form.Select aria-label="Default select example" name="disciplinaryActionsName" onChange={(e) => reportInputChangeHandler(e)}>
+                                    <DisciplinaryActionsList selected={formData.disciplinaryActionsName} org={org} />
+                                </Form.Select>
+                            }
 
                             <Form.Label className=" d-flex justify-content-start">Date </Form.Label>
-                            <Form.Control type="date" value={formData.date} name="date" onChange={(e) => reportInputChangeHandler(e)} />
-
-                            <Form.Label className=" d-flex justify-content-start">Employee</Form.Label>
-                            <Form.Select aria-label="Default select example" name="employeeId" onChange={(e) => reportInputChangeHandler(e)}>
-                                <EmployeeList org={props.org} selected={formData.employeeId} />
-                            </Form.Select>
+                            {viewable ?
+                                <Form.Control type="input" placeholder="" value={formData.date} readOnly />
+                                :
+                                <Form.Control type="date" value={formData.date} name="date" onChange={(e) => reportInputChangeHandler(e)} />
+                            }
+                            {fullVersion ? <>
+                                <Form.Label className=" d-flex justify-content-start">Employee</Form.Label>
+                                {editable || viewable ?
+                                    <Form.Control type="input" placeholder="" value={formData.reportedOfName} readOnly />
+                                    :
+                                    <Form.Select aria-label="Default select example" name="employeeId" onChange={(e) => reportInputChangeHandler(e)}>
+                                        <EmployeeList org={org} selected={formData.reportedOfID} />
+                                    </Form.Select>
+                                }</>
+                                : null}
 
                             <Form.Label className=" d-flex justify-content-start">Number of days for Suspension</Form.Label>
-                            <Form.Control type="number" placeholder="" value={formData.suspendableDurationDays} name="suspendableDurationDays" onChange={(e) => reportInputChangeHandler(e)} />
+                            {viewable ?
+                                <Form.Control type="input" placeholder="" value={formData.suspendableDurationDays} readOnly />
+                                :
+                                <Form.Control type="number" placeholder="" value={formData.suspendableDurationDays} name="suspendableDurationDays" onChange={(e) => reportInputChangeHandler(e)} />
+                            }
+
 
                             <Form.Label className=" d-flex justify-content-start">Summary</Form.Label>
-                            <Form.Control as="textarea" placeholder="" value={formData.note} name="note" onChange={(e) => reportInputChangeHandler(e)} />
+                            {viewable ?
+                                <Form.Control as="textarea" placeholder="" value={formData.note} name="note" readOnly />
+                                :
+                                <Form.Control as="textarea" placeholder="" value={formData.note} name="note" onChange={(e) => reportInputChangeHandler(e)} />
+                            }
                         </div>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary" onClick={() => reportChangeSubmit()}>Submit</Button>
+                    {!viewable ?
+                        <Button variant="primary" onClick={() => reportChangeSubmit()}>Submit</Button>
+                        : null}
                 </Modal.Footer>
             </Modal>
         </>

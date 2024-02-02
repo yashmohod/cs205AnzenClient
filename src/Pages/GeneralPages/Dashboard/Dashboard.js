@@ -218,7 +218,7 @@ export default function({autoLogin}) {
 
     useEffect(() => {
         autoLogin()
-        // checkMessage()
+        checkMessage()
         getShifts()
         setFeatures()
     },[])

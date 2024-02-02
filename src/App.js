@@ -71,7 +71,7 @@ function App() {
         <Route path="/positions" element={<Positions autoLogin={() => autoLogin()} />} />
         <Route path="/shifts" element={<Shifts autoLogin={() => autoLogin()} />} />
         <Route path="/disciplinaryActions" element={<DisciplinaryActions autoLogin={() => autoLogin()} />} />
-        <Route path="/disciplinaryRecords" element={<DisciplinaryRecords autoLogin={() => autoLogin()} />} />
+        <Route path="/disciplinaryRecords" element={<DisciplinaryRecords autoLogin={() => autoLogin()} fullVersion={true} userAcc={null} specificOrg={null}/>} />
         <Route path="/links" element={<Links autoLogin={() => autoLogin()} />} />
 
         {/* sasp routes */}

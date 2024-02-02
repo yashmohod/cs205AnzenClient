@@ -33,10 +33,12 @@ import {
 } from '@chakra-ui/react'
 import Exporter from "../../../Components/Exporter/Exporter";
 import { AG_THEME_CLASS, defineColumns } from "../../../Utils/AG-Grid";
-
+import AGgridTextBox from "../../../Components/AGgridTextBox/AGgridTextBox.js";
 export default function Records({ autoLogin, fullVersion, reportID }) {
-    const columnHeaders = ["Date\t", "Incident\t", "Location\t", "Loc. Details\t", "Received Time\t", "Enroute Time\t", "Arrived Time\t", "Clear Time\t", "Reported By\t", "Summary\t"]
-    const columnKeys = ["date", "incident", "location", "locationDetail", "receivedTime", "enrouteTime", "arivedTime", "clearTime", "reportedByName", "summary"]
+    const columnHeaders = ["Date\t", "Incident\t", "Location\t", "Reported By\t"]
+    const columnKeys = ["date", "incident", "location", "reportedByName"]
+    const columnHeadersForExport = ["Date\t", "Incident\t", "Location\t", "Loc. Details\t", "Received Time\t", "Enroute Time\t", "Arrived Time\t", "Clear Time\t", "Reported By\t", "Summary\t"]
+    const columnKeysForExport = ["date", "incident", "location", "locationDetail", "receivedTime", "enrouteTime", "arivedTime", "clearTime", "reportedByName", "summary"]
     // edit records 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -200,6 +202,20 @@ export default function Records({ autoLogin, fullVersion, reportID }) {
             }
         },
     );
+    const [view_column, setView_columns] = useState(
+        {
+            field: 'id',
+            headerName: '',
+            cellRenderer: CommonButton,
+            cellRendererParams: {
+                clicked: function (field) {
+                    reportView(field)
+                },
+                buttonText: "View Report",
+                variant: "outline-primary",
+            }
+        },
+    );
     const [Delete_column, setDelete_columns] = useState(
         {
             field: 'id',
@@ -225,7 +241,7 @@ export default function Records({ autoLogin, fullVersion, reportID }) {
             toast.warning(response.message)
         }
     }
-
+    const [editable, setEditable] = useState(false);
     async function reportEdit(reportId) {
         let response = await get(API_URL + "/getSaspReport?token=" + localStorage.getItem("token") + "&reportID=" + reportId)
         let oldData = response.SaspIncidentReport;
@@ -242,8 +258,29 @@ export default function Records({ autoLogin, fullVersion, reportID }) {
             locationDetail: oldData.locationDetail,
             summary: oldData.summary,
         }
-        setFormData(data)
-        handleShow()
+        setFormData(data);
+        setEditable(true);
+        handleShow();
+    }
+    async function reportView(reportId) {
+        let response = await get(API_URL + "/getSaspReport?token=" + localStorage.getItem("token") + "&reportID=" + reportId)
+        let oldData = response.SaspIncidentReport;
+        // console.log(oldData)
+        let data = {
+            reportID: reportId,
+            incident: oldData.incident,
+            date: oldData.date,
+            receivedTime: oldData.receivedTime,
+            enrouteTime: oldData.enrouteTime,
+            arivedTime: oldData.arivedTime,
+            clearTime: oldData.clearTime,
+            location: oldData.location,
+            locationDetail: oldData.locationDetail,
+            summary: oldData.summary,
+        }
+        setFormData(data);
+        setEditable(false);
+        handleShow();
     }
     const [reportIdForRef, setreportIdForRef] = useState("")
     function viewReferals(reportID) {
@@ -258,10 +295,36 @@ export default function Records({ autoLogin, fullVersion, reportID }) {
     const location = useLocation()
     const { thisFeaturePerms } = location.state
 
+
+    const [summaryText, setSummaryText] = useState("");
+    const [showSummaryText, setShowSummaryText] = useState(false);
+    const handleCloseSummary = () => setShowSummaryText(false);
+    const handleShowSummary = () => setShowSummaryText(true);
+
+
+    function showSummarry(summary) {
+        setSummaryText(summary);
+        handleShowSummary();
+    }
+
+
     async function setThisFeature() {
 
         //set mini version feature
         let cols = miniverFeatures
+        // add Summary col with resizable textarea
+        const summaryTextBox = ({
+            field: 'summary',
+            headerName: 'Summary',
+            onCellClicked: (pram) => showSummarry(pram.value),
+
+        }
+
+        )
+        cols.push(summaryTextBox);
+
+        cols.push(view_column);
+
         //set full version features
         if (fullVersion) {
             for (let i = 0; i < fullverFeatures.length; i++) {
@@ -280,7 +343,7 @@ export default function Records({ autoLogin, fullVersion, reportID }) {
 
 
         setColumnDefs(cols);
-        // gridRef.current.api.sizeColumnsToFit();
+        //gridRef.current.api.sizeColumnsToFit();
 
     }
 
@@ -373,7 +436,7 @@ export default function Records({ autoLogin, fullVersion, reportID }) {
                                         </Dropdown.Menu>
                                     </Dropdown>  */}
 
-                                    <Exporter {...{ gridRef: gridRef, columnHeaders: columnHeaders, rowData: rowData, keys: columnKeys }} />
+                                    <Exporter {...{ gridRef: gridRef, columnHeaders: columnHeadersForExport, rowData: rowData, keys: columnKeysForExport }} />
 
                                 </div>
 
@@ -424,40 +487,90 @@ export default function Records({ autoLogin, fullVersion, reportID }) {
                         <div className="register-form">
 
                             <Form.Label className=" d-flex justify-content-start">Incident</Form.Label>
-                            <Form.Select aria-label="Default select example" name="incident" onChange={(e) => reportInputChangeHandler(e)}>
-                                <SaspIncidents selected={formData.incident} />
-                            </Form.Select>
+                            {editable ?
+                                <Form.Select aria-label="Default select example" name="incident" onChange={(e) => reportInputChangeHandler(e)}>
+                                    <SaspIncidents selected={formData.incident} />
+                                </Form.Select> :
+                                <Form.Control type="text" placeholder="" value={formData.incident} readOnly />
+                            }
+
 
                             <Form.Label className=" d-flex justify-content-start">Date </Form.Label>
-                            <Form.Control type="date" value={formData.date} name="date" onChange={(e) => reportInputChangeHandler(e)} />
+
+                            {editable ?
+                                <Form.Control type="date" value={formData.date} name="date" onChange={(e) => reportInputChangeHandler(e)} />
+                                :
+                                <Form.Control type="text" placeholder="" value={formData.date} readOnly />
+                            }
 
                             <Form.Label className=" d-flex justify-content-start">Recived Time </Form.Label>
-                            <TimePicker24H time={formData.receivedTime} inputChangeHandler={reportInputChangeHandler} name={"receivedTime"} />
+
+                            {editable ?
+                                <TimePicker24H time={formData.receivedTime} inputChangeHandler={reportInputChangeHandler} name={"receivedTime"} />
+                                :
+                                <Form.Control type="text" placeholder="" value={formData.receivedTime} readOnly />
+                            }
 
                             <Form.Label className=" d-flex justify-content-start">Enroute Time </Form.Label>
-                            <TimePicker24H time={formData.enrouteTime} inputChangeHandler={reportInputChangeHandler} name={"enrouteTime"} />
+
+                            {editable ?
+                                <TimePicker24H time={formData.enrouteTime} inputChangeHandler={reportInputChangeHandler} name={"enrouteTime"} />
+                                :
+                                <Form.Control type="text" placeholder="" value={formData.enrouteTime} readOnly />
+                            }
 
                             <Form.Label className=" d-flex justify-content-start">Arrived Time </Form.Label>
-                            <TimePicker24H time={formData.arivedTime} inputChangeHandler={reportInputChangeHandler} name={"arivedTime"} />
+
+                            {editable ?
+                                <TimePicker24H time={formData.arivedTime} inputChangeHandler={reportInputChangeHandler} name={"arivedTime"} />
+                                :
+                                <Form.Control type="text" placeholder="" value={formData.arivedTime} readOnly />
+                            }
 
                             <Form.Label className=" d-flex justify-content-start">Clear Time </Form.Label>
-                            <TimePicker24H time={formData.clearTime} inputChangeHandler={reportInputChangeHandler} name={"clearTime"} />
+
+                            {editable ?
+                                <TimePicker24H time={formData.clearTime} inputChangeHandler={reportInputChangeHandler} name={"clearTime"} />
+                                :
+                                <Form.Control type="text" placeholder="" value={formData.clearTime} readOnly />
+                            }
 
                             <Form.Label className=" d-flex justify-content-start">Location</Form.Label>
-                            <Form.Select aria-label="Default select example" name="location" onChange={(e) => reportInputChangeHandler(e)}>
-                                <SaspLocations selected={formData.location} />
-                            </Form.Select>
+
+                            {editable ?
+                                <Form.Select aria-label="Default select example" name="location" onChange={(e) => reportInputChangeHandler(e)}>
+                                    <SaspLocations selected={formData.location} />
+                                </Form.Select>
+                                :
+                                <Form.Control type="text" placeholder="" value={formData.location} readOnly />
+                            }
 
                             <Form.Label className=" d-flex justify-content-start">Location Detail</Form.Label>
-                            <Form.Control type="text" placeholder="" value={formData.locationDetail} name="locationDetail" onChange={(e) => reportInputChangeHandler(e)} />
+
+                            {editable ?
+                                <Form.Control type="text" placeholder="" value={formData.locationDetail} name="locationDetail" onChange={(e) => reportInputChangeHandler(e)} />
+                                :
+                                <Form.Control type="text" placeholder="" value={formData.locationDetail} readOnly />
+                            }
+
 
                             <Form.Label className=" d-flex justify-content-start">Summary</Form.Label>
-                            <Form.Control as="textarea" placeholder="" value={formData.summary} name="summary" onChange={(e) => reportInputChangeHandler(e)} />
+
+                            {editable ?
+                                <Form.Control as="textarea" placeholder="" value={formData.summary} name="summary" onChange={(e) => reportInputChangeHandler(e)} />
+                                :
+                                <Form.Control as="textarea" placeholder="" value={formData.summary} readOnly />
+                            }
                         </div>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary" onClick={() => reportChangeSubmit()}>Submit</Button>
+
+                    {editable ?
+                        <Button variant="primary" onClick={() => reportChangeSubmit()}>Submit</Button>
+                        :
+                        null
+                    }
                 </Modal.Footer>
             </Modal>
 
@@ -476,6 +589,26 @@ export default function Records({ autoLogin, fullVersion, reportID }) {
 
                     <Referals autoLogin={() => autoLogin()} fullVersion={false} reportID={reportIdForRef} />
 
+
+                </Modal.Body>
+            </Modal>
+
+
+            <Modal
+                show={showSummaryText}
+                onHide={handleCloseSummary}
+
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Summary</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <div className="register-form">
+                            <Form.Label className=" d-flex justify-content-start">Summary</Form.Label>
+                            <Form.Control as="textarea" placeholder="" value={summaryText} readOnly />
+                        </div>
+                    </Form>
 
                 </Modal.Body>
             </Modal>

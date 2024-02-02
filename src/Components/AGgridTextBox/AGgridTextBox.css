@@ -1,0 +1,20 @@
+.textbox{
+    
+    display: flex;
+    height: 100%;
+    width: auto;
+    align-self: center;
+    justify-self: center;
+    
+
+}
+
+
+.resize  {
+    text-wrap: wrap;
+  height: 5em;
+  background-color: white;
+  padding: .5em;
+  overflow: scroll;
+  resize:vertical;
+}
